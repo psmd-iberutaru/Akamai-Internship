@@ -1,0 +1,73 @@
+\documentclass[twocolumn]{article}
+
+\RequirePackage{Polarization_Modeling__research_documentation}
+
+\begin{document}
+%% Define the title properties and author information.
+%%%%%%%%%%%%%%%%%%%%
+\title{Dust Scattering Polarization Modeling \\
+\textit{\Large Dissipatone Lucem Pulvis Magneticus Unus}}
+
+\author[1]{Kenji Emerson}
+\author[2]{Ramprasad Rao (Mentor)}
+
+\affil[1]{\footnotesize University of Hawaii at Hilo}
+\affil[2]{\footnotesize SMA - Smithsoanian Institute}
+
+%% Begin to create the abstract of the article.
+%%%%%%%%%%%%%%%%%%%%
+\twocolumn[
+\begin{@twocolumnfalse}
+	\maketitle
+	% Ensure that an abstract for the paper is made! This is importiant.
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+	\begin{abstract}
+
+	Abstract!
+	
+	\end{abstract}
+\end{minipage}
+\end{center}
+\vspace{1cm}
+\end{@twocolumnfalse}
+]
+%\clearpage % Optional to make a new page.
+
+%% Formally begin to make the article.
+%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:Introduction}
+
+
+\section{Dated Log}
+\label{sec:Dated_Log}
+
+\subsection{2018 June 6}
+\label{subsec:2018_June_6}
+
+\begin{meetingnotes*}
+	First off, the main introduction to the scope of the project was introduced.
+
+	Light scattered off of dust is polarized preferentially towards the plane shared by its longest side. In this case, dust is modeled as an oblate shaped particle of varying size.
+
+	Thus, the alignment of the polarization of light coming from a dust based object can reveal information about its rotation. There are two different influences towards the orientation of the dust. 
+
+	Magnetic fields in the dust align the particles of the dust such that the plane shared by its longest side is perpendicular to the B-field. Consider the longest axis of a grain a dust to be the y-axis; the B-field would be in the positive or negative z-axis direction (the specifics towards the exact orientation of the B-field is beyond the scope).
+
+	Next, there are two similar tasks to be completed.
+	\begin{enumerate}
+		\item Create a function that generates a noisy (non-smooth) gaussian function given some input parameters. The gaussian function should be fully modifiable. 
+		\item Create the reverse function: a function that, when given data points from a gaussian, can fit a gaussian function to it.
+	\end{enumerate}
+\end{meetingnotes*}
+
+Both of these functions have been completed as of this date, written in Python. 
+
+In order to share the functions and code work done with the Mentor, a Github repository has been created. It can be found at \url{https://github.com/psmd-iberutaru/Akamai_Internship}.
+
+
+
+
+
+\end{document}

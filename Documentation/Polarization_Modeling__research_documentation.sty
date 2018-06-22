@@ -1,0 +1,254 @@
+\ProvidesPackage{kyubey_research_documentation}[Documentation Style File]
+
+% Define page layout.
+\usepackage[letterpaper,margin=1in,left=0.5in,right=0.5in]{geometry}
+\usepackage{multicol}
+
+% Import and export file encodings for special characters.
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+% Text and symbol formatting packages.
+\usepackage{bm}
+\usepackage{soul}
+\usepackage{listings}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+% Math and symbol based packages.
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage[nointegrals]{wasysym}
+\usepackage{cancel}
+\usepackage{esint}
+\usepackage{harpoon}
+
+% Units package.
+\usepackage{siunitx}
+
+% Table packages
+\usepackage{tabulary}
+
+% List packages
+\usepackage{enumitem}
+
+% Graphics packages
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage[framemethod=tikz]{mdframed}
+
+% Authoring styles.
+\usepackage{authblk}
+
+% Sectioning styles.
+\usepackage{titlesec}
+
+% Referencing and linking.
+\usepackage[plain]{fancyref}
+\usepackage{hyperref}
+
+
+% Change the format style for section headers.
+\titleformat{\section}
+{\centering\normalfont\scshape}{\thesection}{1em}{}
+\titleformat{\subsection}
+{\centering\normalfont\scshape}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+{\centering\normalfont\scshape}{\thesubsubsection}{1em}{}
+
+
+% Allow the fancyref package to reference other elements, such as subsections. Moreover, change the formatting of fancyref because the default is ugly. 
+\Frefformat{plain}{\fancyrefseclabelprefix}{Section~#1~[Page~#2]}
+
+\newcommand*{\fancyrefsubseclabelprefix}{subsec}
+\Frefformat{plain}{\fancyrefsubseclabelprefix}{Subsection~#1~[Page~#2]}
+
+\newcommand*{\fancyrefsubsubseclabelprefix}{subsubsec}
+\Frefformat{plain}{\fancyrefsubsubseclabelprefix}{Subsection~#1~[Page~#2]}
+
+\Frefformat{plain}{\fancyreffiglabelprefix}{Figure~#1~[Page~#2]}
+
+\Frefformat{plain}{\fancyreftablabelprefix}{Table~#1~[Page~#2]}
+
+\Frefformat{plain}{\fancyrefeqlabelprefix}{Equation~#1~[Page~#2]}
+
+\newcommand*{\fancyrefexlabelprefix}{ex}
+\Frefformat{plain}{\fancyrefexlabelprefix}{Example~#1~[Page~#2]}
+
+
+% Define a new units command such that there exists a space where the unit is. Without the space, the unit seems a bit too close to the value that it is measuring.
+\DeclareRobustCommand{\siunits}[1]{\,\si{#1}}
+
+% Declare a new command for spectroscopic ionization notation.
+\newcommand*{\ion}[2][\null]{#1{\footnotesize #2}}
+
+% Allow the lstlistings environment to line break.
+\lstset{breaklines=true}
+
+% Within equations, for "aligned" or "gathered" environments from amsmath, allow the equations to break the page if needed. 
+\allowdisplaybreaks
+
+
+% Create a marco for the imaginary constant, where as i^2 = -1
+\newcommand{\imaginary}{\mathrm{i}\mkern1mu}
+
+
+% Define the inverse reciprocal trigonometric functions, the reciprocal trigonometric hyperbolic functions, and inverse (both reciprocal or not) hyperbolic trigonometric functions via the amsmath package.
+\DeclareMathOperator{\sech}{sech}
+\DeclareMathOperator{\csch}{csch}
+\DeclareMathOperator{\arcsec}{arcsec}
+\DeclareMathOperator{\arccot}{arccot}
+\DeclareMathOperator{\arccsc}{arccsc}
+\DeclareMathOperator{\arccosh}{arccosh}
+\DeclareMathOperator{\arcsinh}{arcsinh}
+\DeclareMathOperator{\arctanh}{arctanh}
+\DeclareMathOperator{\arcsech}{arcsech}
+\DeclareMathOperator{\arccsch}{arccsch}
+\DeclareMathOperator{\arccoth}{arccoth}
+
+
+% Parentheses around mathematical functions such as sin and cos, the parentheses must be scalable. Replace the old definitions with the updated definitions.
+\let\oldsin\sin 
+\renewcommand{\sin}[2][\null]{\oldsin^{#1}\!\left( #2 \right)}
+\let\oldcos\cos 
+\renewcommand{\cos}[2][\null]{\oldcos^{#1}\!\left( #2 \right)}
+\let\oldtan\tan 
+\renewcommand{\tan}[2][\null]{\oldtan^{#1}\!\left( #2 \right)}
+\let\oldcsc\csc 
+\renewcommand{\csc}[2][\null]{\oldcsc^{#1}\!\left( #2 \right)}
+\let\oldsec\sec 
+\renewcommand{\sec}[2][\null]{\oldsec^{#1}\!\left( #2 \right)}
+\let\oldcot\cot 
+\renewcommand{\cot}[2][\null]{\oldcot^{#1}\!\left( #2 \right)}
+
+\let\oldsinh\sinh 
+\renewcommand{\sinh}[2][\null]{\oldsinh^{#1}\!\left( #2 \right)}
+\let\oldcosh\cosh 
+\renewcommand{\cosh}[2][\null]{\oldcosh^{#1}\!\left( #2 \right)}
+\let\oldtanh\tanh 
+\renewcommand{\tanh}[2][\null]{\oldtanh^{#1}\!\left( #2 \right)}
+\let\oldcsch\csch 
+\renewcommand{\csch}[2][\null]{\oldcsch^{#1}\!\left( #2 \right)}
+\let\oldsech\sech 
+\renewcommand{\sech}[2][\null]{\oldsech^{#1}\!\left( #2 \right)}
+\let\oldcoth\coth 
+\renewcommand{\coth}[2][\null]{\oldcoth^{#1}\!\left( #2 \right)}
+
+\let\oldarcsin\arcsin 
+\renewcommand{\arcsin}[2][\null]{\oldarcsin^{#1}\!\left( #2 \right)}
+\let\oldarccos\arccos 
+\renewcommand{\arccos}[2][\null]{\oldarccos^{#1}\!\left( #2 \right)}
+\let\oldarctan\arctan 
+\renewcommand{\arctan}[2][\null]{\oldarctan^{#1}\!\left( #2 \right)}
+\let\oldarccsc\arccsc 
+\renewcommand{\arccsc}[2][\null]{\oldarccsc^{#1}\!\left( #2 \right)}
+\let\oldarcsec\arcsec 
+\renewcommand{\arcsec}[2][\null]{\oldarcsec^{#1}\!\left( #2 \right)}
+\let\oldarccot\arccot 
+\renewcommand{\arccot}[2][\null]{\oldarccot^{#1}\!\left( #2 \right)}
+
+\let\oldarcsinh\arcsinh 
+\renewcommand{\arcsinh}[2][\null]{\oldarcsinh^{#1}\!\left( #2 \right)}
+\let\oldarccosh\arccosh 
+\renewcommand{\arccosh}[2][\null]{\oldarccosh^{#1}\!\left( #2 \right)}
+\let\oldarctanh\arctanh 
+\renewcommand{\arctanh}[2][\null]{\oldarctanh^{#1}\!\left( #2 \right)}
+\let\oldarccsch\arccsch 
+\renewcommand{\arccsch}[2][\null]{\oldarccsch^{#1}\!\left( #2 \right)}
+\let\oldarcsech\arcsech 
+\renewcommand{\arcsech}[2][\null]{\oldarcsech^{#1}\!\left( #2 \right)}
+\let\oldarccoth\arccoth 
+\renewcommand{\arccoth}[2][\null]{\oldarccoth^{#1}\!\left( #2 \right)}
+
+
+% Specific functions, like the exponent and the absolute function, should also have their own parenthetical outline.
+\let\oldexp\exp \renewcommand*{\exp}[1]{\oldexp \!\left(#1\right)}
+\newcommand*{\abs}[1]{\left| #1 \right|}
+\let\olddet\det \renewcommand{\det}[1]{\olddet\left( #1 \right)}
+
+
+% Derivatives and integration should have the infinitesimal element of their function have an upright "d", or a partial if need be (or even other, Euler Newton, styles), and the element's symbol. Define a macro for both cases. Allow multiple differentiation power values if need be.
+\newcommand*{\diff}[2][\null]{\, \text{d}^{\mkern-0.5mu #1} \mkern-1.0mu #2}
+\newcommand*{\Diff}[2][\null]{\, \text{D}^{#1}_{#2}}
+\newcommand*{\timediff}[2][1]{
+    \ifnum#1=1
+        \dot{#2}
+    \else
+        \ifnum#1=2
+            \ddot{#2}
+        \else
+            \ifnum#1=3
+                \dddot{#2}
+            \else
+                \overset{#1}{\dot{#2}} % Too many dots, just put number of dots.
+            \fi
+        \fi
+    \fi
+    }
+\newcommand*{\pdiff}[2][\null]{\, \partial^{#1} \mkern-1.1mu #2}
+
+
+% Modify the vector notation such that, rather than an arrow, a harpoon is used to denote a vector or vector field. Create bold, upright, and hatted unit vector definitions for physics-like vector notation.
+\newcommand{\tikzoverset}[2]{%
+  \tikz[baseline=(X.base),inner sep=0pt,outer sep=0pt]{%
+    \node[inner sep=0pt,outer sep=0pt] (X) {$#2$}; 
+    \node[yshift=1pt] at (X.north) {$#1$};
+}}
+\newcommand{\vect}[1]{\tikzoverset{\rightharpoonup}{#1}}
+\newcommand{\bvect}[1]{{\bm{{#1}}}}
+
+\newcommand{\uveci}{{\bm{\, \hat{\textnormal{\bfseries\i}}}}}
+\newcommand{\uvecj}{{\bm{\, \hat{\textnormal{\bfseries\j}}}}}
+\DeclareRobustCommand{\uvect}[1]{{%
+  \ifcat\relax\noexpand#1%
+    % it should be a Greek letter; this is an adaptation for 
+    % letters defined by macros that are also greek letters.
+    \bm{\, \hat{#1}}%
+  \else
+    \ifcsname uvec#1\endcsname
+      \csname uvec#1\endcsname
+    \else
+      \bm{\, \hat{\mathbf{#1}}}%
+    \fi
+  \fi
+}}
+\newcommand{\hvect}[1]{\hat{#1}}
+\newcommand*{\vectmag}[1]{\left \| #1 \right \|}
+
+
+% Establish an enviroment for meeting notes to go within. Notes during 
+% meetings should be seperate from conclusions and work done on that day.
+\newcommand{\meetingnotesenviromentcolor}{Maroon}
+\newenvironment{meetingnotes*}
+{ %
+  \bigskip\noindent % Make vertical offset.
+  \hspace{1cm} % Make a horizontal buffer.
+
+  \begin{mdframed}[
+    linewidth=2pt,
+    linecolor=\meetingnotesenviromentcolor,
+    bottomline=false,topline=false,rightline=false,
+    innerrightmargin=0pt,innertopmargin=0pt,innerbottommargin=0pt,
+    innerleftmargin=0em, % Distance between vertical rule & proof content
+    skipabove=0pt
+  ] %
+
+  \normalfont\textbf{\textsc{ %
+    \vspace{2pt} \\
+    \hspace{1cm} \color{\meetingnotesenviromentcolor} Meeting Notes:}
+    \vspace{2pt} 
+    } %
+  {\color{\meetingnotesenviromentcolor} \hrule height 2pt \relax} %
+
+  \begin{flushright} %
+  \begin{itemize}[label=\null] %
+ } %
+{
+  \end{itemize} %
+  \end{flushright} %
+  \end{mdframed} %
+  \par\bigskip % Make vertical offset.
+}
