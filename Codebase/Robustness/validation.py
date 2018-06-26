@@ -1,15 +1,16 @@
 import numpy as np
 import scipy as sp 
 
-from exception import *
+from Robustness.exception import *
 
 def validate_boolean_value(boolean_value_input):
     """
-    The purpose of this function is to validate that a boolean value input is
-    valid. 
+    The purpose of this function is to validate that a boolean value 
+    input is valid. 
     """
 
-    # Type check. If it is not a boolean value, attempt to change it into one.
+    # Type check. If it is not a boolean value, attempt to change it 
+    # into one.
     if not isinstance(boolean_value_input,bool):
         try:
             boolean_value_input = bool(boolean_value_input)
@@ -23,11 +24,12 @@ def validate_boolean_array(boolean_array_input,
                            shape=None,size=None,
                            deep_validate=False):
     """
-        The purpose of this function is to validate that the boolean array is 
-    valid. The shape and size of the array can be optionally tested.
+    The purpose of this function is to validate that the boolean 
+    array is valid. The shape and size of the array can be optionally 
+    tested.
 
-    deep_validate instructs the program to loop over every element array and
-    validate it in turn.
+    deep_validate instructs the program to loop over every element 
+    array and validate it in turn.
     """
     # Type check. If it is not an array, attempt to change it to one.
     if not isinstance(boolean_array_input,(bool,np.ndarray)):
@@ -48,18 +50,22 @@ def validate_boolean_array(boolean_array_input,
         # Type check optional condition inputs.
         shape = validate_tuple(shape)
         if (boolean_array_input.shape != shape):
-            raise ShapeError('Input boolean array is not the correct shape.'
-                             '    --Kyubey')
+            raise ShapeError('Input boolean array is not the correct shape. '
+                             'Expected: {expt}  Actual: {act} '
+                             '    --Kyubey'
+                             .format(expt=shape,act=boolean_array_input.shape))
     
     if (size is not None):
         # Type check optional condition inputs.
         size = validate_int_value(size,greater_than=0)
         if (boolean_array_input.size != size):
             raise ShapeError('Input boolean array is not the correct size. '
-                             ' --Kyubey')
+                             'Expected: {expt}  Actual: {act} '
+                             ' --Kyubey'
+                             .format(expt=size,act=boolean_array_input.size))
 
-    # Check if the user desired a deep validation check, warn about time. First
-    # type check.
+    # Check if the user desired a deep validation check, warn about 
+    # time. First type check.
     deep_validate = validate_boolean_value(deep_validate)
     if (deep_validate):
         # Warn about time.
@@ -68,8 +74,7 @@ def validate_boolean_array(boolean_array_input,
                                     '    --Kyubey'))
 
         # Enable value function to loop over all elements of an array.
-        vect_validate_boolean_value = np.vectorize(validate_boolean_value,  
-                                                   otypes=bool)
+        vect_validate_boolean_value = np.vectorize(validate_boolean_value,)
         boolean_array_input = vect_validate_boolean_value(boolean_array_input)
 
     return np.array(boolean_array_input,dtype=bool)
@@ -81,7 +86,7 @@ def validate_int_value(int_value_input,
     The purpose of this function is to validate that a int value is valid. 
     The value, its range (either greater than or less than a number) may 
     also be tested. This function will bark if the value is greater than 
-    less_than or greater than less_than. It can also be tested if it is 
+    less_than or less than greater_than. It can also be tested if it is 
     non-zero (true for non-zero, false for zero passes).
     """
     # Type check. If it is not a int value, attempt to change it into one.
@@ -120,7 +125,9 @@ def validate_int_value(int_value_input,
 
 def validate_int_array(int_array_input,
                        shape=None,size=None,
-                       deep_validate=False):
+                       deep_validate=False,
+                       # Deep/value validate parameters.
+                       non_zero=None,greater_than=None,less_than=None):
     """
     The purpose of this function is to validate that the integer array is 
     valid. The shape and size of the array can be optionally tested.
@@ -148,14 +155,18 @@ def validate_int_array(int_array_input,
         shape = validate_tuple(shape)
         if (int_array_input.shape != shape):
             raise ShapeError('Input integer array is not the correct shape.'
-                             '    --Kyubey')
+                             'Expected: {expt}  Actual: {act}'
+                             '    --Kyubey'
+                             .format(expt=shape,act=int_array_input.shape))
     
     if (size is not None):
         # Type check optional condition inputs.
         size = validate_int_value(size,greater_than=0)
         if (int_array_input.size != size):
             raise ShapeError('Input integer array is not the correct size. '
-                             ' --Kyubey')
+                             'Expected: {expt}  Actual: {act}'
+                             ' --Kyubey'
+                             .format(expt=size,act=int_array_input.size))
 
     # Check if the user desired a deep validation check, warn about time. First
     # type check.
@@ -167,8 +178,11 @@ def validate_int_array(int_array_input,
                                     '    --Kyubey'))
 
         # Enable value function to loop over all elements of an array.
-        vect_validate_int_value = np.vectorize(validate_int_value,otypes=bool)
-        int_array_input = vect_validate_int_value(int_array_input)
+        vect_validate_int_value = np.vectorize(validate_int_value)
+        int_array_input = vect_validate_int_value(int_array_input,
+                                                  non_zero=non_zero,
+                                                  greater_than=greater_than,
+                                                  less_than=less_than)
 
     return np.array(int_array_input,dtype=int)
 
@@ -179,7 +193,7 @@ def validate_float_value(float_value_input,
     The purpose of this function is to validate that a float value is valid. 
     The value, its range (either greater than or less than a number) may 
     also be tested. This function will bark if the value is greater than 
-    greater_than or less than less_than.
+    less_than or less than greater_than.
     """
     # Type check. If it is not a float value, attempt to change it into one.
     if not isinstance(float_value_input,float):
@@ -193,20 +207,22 @@ def validate_float_value(float_value_input,
     if (greater_than is not None):
         # Type check the optional test inputs.
         greater_than = validate_float_value(greater_than)
-        if (float_value_input > greater_than):
-            raise ValueError('Input float value is greater than the stipulated '
+        if (float_value_input < greater_than):
+            raise ValueError('Input float value is less than the stipulated '
                              'value.    --Kyubey')
     if (less_than is not None):
         less_than = validate_float_value(less_than)
-        if (float_value_input < less_than):
-            raise ValueError('Input float value is less than the stipulated '
+        if (float_value_input > less_than):
+            raise ValueError('Input float value is greater than the stipulated '
                              'value.    --Kyubey')
         
     return float(float_value_input)
 
 def validate_float_array(float_array_input,
                          shape=None,size=None,
-                         deep_validate=False):
+                         deep_validate=False,
+                         # Deep/value validate parameters.
+                         greater_than=None,less_than=None):
     """
     The purpose of this function is to validate that the float array is 
     valid. The shape and size of the array can be optionally tested.
@@ -234,14 +250,18 @@ def validate_float_array(float_array_input,
         shape = validate_tuple(shape)
         if (float_array_input.shape != shape):
             raise ShapeError('Input float array is not the correct shape.'
-                             '    --Kyubey')
+                             'Expected: {expt}  Actual: {act}.'
+                             '    --Kyubey'
+                             .format(expt=size,act=float_array_input.size))
     
     if (size is not None):
         # Type check optional condition inputs.
         size = validate_int_value(size,greater_than=0)
         if (float_array_input.size != size):
             raise ShapeError('Input float array is not the correct size. '
-                             ' --Kyubey')
+                             'Expected: {expt}  Actual: {act}.'
+                             ' --Kyubey'
+                             .format(expt=size,act=float_array_input.size))
 
     # Check if the user desired a deep validation check, warn about time. First
     # type check.
@@ -253,9 +273,10 @@ def validate_float_array(float_array_input,
                                     '    --Kyubey'))
 
         # Enable value function to loop over all elements of an array.
-        vect_validate_float_value = np.vectorize(validate_float_value,
-                                                 otypes=bool)
-        float_array_input = vect_validate_float_value(float_array_input)
+        vect_validate_float_value = np.vectorize(validate_float_value)
+        float_array_input = vect_validate_float_value(float_array_input,
+                                                      greater_than=None,
+                                                      less_than=None)
 
     return np.array(float_array_input,dtype=float)
 
@@ -280,7 +301,9 @@ def validate_list(input_list,
         length = validate_int_value(length,greater_than=0)
         if (len(input_list) != length):
             raise ShapeError('The input list is not the correct length.'
-                             '    --Kyubey')
+                             'Expected: {expt}  Actual: {act}'
+                             '    --Kyubey'
+                             .format(expt=length,act=len(input_list)))
 
     return list(input_list)
 
@@ -305,6 +328,41 @@ def validate_tuple(input_tuple,
         length = validate_int_value(length,greater_than=0)
         if (len(input_tuple) != length):
             raise ShapeError('The input tuple is not the correct length.'
-                             '    --Kyubey')
+                             'Expected: {expt}  Actual: {act}'
+                             '    --Kyubey'
+                             .format(expt=length,act=len(input_tuple)))
 
     return tuple(input_tuple)
+
+
+def validate_string(input_string,length=None,contain_substr=None):
+    """
+    The purpose of this function is to determine if a string is valid. The 
+    length of the string can also be tested. If the string contains a substring 
+    can also be tested. Due to oddities of strings, this function may return 
+    back false errors.
+    """
+    # Type check. If not string, attempt to turn it into one.
+    if not isinstance(input_string,str):
+        try:
+            input_string = str(input_string)
+        except:
+            raise TypeError('Input string cannot be turned into a string.'
+                            '    --Kyubey')
+    
+    # Check for optional conditions.
+    if (length is not None):
+        # Type check.
+        length = validate_int_value(length,greater_than=0)
+        if (len(input_string) != length):
+            raise ShapeError('Input string is not the correct length.'
+                             'Expected: {expt}  Actual: {act}'
+                             '    --Kyubey'
+                             .format(expt=length,act=len(input_string)))
+    if (contain_substr is not None):
+        contain_substr = validate_string(contain_substr)
+        if not (contain_substr in input_string):
+            raise ValueError('Input string does not contain given substring.'
+                             '    --Kyubey')
+
+    return str(input_string)
