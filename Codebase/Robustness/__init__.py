@@ -2,8 +2,8 @@
 __all__ = ['exception']
 
 # Import all of the custom exceptions and warnings.
-from .exception import *
+from Robustness.exception import *
 
 # Namespaces are preferred
-from . import validation
-from . import exception
+from Robustness import validation
+from Robustness import exception

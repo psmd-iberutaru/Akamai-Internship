@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 from Robustness.exception import *
 import Robustness.validation as valid
+import misc_functions as misc
 
 
 def gaussian_function(x_input, center, std_dev, height):
@@ -42,9 +43,9 @@ def multigaussian_function(x_input, center_array, std_dev_array, height_array,
     x_input = valid.validate_float_array(x_input)
     center_array = valid.validate_float_array(
         center_array, size=gaussian_count)
-    std_dev_array = valid.validate_float_array(std_dev_array,
-                                               size=gaussian_count,
-                                               deep_validate=True,
+    std_dev_array = valid.validate_float_array(std_dev_array, 
+                                               size=gaussian_count, 
+                                               deep_validate=True, 
                                                greater_than=0)
     height_array = valid.validate_float_array(
         height_array, size=gaussian_count)
@@ -89,19 +90,21 @@ def generate_gaussian(center, std_dev, height,
     return x_values, y_values
 
 
-def generate_multigaussian(center_list, std_dev_list, height_list,x_domain_list,                           gaussian_count=None,n_datapoints_list=None,   
+def generate_multigaussian(center_list, std_dev_list, height_list,
+                           x_domain_list, gaussian_count=None,
+                           n_datapoints_list=None,
                            n_datapoints=None):
     """
     Generates a multigaussian of datapoints.
     """
 
-    # Assume the center list is the highest priority (but check the 
+    # Assume the center list is the highest priority (but check the
     # std_dev) for double checking the gaussian count.
     if (gaussian_count is None):
         gaussian_count = len(center_list)
         # Double check with std_dev
         if ((gaussian_count != len(std_dev_list)) or
-            (len(std_dev_list) != len(center_list))):
+                (len(std_dev_list) != len(center_list))):
             raise InputError('The number of gaussians to generate is not '
                              'known, nor can it be accurately derived from '
                              'the inputs given.    --Kyubey')
@@ -114,27 +117,27 @@ def generate_multigaussian(center_list, std_dev_list, height_list,x_domain_list,
                                               deep_validate=True,
                                               greater_than=0)
     height_list = valid.validate_float_array(height_list, size=gaussian_count)
-    
+
     # Initial variables.
     x_points = []
     y_points = []
 
     # Check if the user provides individual datapoint count values.
     if (n_datapoints_list is not None):
-        n_datapoints_list = valid.validate_int_array(n_datapoints_list,
-                                                     size=gaussian_count,
-                                                     deep_validate=True,
+        n_datapoints_list = valid.validate_int_array(n_datapoints_list, 
+                                                     size=gaussian_count, 
+                                                     deep_validate=True, 
                                                      greater_than=0)
     elif (n_datapoints is not None):
         # Validate
-        n_datapoints = valid.validate_int_value(n_datapoints,greater_than=0)
+        n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
         # Define subpoints
         n_subpoints = np.ceil(n_datapoints/gaussian_count)
         n_datapoints_list = np.full(gaussian_count, n_subpoints)
-    
+
     for gaussiandex in range(gaussian_count):
         # Generate one gaussian.
-        temp_x_points,temp_y_points = \
+        temp_x_points, temp_y_points = \
             generate_gaussian(center_list[gaussiandex],
                               std_dev_list[gaussiandex],
                               height_list[gaussiandex],
@@ -147,7 +150,7 @@ def generate_multigaussian(center_list, std_dev_list, height_list,x_domain_list,
             # Prevent double dipping.
             if (sub_gaussiandex == gaussiandex):
                 continue
-            
+
             # Extract the maximum value from all of the gaussians.
             added_y_points = gaussian_function(temp_x_points,
                                                center_list[sub_gaussiandex],
@@ -155,18 +158,18 @@ def generate_multigaussian(center_list, std_dev_list, height_list,x_domain_list,
                                                height_list[sub_gaussiandex])
             # Propagate one dimension out.
             added_y_points = np.array([added_y_points])
-            temp_y_points = np.concatenate((temp_y_points,added_y_points),
+            temp_y_points = np.concatenate((temp_y_points, added_y_points),
                                            axis=0)
         # Extract only the maximum values.
-        temp_y_points = np.amax(temp_y_points,axis=0)
+        temp_y_points = np.amax(temp_y_points, axis=0)
 
         # Append the values for storage.
         x_points.append(temp_x_points)
         y_points.append(temp_y_points)
 
     # Morph to numpy arrays.
-    x_points = np.array(x_points,dtype=float)
-    y_points = np.array(y_points,dtype=float)
+    x_points = np.array(x_points, dtype=float)
+    y_points = np.array(y_points, dtype=float)
     # Flatten arrays just in case.
     x_points = np.ravel(x_points)
     y_points = np.ravel(y_points)
@@ -185,87 +188,24 @@ def generate_multigaussian(center_list, std_dev_list, height_list,x_domain_list,
             delta_size = x_points.size - n_datapoints
             # It should not be the case that delta_size is negative.
             if (delta_size < 0):
-                raise OutputError('The number of points is less than expected.')
-            
-            removed_indexes = np.random.randint(0,x_points.size - 1,
+                raise OutputError(
+                    'The number of points is less than expected.')
+
+            removed_indexes = np.random.randint(0, x_points.size - 1,
                                                 delta_size)
-            x_points = np.delete(x_points,removed_indexes)
-            y_points = np.delete(y_points,removed_indexes)
-    
+            x_points = np.delete(x_points, removed_indexes)
+            y_points = np.delete(y_points, removed_indexes)
+
     # Sort the values before returning.
     sort_index = np.argsort(x_points)
     x_points = x_points[sort_index]
     y_points = y_points[sort_index]
 
-    return np.array(x_points,dtype=float),np.array(y_points,dtype=float)
+    return np.array(x_points, dtype=float), np.array(y_points, dtype=float)
 
 
-def generate_noise(input_array, noise_domain, distribution='uniform',
-                   center=None, std_dev=None,  # Normal distribution terms.
-                   debug=False):
-    """
-    Takes a set of 'perfect' datapoints and scatters them based on some 
-    randomly generated noise. The generated noise can be distributed in a number
-    of ways.
-
-    Input:
-    input_array = array of datapoints to be scattered from the original value
-    noise_domain = (2,) shaped array of the upper and lower bounds of scattering
-    distribution = method of random number distribution
-                    - 'uniform'
-                    - 'gaussian'
-    debug = Debug mode
-
-    Output:
-    output_array = scattered 'noisy' datapoints
-    """
-    # Type check. 
-    input_array = valid.validate_float_array(input_array,size=len(input_array))
-    noise_domain = valid.validate_float_array(noise_domain, shape=(2,), size=2)
-    distribution = valid.validate_string(distribution)
-
-    # Initial conditions
-    n_datapoints = len(input_array)
-
-    # Ensure the lower bound of the noise domain is the first element.
-    if (noise_domain[0] < noise_domain[-1]):
-        # This is correct behavior.
-        pass
-    elif (noise_domain[0] > noise_domain[-1]):
-        # Warn and change, the array seems to be reversed.
-        noise_domain = np.flip(noise_domain, axis=0)
-    elif (noise_domain[0] == noise_domain[-1]):
-        raise ValueError('Noise domain range is detected to be zero. There is '
-                         'no functional use of this function.    --Kyubey')
-
-    # Check for distribution method, generate noise array from method.
-    if (distribution == 'uniform'):
-        if (debug):
-            print('Noise distribution set to "uniform".')
-        noise_array = np.random.uniform(noise_domain[0], noise_domain[1],
-                                        size=n_datapoints)
-    elif ((distribution == 'gaussian') or (distribution == 'normal')):
-        if (debug):
-            print('Noise distribution set to "gaussian".')
-            kyubey_warning(OutputWarning, ('Noise domain is ignored under '
-                                           'gaussian distribution.    --Kyubey'))
-        # Type check center and standard deviation.
-        if (std_dev is None):
-            raise InputError('Noise distribution is set to gaussian, there is '
-                             'no standard deviation input.')
-        else:
-            # Standard deviation cannot be negative
-            center = valid.validate_float_value(center)
-            std_dev = valid.validate_float_value(std_dev, greater_than=0)
-            noise_array = np.random.normal(center, std_dev, size=n_datapoints)
-
-    # Noise array plus standard values.
-    return input_array + noise_array
-
-
-def generate_noisy_gaussian(center, std_dev, height,
-                            noise_domain=[-0.1, 0.1], x_domain=[-3, 3],
-                            n_datapoints=10000):
+def generate_noisy_gaussian(center, std_dev, height, x_domain, noise_domain, 
+                            n_datapoints):
     """
     Generate a gaussian with some aspect of noise.
 
@@ -280,6 +220,13 @@ def generate_noisy_gaussian(center, std_dev, height,
         x_values = the x-axial array of the gaussian function within the domain
         y_values = the y-axial array of the gaussian function within the domain
     """
+    # Type check.
+    center = valid.validate_float_value(center)
+    std_dev = valid.validate_float_value(std_dev,greater_than=0)
+    height = valid.validate_float_value(height)
+    x_domain = valid.validate_float_array(x_domain,shape=(2,),size=2)
+    noise_domain = valid.validate_float_array(noise_domain,shape=(2,),size=2)
+    n_datapoints = valid.validate_int_value(n_datapoints,greater_than=0)
 
     # Make the x-axis value array given the domain and the number of points.
     x_values = np.random.uniform(x_domain[0], x_domain[-1], n_datapoints)
@@ -289,7 +236,8 @@ def generate_noisy_gaussian(center, std_dev, height,
     y_values = gaussian_function(x_values, center, std_dev, height)
 
     # Imbue the gaussian with random noise.
-    y_values = generate_noise(y_values, noise_domain, distribution='uniform')
+    y_values = misc.generate_noise(y_values, noise_domain,
+                                   distribution='uniform')
 
     return x_values, y_values
 
@@ -323,25 +271,26 @@ def generate_noisy_multigaussian(center_list, std_dev_list, height_list,
         domain
     """
 
-    # Assume the center list is the highest priority (but check the 
+    # Assume the center list is the highest priority (but check the
     # std_dev) for double checking the gaussian count.
     if (gaussian_count is None):
         gaussian_count = len(center_list)
         # Double check with std_dev
         if ((gaussian_count != len(std_dev_list)) or
-            (len(std_dev_list) != len(center_list))):
+                (len(std_dev_list) != len(center_list))):
             raise InputError('The number of gaussians to generate is not '
                              'known, nor can it be accurately derived from '
                              'the inputs given.    --Kyubey')
 
     # Type check.
-    center_list = valid.validate_float_array(center_list,size=gaussian_count)
-    std_dev_list = valid.validate_float_array(std_dev_list,size=gaussian_count)
-    height_list = valid.validate_float_array(height_list,size=gaussian_count)
+    center_list = valid.validate_float_array(center_list, size=gaussian_count)
+    std_dev_list = valid.validate_float_array(
+        std_dev_list, size=gaussian_count)
+    height_list = valid.validate_float_array(height_list, size=gaussian_count)
     noise_domain_list = valid.validate_float_array(noise_domain_list,
-                                                   shape=(gaussian_count,2))
+                                                   shape=(gaussian_count, 2))
     x_domain_list = valid.validate_float_array(x_domain_list,
-                                               shape=(gaussian_count,2))
+                                               shape=(gaussian_count, 2))
     cumulative_noise = valid.validate_boolean_value(cumulative_noise)
 
     # Type check optional elements
@@ -375,41 +324,41 @@ def generate_noisy_multigaussian(center_list, std_dev_list, height_list,
         # Each gaussian must be generated on its own.
         for gaussiandex in range(gaussian_count):
             # Generate gaussian.
-            temp_x_points,temp_y_points = \
+            temp_x_points, temp_y_points = \
                 generate_gaussian(center_list[gaussiandex],
                                   std_dev_list[gaussiandex],
                                   height_list[gaussiandex],
                                   x_domain_list[gaussiandex],
                                   n_datapoints_list[gaussiandex])
-            temp_y_points = generate_noise(temp_y_points,
-                                           noise_domain_list[gaussiandex],
-                                           distribution='uniform')
+            temp_y_points = misc.generate_noise(temp_y_points,
+                                                noise_domain_list[gaussiandex],
+                                                distribution='uniform')
             # Store for return
-            x_values = np.append([x_values],[temp_x_points],axis=0)
-            y_values = np.append([y_values],[temp_y_points],axis=0)
+            x_values = np.append([x_values], [temp_x_points], axis=0)
+            y_values = np.append([y_values], [temp_y_points], axis=0)
 
         # Maximize the values, discarding everything lower than.
-        x_values = np.amax(x_values,axis=0)
-        y_values = np.amax(y_values,axis=0)
+        x_values = np.amax(x_values, axis=0)
+        y_values = np.amax(y_values, axis=0)
 
     else:
         # Generate noise of every point after gaussian generation.
         # Generate gaussian
-        x_values,y_values = generate_multigaussian(center_list,std_dev_list,
-                                                   height_list,x_domain_list,
-                                                   gaussian_count,
-                                                   n_datapoints_list)
-        
+        x_values, y_values = generate_multigaussian(center_list, std_dev_list,
+                                                    height_list, x_domain_list,
+                                                    gaussian_count,
+                                                    n_datapoints_list)
+
         # Generate noise. Warn the user that only the first noise domain is
         # being used.
-        kyubey_warning(OutputWarning,('Only the first element of the '
-                                      'noise_domian_list is used if ' 
-                                      'cumulative_noise is False.'
-                                      '    --Kyubey'))
-        y_values = generate_noise(y_values,noise_domain_list[0],
-                                  distribution='uniform')
+        kyubey_warning(OutputWarning, ('Only the first element of the '
+                                       'noise_domian_list is used if '
+                                       'cumulative_noise is False.'
+                                       '    --Kyubey'))
+        y_values = misc.generate_noise(y_values, noise_domain_list[0],
+                                       distribution='uniform')
 
-    return np.array(x_values,dtype=float),np.array(y_values,dtype=float)
+    return np.array(x_values, dtype=float), np.array(y_values, dtype=float)
 
 
 def fit_gaussian(x_values, y_values,
@@ -434,7 +383,7 @@ def fit_gaussian(x_values, y_values,
     # Type check
     x_values = valid.validate_float_array(x_values)
     y_values = valid.validate_float_array(y_values)
-    
+
     # Type check optional issues.
     # Type check the guesses
     if (center_guess is not None):
@@ -443,7 +392,8 @@ def fit_gaussian(x_values, y_values,
         # The default of scipy's curve fit.
         center_guess = 1
     if (std_dev_guess is not None):
-        std_dev_guess = valid.validate_float_value(std_dev_guess,greater_than=0)
+        std_dev_guess = valid.validate_float_value(
+            std_dev_guess, greater_than=0)
     else:
         # The default of scipy's curve fit.
         std_dev_guess = 1
@@ -454,37 +404,36 @@ def fit_gaussian(x_values, y_values,
         height_guess = 1
     # Type check bounds.
     if (center_bounds is not None):
-        center_bounds = valid.validate_float_array(center_bounds,size=2)
+        center_bounds = valid.validate_float_array(center_bounds, size=2)
         center_bounds = np.sort(center_bounds)
     else:
-        center_bounds = np.array([-np.inf,np.inf])
+        center_bounds = np.array([-np.inf, np.inf])
     if (std_dev_bounds is not None):
-        std_dev_bounds = valid.validate_float_array(std_dev_bounds,size=2,
+        std_dev_bounds = valid.validate_float_array(std_dev_bounds, size=2,
                                                     deep_validate=True,
                                                     greater_than=0)
         std_dev_bounds = np.sort(std_dev_bounds)
     else:
-        std_dev_bounds = np.array([0,np.inf])
+        std_dev_bounds = np.array([0, np.inf])
     if (height_bounds is not None):
         height_bounds = valid.validate_float_array(height_bounds)
         height_bounds = np.sort(height_bounds)
     else:
-        height_bounds = np.array([-np.inf,np.inf])
-        
+        height_bounds = np.array([-np.inf, np.inf])
 
     # Compiling the guesses.
-    guesses = np.array([center_guess,std_dev_guess,height_guess])
-    
+    guesses = np.array([center_guess, std_dev_guess, height_guess])
+
     # Compiling the bounds
-    lower_bounds = (center_bounds[0],std_dev_bounds[0],height_bounds[0])
-    upper_bounds = (center_bounds[1],std_dev_bounds[1],height_bounds[1])
-    bounds = (lower_bounds,upper_bounds)
+    lower_bounds = (center_bounds[0], std_dev_bounds[0], height_bounds[0])
+    upper_bounds = (center_bounds[1], std_dev_bounds[1], height_bounds[1])
+    bounds = (lower_bounds, upper_bounds)
 
     # Use scipy's curve optimization function for the gaussian function.
-    fit_parameters, covariance = sp_opt.curve_fit(gaussian_function, 
+    fit_parameters, covariance = sp_opt.curve_fit(gaussian_function,
                                                   x_values, y_values,
-                                                  p0=guesses,bounds=bounds)
-    
+                                                  p0=guesses, bounds=bounds)
+
     # For ease.
     center = fit_parameters[0]
     std_dev = fit_parameters[1]
@@ -493,9 +442,9 @@ def fit_gaussian(x_values, y_values,
     return center, std_dev, height, covariance
 
 
-def fit_multigaussian(x_points,y_points,
-                      gaussian_count=None,masking=False,
-                      prominence=None, fft_keep=0.01,prom_height_ratio=None):
+def fit_multigaussian(x_points, y_points,
+                      gaussian_count=None, masking=False,
+                      prominence=None, fft_keep=0.01, prom_height_ratio=None):
     """
     Fit a gaussian function with 3 degrees of freedom but with many gaussians.
 
@@ -525,13 +474,15 @@ def fit_multigaussian(x_points,y_points,
     covariance_array = []
 
     # Type check.
-    x_points = valid.validate_float_array(x_points,size=n_datapoints)
-    y_points = valid.validate_float_array(y_points,size=n_datapoints)
+    x_points = valid.validate_float_array(x_points, size=n_datapoints)
+    y_points = valid.validate_float_array(y_points, size=n_datapoints)
     masking = valid.validate_boolean_value(masking)
     if (gaussian_count is not None):
         # Gaussian count can't be less than 0.
-        gaussian_count = valid.validate_int_value(gaussian_count,greater_than=0)
-    fft_keep = valid.validate_float_value(fft_keep,greater_than=0,less_than=1)
+        gaussian_count = valid.validate_int_value(
+            gaussian_count, greater_than=0)
+    fft_keep = valid.validate_float_value(
+        fft_keep, greater_than=0, less_than=1)
     if (prominence is not None):
         prominence = valid.validate_float_value(prom_height_ratio,
                                                 greater_than=0)
@@ -549,38 +500,38 @@ def fit_multigaussian(x_points,y_points,
     fourier_y_points[int(n_datapoints*fft_keep):] = 0
     inv_fourier_y_points = np.fft.ifft(fourier_y_points)
 
-    # Find the peaks of the smooth fourier transform. Only the values are 
+    # Find the peaks of the smooth fourier transform. Only the values are
     # desired.
     peak_index = sp_sig.find_peaks(np.abs(inv_fourier_y_points),
                                    prominence=0.1)[0]
-    peak_index = np.array(peak_index,dtype=int)
+    peak_index = np.array(peak_index, dtype=int)
     center_estimates = x_points[peak_index]
 
     # Test if the center estimate found the right amount of gaussians. If not,
     # warn the user, but carry on, it is likely a more or less minor issue.
     if (gaussian_count is not None):
         if (len(center_estimates) < gaussian_count):
-            kyubey_warning(OutputError,('Less gaussians were detected than '
-                                        'input as the number of gaussians. '
-                                        'Consider raising fft_keep or '
-                                        'lowering prominence.'
-                                        '    --Kyubey'))
+            kyubey_warning(OutputError, ('Less gaussians were detected than '
+                                         'input as the number of gaussians. '
+                                         'Consider raising fft_keep or '
+                                         'lowering prominence.'
+                                         '    --Kyubey'))
         elif (len(center_estimates) > gaussian_count):
-            kyubey_warning(OutputError,('More gaussians were detected than '
-                                        'input as the number of gaussians. '
-                                        'Consider lowering fft_keep or '
-                                        'raising prominence.'
-                                        '    --Kyubey'))
-    
+            kyubey_warning(OutputError, ('More gaussians were detected than '
+                                         'input as the number of gaussians. '
+                                         'Consider lowering fft_keep or '
+                                         'raising prominence.'
+                                         '    --Kyubey'))
+
     # Do an initial fit over all possible center estimates. Only attempt to fit
-    for guessdex in range (len(center_estimates)):
+    for guessdex in range(len(center_estimates)):
         # Find the range between to evaluate a fit using half peak width as an
         # approximation for FWHF
         peak_widths = sp_sig.peak_widths(np.abs(inv_fourier_y_points),
                                          peaks=peak_index,
                                          rel_height=prom_height_ratio)
-        peak_lower_bounds = np.array(np.floor(peak_widths[2]),dtype=int)
-        peak_upper_bounds = np.array(np.ceil(peak_widths[3]),dtype=int)
+        peak_lower_bounds = np.array(np.floor(peak_widths[2]), dtype=int)
+        peak_upper_bounds = np.array(np.ceil(peak_widths[3]), dtype=int)
 
         # Fit a gaussian using only the points between 2 peak bounds.
         temp_x_points = x_points[peak_lower_bounds[guessdex]:
@@ -588,9 +539,9 @@ def fit_multigaussian(x_points,y_points,
         temp_y_points = y_points[peak_lower_bounds[guessdex]:
                                  peak_upper_bounds[guessdex]]
 
-        temp_center,temp_std_dev,temp_height,temp_covariance = \
-            fit_gaussian(temp_x_points,temp_y_points,
-                         center_guess=center_estimates[guessdex])        
+        temp_center, temp_std_dev, temp_height, temp_covariance = \
+            fit_gaussian(temp_x_points, temp_y_points,
+                         center_guess=center_estimates[guessdex])
 
         # Append the values of the fit.
         center_array.append(temp_center)
@@ -602,8 +553,8 @@ def fit_multigaussian(x_points,y_points,
     # is the only next step.
     if (not masking):
         # Turn into numpy arrays just in case.
-        center_array = np.array(center_array,dtype=float)
-        std_dev_array = np.array(std_dev_array,dtype=float)
-        height_array = np.array(height_array,dtype=float)
-        covariance_array = np.array(covariance_array,dtype=float)
-        return center_array,std_dev_array,height_array,covariance_array
+        center_array = np.array(center_array, dtype=float)
+        std_dev_array = np.array(std_dev_array, dtype=float)
+        height_array = np.array(height_array, dtype=float)
+        covariance_array = np.array(covariance_array, dtype=float)
+        return center_array, std_dev_array, height_array, covariance_array
