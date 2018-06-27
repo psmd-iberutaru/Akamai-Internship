@@ -113,13 +113,19 @@ def validate_int_value(int_value_input,
         greater_than = validate_float_value(greater_than)
         if (int_value_input < greater_than):
             raise ValueError('Input int value is less than the stipulated '
-                             'value.    --Kyubey')
+                             'value. '
+                             'Expected: {expt}  Actual: {act}'
+                             '    --Kyubey'
+                             .format(expt=greater_than,act=int_value_input))
     if (less_than is not None):
         # Type check the optional test inputs.
         less_than = validate_float_value(less_than)
         if (int_value_input > less_than):
             raise ValueError('Input int value is greater than the stipulated '
-                             'value.    --Kyubey')
+                             'value. '
+                             'Expected: {expt}  Actual: {act}'
+                             '    --Kyubey'
+                             .format(expt=less_than,act=int_value_input))
         
     return int(int_value_input)
 
@@ -209,12 +215,18 @@ def validate_float_value(float_value_input,
         greater_than = validate_float_value(greater_than)
         if (float_value_input < greater_than):
             raise ValueError('Input float value is less than the stipulated '
-                             'value.    --Kyubey')
+                             'value. '
+                             'Expected: {expt}  Actual: {act}'
+                             '    --Kyubey'
+                             .format(expt=greater_than,act=float_value_input))
     if (less_than is not None):
         less_than = validate_float_value(less_than)
         if (float_value_input > less_than):
-            raise ValueError('Input float value is greater than the stipulated '
-                             'value.    --Kyubey')
+            raise ValueError('Input int value is greater than the stipulated '
+                             'value. '
+                             'Expected: {expt}  Actual: {act}'
+                             '    --Kyubey'
+                             .format(expt=less_than,act=float_value_input))
         
     return float(float_value_input)
 

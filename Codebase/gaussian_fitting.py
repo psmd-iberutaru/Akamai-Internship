@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 import scipy.optimize as sp_opt
+import scipy.signal as sp_sig
 import matplotlib.pyplot as plt
 
 from Robustness.exception import *
@@ -24,7 +25,7 @@ def gaussian_function(x_input, center, std_dev, height):
 
     # Use the equation of a gaussian from Wikipedia:
     y_output = (((1 / std_dev * np.sqrt(2 * np.pi))
-                 * np.exp(-0.5 * (x_input - (center/std_dev))**2))
+                 * np.exp(-0.5 * ((x_input - center)/std_dev)**2))
                 + height)
     return np.array(y_output, dtype=float)
 
@@ -411,24 +412,198 @@ def generate_noisy_multigaussian(center_list, std_dev_list, height_list,
     return np.array(x_values,dtype=float),np.array(y_values,dtype=float)
 
 
-def fit_gaussian(x_values, y_values):
+def fit_gaussian(x_values, y_values,
+                 center_guess=None, std_dev_guess=None, height_guess=None,
+                 center_bounds=None, std_dev_bounds=None, height_bounds=None):
     """
-    Fit a gaussian function with 4 degrees of freedom.
+    Fit a gaussian function with 3 degrees of freedom.
 
     Input:
         x_values = the x-axial array of the values
         y_values = the y-axial array of the values
+        center_guess = a starting point for the center
+        std_dev_guess = a starting point for the std_dev
+        height_guess = a starting point for the height
 
-    Returns: fit_parameters[center,std_dev,height],covariance
-        fit_parameters = an array containing the values of the fit
+    Returns: center,std_dev,height,covariance
         center = the central value of the gaussian
         std_dev = the standard deviation of the gaussian
         height = the height of the gaussian function along the x-axis
         covariance = a convariance matrix of the fit
     """
+    # Type check
+    x_values = valid.validate_float_array(x_values)
+    y_values = valid.validate_float_array(y_values)
+    
+    # Type check optional issues.
+    # Type check the guesses
+    if (center_guess is not None):
+        center_guess = valid.validate_float_value(center_guess)
+    else:
+        # The default of scipy's curve fit.
+        center_guess = 1
+    if (std_dev_guess is not None):
+        std_dev_guess = valid.validate_float_value(std_dev_guess,greater_than=0)
+    else:
+        # The default of scipy's curve fit.
+        std_dev_guess = 1
+    if (height_guess is not None):
+        height_guess = valid.validate_float_value(height_guess)
+    else:
+        # The default of scipy's curve fit.
+        height_guess = 1
+    # Type check bounds.
+    if (center_bounds is not None):
+        center_bounds = valid.validate_float_array(center_bounds,size=2)
+        center_bounds = np.sort(center_bounds)
+    else:
+        center_bounds = np.array([-np.inf,np.inf])
+    if (std_dev_bounds is not None):
+        std_dev_bounds = valid.validate_float_array(std_dev_bounds,size=2,
+                                                    deep_validate=True,
+                                                    greater_than=0)
+        std_dev_bounds = np.sort(std_dev_bounds)
+    else:
+        std_dev_bounds = np.array([0,np.inf])
+    if (height_bounds is not None):
+        height_bounds = valid.validate_float_array(height_bounds)
+        height_bounds = np.sort(height_bounds)
+    else:
+        height_bounds = np.array([-np.inf,np.inf])
+        
+
+    # Compiling the guesses.
+    guesses = np.array([center_guess,std_dev_guess,height_guess])
+    
+    # Compiling the bounds
+    lower_bounds = (center_bounds[0],std_dev_bounds[0],height_bounds[0])
+    upper_bounds = (center_bounds[1],std_dev_bounds[1],height_bounds[1])
+    bounds = (lower_bounds,upper_bounds)
 
     # Use scipy's curve optimization function for the gaussian function.
-    fit_parameters, covariance = sp_opt.curve_fit(gaussian_function, x_values,
-                                                  y_values)
+    fit_parameters, covariance = sp_opt.curve_fit(gaussian_function, 
+                                                  x_values, y_values,
+                                                  p0=guesses,bounds=bounds)
+    
+    # For ease.
+    center = fit_parameters[0]
+    std_dev = fit_parameters[1]
+    height = fit_parameters[2]
 
-    return fit_parameters, covariance
+    return center, std_dev, height, covariance
+
+
+def fit_multigaussian(x_points,y_points,
+                      gaussian_count=None,masking=False,
+                      prominence=None, fft_keep=0.01,prom_height_ratio=None):
+    """
+    Fit a gaussian function with 3 degrees of freedom but with many gaussians.
+
+    Input:
+        x_values = the x-axial array of the values
+        y_values = the y-axial array of the values
+        gaussian_count = the number of expected gaussian functions
+        masking = mask out known gaussians to prevent overfitting.
+        fft_keep = the percentage kept by the fft truncation, use a lower 
+            fft_keep if there is a lot of noise
+        prom_height_ratio = the ratio of prominence to height for width 
+            detection, a lower value increases accuracy until there are too
+            little patterns.
+
+
+    Returns: center_array,std_dev_array,height_array,covariance_array
+        center_array = the central value of the gaussian
+        std_dev_array = the standard deviation of the gaussian
+        height_array = the height of the gaussian function along the x-axis
+        covariance_array = a convariance matrix of the fit
+    """
+    # Initial variables.
+    n_datapoints = len(x_points)
+    center_array = []
+    std_dev_array = []
+    height_array = []
+    covariance_array = []
+
+    # Type check.
+    x_points = valid.validate_float_array(x_points,size=n_datapoints)
+    y_points = valid.validate_float_array(y_points,size=n_datapoints)
+    masking = valid.validate_boolean_value(masking)
+    if (gaussian_count is not None):
+        # Gaussian count can't be less than 0.
+        gaussian_count = valid.validate_int_value(gaussian_count,greater_than=0)
+    fft_keep = valid.validate_float_value(fft_keep,greater_than=0,less_than=1)
+    if (prominence is not None):
+        prominence = valid.validate_float_value(prom_height_ratio,
+                                                greater_than=0)
+    else:
+        prominence = 0.1
+    if (prom_height_ratio is not None):
+        prom_height_ratio = valid.validate_float_value(prom_height_ratio,
+                                                       greater_than=0)
+    else:
+        prom_height_ratio = 0.25
+
+    # Detect the approximate center values of the gaussians. Using a smoothing
+    # fft and ifft.
+    fourier_y_points = np.fft.fft(y_points)
+    fourier_y_points[int(n_datapoints*fft_keep):] = 0
+    inv_fourier_y_points = np.fft.ifft(fourier_y_points)
+
+    # Find the peaks of the smooth fourier transform. Only the values are 
+    # desired.
+    peak_index = sp_sig.find_peaks(np.abs(inv_fourier_y_points),
+                                   prominence=0.1)[0]
+    peak_index = np.array(peak_index,dtype=int)
+    center_estimates = x_points[peak_index]
+
+    # Test if the center estimate found the right amount of gaussians. If not,
+    # warn the user, but carry on, it is likely a more or less minor issue.
+    if (gaussian_count is not None):
+        if (len(center_estimates) < gaussian_count):
+            kyubey_warning(OutputError,('Less gaussians were detected than '
+                                        'input as the number of gaussians. '
+                                        'Consider raising fft_keep or '
+                                        'lowering prominence.'
+                                        '    --Kyubey'))
+        elif (len(center_estimates) > gaussian_count):
+            kyubey_warning(OutputError,('More gaussians were detected than '
+                                        'input as the number of gaussians. '
+                                        'Consider lowering fft_keep or '
+                                        'raising prominence.'
+                                        '    --Kyubey'))
+    
+    # Do an initial fit over all possible center estimates. Only attempt to fit
+    for guessdex in range (len(center_estimates)):
+        # Find the range between to evaluate a fit using half peak width as an
+        # approximation for FWHF
+        peak_widths = sp_sig.peak_widths(np.abs(inv_fourier_y_points),
+                                         peaks=peak_index,
+                                         rel_height=prom_height_ratio)
+        peak_lower_bounds = np.array(np.floor(peak_widths[2]),dtype=int)
+        peak_upper_bounds = np.array(np.ceil(peak_widths[3]),dtype=int)
+
+        # Fit a gaussian using only the points between 2 peak bounds.
+        temp_x_points = x_points[peak_lower_bounds[guessdex]:
+                                 peak_upper_bounds[guessdex]]
+        temp_y_points = y_points[peak_lower_bounds[guessdex]:
+                                 peak_upper_bounds[guessdex]]
+
+        temp_center,temp_std_dev,temp_height,temp_covariance = \
+            fit_gaussian(temp_x_points,temp_y_points,
+                         center_guess=center_estimates[guessdex])        
+
+        # Append the values of the fit.
+        center_array.append(temp_center)
+        std_dev_array.append(temp_std_dev)
+        height_array.append(temp_height)
+        covariance_array.append(temp_covariance)
+
+    # Test if the user did not want masking, if so, then return data as masking
+    # is the only next step.
+    if (not masking):
+        # Turn into numpy arrays just in case.
+        center_array = np.array(center_array,dtype=float)
+        std_dev_array = np.array(std_dev_array,dtype=float)
+        height_array = np.array(height_array,dtype=float)
+        covariance_array = np.array(covariance_array,dtype=float)
+        return center_array,std_dev_array,height_array,covariance_array
