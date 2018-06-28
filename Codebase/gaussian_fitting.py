@@ -43,9 +43,9 @@ def multigaussian_function(x_input, center_array, std_dev_array, height_array,
     x_input = valid.validate_float_array(x_input)
     center_array = valid.validate_float_array(
         center_array, size=gaussian_count)
-    std_dev_array = valid.validate_float_array(std_dev_array, 
-                                               size=gaussian_count, 
-                                               deep_validate=True, 
+    std_dev_array = valid.validate_float_array(std_dev_array,
+                                               size=gaussian_count,
+                                               deep_validate=True,
                                                greater_than=0)
     height_array = valid.validate_float_array(
         height_array, size=gaussian_count)
@@ -119,14 +119,14 @@ def generate_multigaussian(center_list, std_dev_list, height_list,
     height_list = valid.validate_float_array(height_list, size=gaussian_count)
 
     # Initial variables.
-    x_points = []
-    y_points = []
+    x_values = []
+    y_values = []
 
     # Check if the user provides individual datapoint count values.
     if (n_datapoints_list is not None):
-        n_datapoints_list = valid.validate_int_array(n_datapoints_list, 
-                                                     size=gaussian_count, 
-                                                     deep_validate=True, 
+        n_datapoints_list = valid.validate_int_array(n_datapoints_list,
+                                                     size=gaussian_count,
+                                                     deep_validate=True,
                                                      greater_than=0)
     elif (n_datapoints is not None):
         # Validate
@@ -137,14 +137,14 @@ def generate_multigaussian(center_list, std_dev_list, height_list,
 
     for gaussiandex in range(gaussian_count):
         # Generate one gaussian.
-        temp_x_points, temp_y_points = \
+        temp_x_values, temp_y_values = \
             generate_gaussian(center_list[gaussiandex],
                               std_dev_list[gaussiandex],
                               height_list[gaussiandex],
                               x_domain_list[gaussiandex],
                               n_datapoints=n_datapoints_list[gaussiandex])
         # Propagate one dimension out.
-        temp_y_points = np.array([temp_y_points])
+        temp_y_values = np.array([temp_y_values])
 
         for sub_gaussiandex in range(gaussian_count):
             # Prevent double dipping.
@@ -152,59 +152,59 @@ def generate_multigaussian(center_list, std_dev_list, height_list,
                 continue
 
             # Extract the maximum value from all of the gaussians.
-            added_y_points = gaussian_function(temp_x_points,
+            added_y_values = gaussian_function(temp_x_values,
                                                center_list[sub_gaussiandex],
                                                std_dev_list[sub_gaussiandex],
                                                height_list[sub_gaussiandex])
             # Propagate one dimension out.
-            added_y_points = np.array([added_y_points])
-            temp_y_points = np.concatenate((temp_y_points, added_y_points),
+            added_y_values = np.array([added_y_values])
+            temp_y_values = np.concatenate((temp_y_values, added_y_values),
                                            axis=0)
         # Extract only the maximum values.
-        temp_y_points = np.amax(temp_y_points, axis=0)
+        temp_y_values = np.amax(temp_y_values, axis=0)
 
         # Append the values for storage.
-        x_points.append(temp_x_points)
-        y_points.append(temp_y_points)
+        x_values.append(temp_x_values)
+        y_values.append(temp_y_values)
 
     # Morph to numpy arrays.
-    x_points = np.array(x_points, dtype=float)
-    y_points = np.array(y_points, dtype=float)
+    x_values = np.array(x_values, dtype=float)
+    y_values = np.array(y_values, dtype=float)
     # Flatten arrays just in case.
-    x_points = np.ravel(x_points)
-    y_points = np.ravel(y_points)
+    x_values = np.ravel(x_values)
+    y_values = np.ravel(y_values)
 
     # Double check that they are the same size.
-    if (x_points.size != y_points.size):
-        raise ShapeError('x_points and y_points do not seem to be the same '
+    if (x_values.size != y_values.size):
+        raise ShapeError('x_values and y_values do not seem to be the same '
                          'size.    --Kyubey')
-    elif (x_points.shape != y_points.shape):
-        raise ShapeError('x_points and y_points do not seem to be the same '
+    elif (x_values.shape != y_values.shape):
+        raise ShapeError('x_values and y_values do not seem to be the same '
                          'shape.    --Kyubey')
 
     # Ensure that the total number of points is not exceeded.
     if (n_datapoints is not None):
-        if (x_points.size != n_datapoints):
-            delta_size = x_points.size - n_datapoints
+        if (x_values.size != n_datapoints):
+            delta_size = x_values.size - n_datapoints
             # It should not be the case that delta_size is negative.
             if (delta_size < 0):
                 raise OutputError(
                     'The number of points is less than expected.')
 
-            removed_indexes = np.random.randint(0, x_points.size - 1,
+            removed_indexes = np.random.randint(0, x_values.size - 1,
                                                 delta_size)
-            x_points = np.delete(x_points, removed_indexes)
-            y_points = np.delete(y_points, removed_indexes)
+            x_values = np.delete(x_values, removed_indexes)
+            y_values = np.delete(y_values, removed_indexes)
 
     # Sort the values before returning.
-    sort_index = np.argsort(x_points)
-    x_points = x_points[sort_index]
-    y_points = y_points[sort_index]
+    sort_index = np.argsort(x_values)
+    x_values = x_values[sort_index]
+    y_values = y_values[sort_index]
 
-    return np.array(x_points, dtype=float), np.array(y_points, dtype=float)
+    return np.array(x_values, dtype=float), np.array(y_values, dtype=float)
 
 
-def generate_noisy_gaussian(center, std_dev, height, x_domain, noise_domain, 
+def generate_noisy_gaussian(center, std_dev, height, x_domain, noise_domain,
                             n_datapoints):
     """
     Generate a gaussian with some aspect of noise.
@@ -222,11 +222,11 @@ def generate_noisy_gaussian(center, std_dev, height, x_domain, noise_domain,
     """
     # Type check.
     center = valid.validate_float_value(center)
-    std_dev = valid.validate_float_value(std_dev,greater_than=0)
+    std_dev = valid.validate_float_value(std_dev, greater_than=0)
     height = valid.validate_float_value(height)
-    x_domain = valid.validate_float_array(x_domain,shape=(2,),size=2)
-    noise_domain = valid.validate_float_array(noise_domain,shape=(2,),size=2)
-    n_datapoints = valid.validate_int_value(n_datapoints,greater_than=0)
+    x_domain = valid.validate_float_array(x_domain, shape=(2,), size=2)
+    noise_domain = valid.validate_float_array(noise_domain, shape=(2,), size=2)
+    n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
 
     # Make the x-axis value array given the domain and the number of points.
     x_values = np.random.uniform(x_domain[0], x_domain[-1], n_datapoints)
@@ -324,18 +324,18 @@ def generate_noisy_multigaussian(center_list, std_dev_list, height_list,
         # Each gaussian must be generated on its own.
         for gaussiandex in range(gaussian_count):
             # Generate gaussian.
-            temp_x_points, temp_y_points = \
+            temp_x_values, temp_y_values = \
                 generate_gaussian(center_list[gaussiandex],
                                   std_dev_list[gaussiandex],
                                   height_list[gaussiandex],
                                   x_domain_list[gaussiandex],
                                   n_datapoints_list[gaussiandex])
-            temp_y_points = misc.generate_noise(temp_y_points,
+            temp_y_values = misc.generate_noise(temp_y_values,
                                                 noise_domain_list[gaussiandex],
                                                 distribution='uniform')
             # Store for return
-            x_values = np.append([x_values], [temp_x_points], axis=0)
-            y_values = np.append([y_values], [temp_y_points], axis=0)
+            x_values = np.append([x_values], [temp_x_values], axis=0)
+            y_values = np.append([y_values], [temp_y_values], axis=0)
 
         # Maximize the values, discarding everything lower than.
         x_values = np.amax(x_values, axis=0)
@@ -380,6 +380,16 @@ def fit_gaussian(x_values, y_values,
         height = the height of the gaussian function along the x-axis
         covariance = a convariance matrix of the fit
     """
+    # The total number of points, useful.
+    try:
+        n_datapoints = len(x_values)
+    except:
+        raise InputError('It does not make sense to try and fit a '
+                         'single point.'
+                         '    --Kyubey')
+    else:
+        n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
+
     # Type check
     x_values = valid.validate_float_array(x_values)
     y_values = valid.validate_float_array(y_values)
@@ -442,8 +452,8 @@ def fit_gaussian(x_values, y_values,
     return center, std_dev, height, covariance
 
 
-def fit_multigaussian(x_points, y_points,
-                      gaussian_count=None, masking=False,
+def fit_multigaussian(x_values, y_values,
+                      gaussian_count=None,
                       prominence=None, fft_keep=0.01, prom_height_ratio=None):
     """
     Fit a gaussian function with 3 degrees of freedom but with many gaussians.
@@ -452,7 +462,6 @@ def fit_multigaussian(x_points, y_points,
         x_values = the x-axial array of the values
         y_values = the y-axial array of the values
         gaussian_count = the number of expected gaussian functions
-        masking = mask out known gaussians to prevent overfitting.
         fft_keep = the percentage kept by the fft truncation, use a lower 
             fft_keep if there is a lot of noise
         prom_height_ratio = the ratio of prominence to height for width 
@@ -466,17 +475,25 @@ def fit_multigaussian(x_points, y_points,
         height_array = the height of the gaussian function along the x-axis
         covariance_array = a convariance matrix of the fit
     """
+    # The total number of points, useful.
+    try:
+        n_datapoints = len(x_values)
+    except:
+        raise InputError('It does not make sense to try and fit a '
+                         'single point.'
+                         '    --Kyubey')
+    else:
+        n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
+
     # Initial variables.
-    n_datapoints = len(x_points)
     center_array = []
     std_dev_array = []
     height_array = []
     covariance_array = []
 
     # Type check.
-    x_points = valid.validate_float_array(x_points, size=n_datapoints)
-    y_points = valid.validate_float_array(y_points, size=n_datapoints)
-    masking = valid.validate_boolean_value(masking)
+    x_values = valid.validate_float_array(x_values, size=n_datapoints)
+    y_values = valid.validate_float_array(y_values, size=n_datapoints)
     if (gaussian_count is not None):
         # Gaussian count can't be less than 0.
         gaussian_count = valid.validate_int_value(
@@ -496,16 +513,16 @@ def fit_multigaussian(x_points, y_points,
 
     # Detect the approximate center values of the gaussians. Using a smoothing
     # fft and ifft.
-    fourier_y_points = np.fft.fft(y_points)
-    fourier_y_points[int(n_datapoints*fft_keep):] = 0
-    inv_fourier_y_points = np.fft.ifft(fourier_y_points)
+    fourier_y_values = np.fft.fft(y_values)
+    fourier_y_values[int(n_datapoints*fft_keep):] = 0
+    inv_fourier_y_values = np.fft.ifft(fourier_y_values)
 
     # Find the peaks of the smooth fourier transform. Only the values are
     # desired.
-    peak_index = sp_sig.find_peaks(np.abs(inv_fourier_y_points),
+    peak_index = sp_sig.find_peaks(np.abs(inv_fourier_y_values),
                                    prominence=0.1)[0]
     peak_index = np.array(peak_index, dtype=int)
-    center_estimates = x_points[peak_index]
+    center_estimates = x_values[peak_index]
 
     # Test if the center estimate found the right amount of gaussians. If not,
     # warn the user, but carry on, it is likely a more or less minor issue.
@@ -527,20 +544,20 @@ def fit_multigaussian(x_points, y_points,
     for guessdex in range(len(center_estimates)):
         # Find the range between to evaluate a fit using half peak width as an
         # approximation for FWHF
-        peak_widths = sp_sig.peak_widths(np.abs(inv_fourier_y_points),
+        peak_widths = sp_sig.peak_widths(np.abs(inv_fourier_y_values),
                                          peaks=peak_index,
                                          rel_height=prom_height_ratio)
         peak_lower_bounds = np.array(np.floor(peak_widths[2]), dtype=int)
         peak_upper_bounds = np.array(np.ceil(peak_widths[3]), dtype=int)
 
         # Fit a gaussian using only the points between 2 peak bounds.
-        temp_x_points = x_points[peak_lower_bounds[guessdex]:
+        temp_x_values = x_values[peak_lower_bounds[guessdex]:
                                  peak_upper_bounds[guessdex]]
-        temp_y_points = y_points[peak_lower_bounds[guessdex]:
+        temp_y_values = y_values[peak_lower_bounds[guessdex]:
                                  peak_upper_bounds[guessdex]]
 
         temp_center, temp_std_dev, temp_height, temp_covariance = \
-            fit_gaussian(temp_x_points, temp_y_points,
+            fit_gaussian(temp_x_values, temp_y_values,
                          center_guess=center_estimates[guessdex])
 
         # Append the values of the fit.
@@ -549,12 +566,10 @@ def fit_multigaussian(x_points, y_points,
         height_array.append(temp_height)
         covariance_array.append(temp_covariance)
 
-    # Test if the user did not want masking, if so, then return data as masking
-    # is the only next step.
-    if (not masking):
-        # Turn into numpy arrays just in case.
-        center_array = np.array(center_array, dtype=float)
-        std_dev_array = np.array(std_dev_array, dtype=float)
-        height_array = np.array(height_array, dtype=float)
-        covariance_array = np.array(covariance_array, dtype=float)
-        return center_array, std_dev_array, height_array, covariance_array
+    # Turn into numpy arrays just in case.
+    center_array = np.array(center_array, dtype=float)
+    std_dev_array = np.array(std_dev_array, dtype=float)
+    height_array = np.array(height_array, dtype=float)
+    covariance_array = np.array(covariance_array, dtype=float)
+
+    return center_array, std_dev_array, height_array, covariance_array

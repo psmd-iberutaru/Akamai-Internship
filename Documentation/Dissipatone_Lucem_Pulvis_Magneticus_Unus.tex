@@ -88,8 +88,53 @@ In order to share the functions and code work done with the Mentor, a Github rep
 A field trip on Monday, 2018 June 25, to Mauna Loa's Yuan-Tseh Lee Array (YTLA), a radio telescope, is planned. Departure is expected to be at 14:00, arrival back at the SMA facility is expected to be 19:00 at the latest. 
 
 
+\subsection{2018 June 26}
+The gaussian fitting functions have been completed. They work accurately unless the separation between two gaussian functions is such that the peak of one is obscured in the body of the other (in the case of multi-gaussian fitting). 
+
+In the case of multi-gaussian fitting, the peaks of each gaussian (if not already obscured) is detected using \texttt{scipy} based peak finding algorithms. To prevent the intrusion of other gaussians, the domain that the data points for any one particular gaussian is determined by the \texttt{peak\_widths} function, with the start and ending points of the gaussian being determined by the function's 2nd and 3rd returns in index space.
+
+Research has also been done to also fit Bessel functions. Bessel functions are a class of functions that satisfy the Bessel ODE equation.
+\begin{equation}
+	x^2 \frac{\diff[2]{y}}{\diff{x^2}} + x \frac{\diff{y}}{\diff{x}} + \left( x^2 + \alpha^2 \right) y = 0
+	\label{eq:Bessel_ODE_equation}
+\end{equation}
+
+For $\alpha$ being the order of the Bessel equation. 
+
+The solution(s) to Bessel's equations, the Bessel functions that we are interested in, come in one of two flavors. 
+
+Bessel functions of the first kind are used when $x$ is finite and definable at the origin for either integer or positive $\alpha$ ($\left\{ \left. \alpha \right| \alpha \in \mathbb{Z} \lor \alpha > 0 \right\}$) or if $y$ diverges as $x$ approaches $0$ for negative non-integer $\alpha$ ($\left\{ \left. \alpha \right| \alpha \notin \mathbb{Z} \land \alpha < 0\right\})$.
+
+\begin{equation}
+	J_{\alpha}(x) = \sum_{k=0}^{\infty} \frac{\left(-1\right)^{k}}{k! \Gamma(k+\alpha+1)} \left( \frac{x}{2} \right)^{2k + \alpha}
+	\label{eq:Bessel_equation_firstkind}
+\end{equation}
+
+Bessel functions of the second find are used when $x=0$ is a singularity. In this case, the solutions are in a few forms.
+
+For non-integer $\alpha$ ($\left\{ \left. \alpha \right| \alpha \notin \mathbb{Z} \right\}$):
+\begin{equation}
+	Y_{\alpha}(x) = \frac{J_{\alpha}(x) \cos{\alpha \pi} - J_{-\alpha}(x)}{\sin{\alpha\pi}}
+	\label{eq:Bessel_equation_secondkind_noninterger}
+\end{equation}
+
+For an integer order $n$ ($\left\{ \left. n \right| n \in \mathbb{Z} \right\}$):
+\begin{equation}
+	Y_{n}(x) = \lim_{\alpha \rightarrow n} \left[ {Y_{\alpha(x)}} \right]
+	\label{eq:Bessel_equation_secondkind_interger}
+\end{equation}
+
+It is, of course, the case that \texttt{scipy} already has a family of functions outlining the numerical implementation of these functions. The Bessel functions, and the generating/fitting functions are written using those family of equations as the basis of computation. 
 
 
+\begin{meetingnotes*}
+	We search for mostly the deformation of the polarization region. 
+
+	Future tasks:
+	\begin{itemize}
+		\item Bessel function and gaussian function fitting, where both are linearly combined, i.e. $y = a G(x,\mu,\sigma,h) + b B(x,\alpha,\mu,h)$.
+	\end{itemize}
+\end{meetingnotes*}
 
 
 
