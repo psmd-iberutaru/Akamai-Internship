@@ -25,7 +25,7 @@ def gaussian_function(x_input, center, std_dev, height):
     height = valid.validate_float_value(height)
 
     # Use the equation of a gaussian from Wikipedia:
-    y_output = (((1 / std_dev * np.sqrt(2 * np.pi))
+    y_output = (((1 / (std_dev * np.sqrt(2 * np.pi)))
                  * np.exp(-0.5 * ((x_input - center)/std_dev)**2))
                 + height)
     return np.array(y_output, dtype=float)
@@ -509,7 +509,7 @@ def fit_multigaussian(x_values, y_values,
         prom_height_ratio = valid.validate_float_value(prom_height_ratio,
                                                        greater_than=0)
     else:
-        prom_height_ratio = 0.25
+        prom_height_ratio = 0.1
 
     # Detect the approximate center values of the gaussians. Using a smoothing
     # fft and ifft.
@@ -520,7 +520,7 @@ def fit_multigaussian(x_values, y_values,
     # Find the peaks of the smooth fourier transform. Only the values are
     # desired.
     peak_index = sp_sig.find_peaks(np.abs(inv_fourier_y_values),
-                                   prominence=0.1)[0]
+                                   prominence=prominence)[0]
     peak_index = np.array(peak_index, dtype=int)
     center_estimates = x_values[peak_index]
 

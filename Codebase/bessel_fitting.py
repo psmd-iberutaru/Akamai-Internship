@@ -247,3 +247,85 @@ def fit_bessel_function_2nd(x_points, y_points,
     covariance = float(fit_parameters[1])
 
     return fit_order, covariance
+
+
+def fit_bessel_function_1st_integer(x_values,y_values,
+                                    max_order=1000,negative_order=False):
+    """
+    This is the main bessel fitting algorithm. It can fit, and then extract, 
+    the order of the bessel function according to the best fit of the data 
+    points.
+
+    However, it can only do integer orders, and will not attempt float orders or
+    complex orders.
+
+    Input:
+    x_values = Input x values
+    y_values = Input y values
+    max_order = The absolute value of the max order that is to be checked.
+    negative_order = If the user prefers the negative order if the positive and
+        negative order is the same.
+
+    Output:
+    fit_order = The primary positive fit order
+    """
+    # Important information and validate.
+    try:
+        n_datapoints = len(x_values)
+    except:
+        x_values = valid.validate_float_array(x_values)
+        n_datapoints = len(x_values)
+    finally:
+        # Type check
+        x_values = valid.validate_float_array(x_values,size=n_datapoints)
+        y_values = valid.validate_float_array(y_values,size=n_datapoints)
+    negative_order =  valid.validate_boolean_value(negative_order)
+
+    # Because an order of 0 is a thing.
+    searchable_orders = range(max_order + 1)
+
+    # Generate list of output values, given inputs and searching through all 
+    # given possible orders.
+    output_ranges = []
+    for orderdex in searchable_orders:
+        output_ranges.append(bessel_function_1st(x_values,orderdex))
+
+    # Copy the positive domain and transpose to the negative order domain via
+    # the relationship of non-linearity of Bessel functions of the the first
+    # kind of interger order.
+    positive_order_outputs = np.array(output_ranges)
+    negative_order_outputs = np.array(output_ranges)
+    for orderdex, output_array in enumerate(negative_order_outputs):
+        negative_order_outputs[orderdex] *= (-1)**orderdex
+
+    # Use the least squares fitting algorithm.
+    
+    # Define square residuals for both positive and negative.
+    positive_order_sq_residuals = \
+        np.sum((y_values - positive_order_outputs[:])**2,axis=1)
+    negative_order_sq_residuals = \
+        np.sum((y_values - negative_order_outputs[:])**2,axis=1)
+
+    # Find the lowest square residual of both the positive and negative values.
+    positive_order_fit = np.argmin(positive_order_sq_residuals)
+    negative_order_fit = np.argmin(negative_order_sq_residuals)
+
+    # It might be the case that the values of the negative and the positive 
+    # order is the same via the non-linearity relationship, if so, send the
+    # positive value if the negative order is not wanted.
+    if (positive_order_fit == negative_order_fit):
+        if (negative_order):
+            return int(negative_order_fit)
+        else:
+            return int(positive_order_fit)
+    elif (positive_order_sq_residuals[positive_order_fit] 
+          < negative_order_sq_residuals[negative_order_fit]):
+          return int(positive_order_fit)
+    elif (positive_order_sq_residuals[positive_order_fit] 
+          > negative_order_sq_residuals[negative_order_fit]):
+          return int(negative_order_fit)
+    else:
+        raise OutputError('There seems to be something wrong, it is not known'
+                          'what is wrong.'
+                          '    --Kyubey')
+

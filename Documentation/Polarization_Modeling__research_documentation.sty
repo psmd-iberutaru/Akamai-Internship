@@ -165,7 +165,8 @@
 
 
 % Specific functions, like the exponent and the absolute function, should also have their own parenthetical outline.
-\let\oldexp\exp \renewcommand*{\exp}[1]{\oldexp \!\left(#1\right)}
+\let\oldexp\exp \renewcommand*{\exp}[1]{\oldexp \! \left( #1 \right)}
+\newcommand*{\erf}[1]{\text{erf} \! \left( #1 \right)}
 \newcommand*{\abs}[1]{\left| #1 \right|}
 \let\olddet\det \renewcommand{\det}[1]{\olddet\left( #1 \right)}
 

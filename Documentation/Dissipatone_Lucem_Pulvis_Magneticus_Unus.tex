@@ -62,7 +62,11 @@
 	\end{enumerate}
 \end{meetingnotes*}
 
-Both of these functions have been completed as of this date, written in Python. 
+Both of these functions have been completed as of this date, written in Python. The gaussian equation implemented is similar to that on Wikipedia:
+\begin{equation}
+	g(x) = \frac{1}{\sigma \sqrt{2 \pi}} e^{ -\frac{1}{2} \left(\frac{x-\mu}{\sigma}\right)^2 } = \frac{1}{\sigma \sqrt{2 \pi}} \exp{ -\frac{1}{2} \left(\frac{x-\mu}{\sigma}\right)^2 }
+	\label{eq:gaussian_probability_distribution}
+\end{equation}
 
 In order to share the functions and code work done with the Mentor, a Github repository has been created. It can be found at \url{https://github.com/psmd-iberutaru/Akamai_Internship}.
 
@@ -135,6 +139,70 @@ It is, of course, the case that \texttt{scipy} already has a family of functions
 		\item Bessel function and gaussian function fitting, where both are linearly combined, i.e. $y = a G(x,\mu,\sigma,h) + b B(x,\alpha,\mu,h)$.
 	\end{itemize}
 \end{meetingnotes*}
+
+08:30
+08:30==10:00-10:30 (most days)
+
+\subsection{2018 June 28}:
+\label{subsec:2018_June_28}
+
+There has been some interesting trends or quirks found in the properties of Bessel functions of the first kind. These quirks prevent Python from plotting it very effectively, however, it is the case that there are workarounds.
+
+These are by no mean always true, but, for a large range of values (to numerical accuracy and computational usefulness), they seem to be true.
+
+For $\alpha \in \mathbb{Z}$:
+\begin{equation*}
+	J_{-\alpha} (x) = \left( -1 \right)^{\alpha) J_{\alpha}(x)
+\end{equation*}
+This is a true relationship as it also proves that $J_{\alpha} (x)$ and $J_{-\alpha} (x)$ are not linearly independent.
+
+For $\alpha \in \mathbb{Z}$:
+\begin{equation*}
+	J_\alpha (x) = 
+	\begin{cases}
+	J_\alpha (-x) & \text{ if } \alpha \in \mathbb{Z}_\text{even} \\ 
+	-J_\alpha (-x) & \text{ if } \alpha \in \mathbb{Z}_\text{odd} 
+	\end{cases}
+\end{equation*}
+Thus Bessel functions of the first kind for integer order is an even function for even order, or an odd function for odd order.
+
+For $\alpha \notin \mathbb{Z} \land \alpha \in \mathbb{R}$:
+\begin{gather*}
+	\text{Re}\left( J_\alpha (x) \right) = \text{Im}\left( J_\alpha (-x) \right) \\
+	\Downarrow \\
+	J_\alpha (-x) = J_\alpha (x) \imaginary
+\end{gather*}
+
+For $\alpha = \frac{1}{2}k \quad \text{For:} \quad \left\{ \left. k \in \mathbb{Z} \right| k \neq 0 \right\}$:
+\begin{equation*}
+	\text{Re} \left( J_\alpha (x \imaginary) \right) = \text{Im} \left( J_\alpha (x \imaginary) \right)
+\end{equation*}
+
+\begin{meetingnotes*}
+	First, a small discussion was held about the Mentor's meeting times. In general, between the times of 08:30 and 10:30, he will be in a meeting and unavailable. Otherwise, if he is not present in his office, he may be downstairs of the SMA building in one of the labs. Emailing is preferred by both parties, however, if necessary, his cell phone number is recorded in contacts.
+
+	Based on the discussions with my Mentor, it does not seem that fractional order Bessel functions are needed. We can stick to integer Bessel functions ($\alpha \in \mathbb{Z}$). 
+
+	In fact, so far, the main functions that are going to be used (i.e. periodic functions)
+	\begin{enumerate}
+		\item Basic trigonometric functions: $\sin{x}$, $\cos{x}$
+		\item Gaussian functions (see \Fref{eq:gaussian_probability_distribution}: 
+			\begin{equation*}
+				g(x) = \frac{1}{\sigma \sqrt{2 \pi}} \exp{ -\frac{1}{2} \left(\frac{x-\mu}{\sigma}\right)^2 }
+			\end{equation*}
+		\item Bessel functions of the first kind ($J_\alpha(x)$) of integer order ($\alpha \in \mathbb{Z}$), see \Fref{eq:Bessel_equation_firstkind}:
+			\begin{equation*}
+				J_{\alpha}(x) = \sum_{k=0}^{\infty} \frac{\left(-1\right)^{k}}{k! \Gamma(k+\alpha+1)} \left( \frac{x}{2} \right)^{2k + \alpha}
+			\end{equation*}
+		\item Error functions $\erf{x}$:
+			\begin{equation*}
+				\erf{x} = \frac{1}{\sqrt{\pi}} \int_{-x}^{x} \exp{-t^2} \diff{t} = \frac{2}{\sqrt{\pi}} \int_{0}^{x} \exp{-t^2} \diff{t}
+				\label{eq:error_function}
+			\end{equation*}
+	\end{enumerate}
+\end{meetingnotes*}
+
+
 
 
 
