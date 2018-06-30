@@ -80,14 +80,14 @@ def generate_noise(input_array, noise_domain, distribution='uniform',
     return input_array + noise_array
 
 
-def generate_function_envelope(x_inputs, functions, parameters):
+def generate_function_envelope(x_values, functions, parameters):
     """
     Generate a function (x,y points) based on the maximum value of a list of
     functions, given their parameters. This creates an envelope function around
     the list of functions.
 
     Input:
-    x_inputs = x input values
+    x_values = x input values
     functions = list of functions to be used, the first entry of each function
         is assumed to be the main input value of the function.
     parameters = list of tuples or dictionaries of the parameters to be used, 
@@ -95,14 +95,14 @@ def generate_function_envelope(x_inputs, functions, parameters):
         definition or be a dictionary of inputs.
 
     Output:
-    y_outputs = y output values
+    y_values = y output values
     """
     # Initial values.
-    y_outputs = []
+    y_values = []
 
     # Type check, the only initial type checking that can be done is for
-    # x_inputs.
-    x_inputs = valid.validate_float_array(x_inputs)
+    # x_values.
+    x_values = valid.validate_float_array(x_values)
     parameters = list(parameters)
 
     # Number of functions.
@@ -148,7 +148,7 @@ def generate_function_envelope(x_inputs, functions, parameters):
             # function.
             x_input_name = list(function_signature.parameters.keys())[0]
             # Create a dictionary entry and insert at the beginning of the list.
-            x_input_dict = {str(x_input_name): x_inputs}
+            x_input_dict = {str(x_input_name): x_values}
 
             # For backwards compatability:
             try:
@@ -163,7 +163,7 @@ def generate_function_envelope(x_inputs, functions, parameters):
 
             # Input the first element, the x-values, just as the first element.
             parameters[functiondex] = list(parameters[functiondex])
-            parameters[functiondex] = (x_inputs,) + parameters[functiondex]
+            parameters[functiondex] = (x_values,) + parameters[functiondex]
         else:
             # Try and adapt the input into one of the two accepted types.
             try:
@@ -189,12 +189,12 @@ def generate_function_envelope(x_inputs, functions, parameters):
             if (is_dictionary_parameters):
                 # Output the function given the parameters of the same index.
                 # Use argument slicing based on dictionaries.
-                y_outputs.append(
+                y_values.append(
                     functions[functiondex](**parameters[functiondex]))
             else:
                 # Output the function given the parameters of the same index.
                 # Use argument slicing based on aligned tuples or lists.
-                y_outputs.append(
+                y_values.append(
                     functions[functiondex](*parameters[functiondex]))
         except:
             print('Error occurred on function {funt_num} '
@@ -205,6 +205,6 @@ def generate_function_envelope(x_inputs, functions, parameters):
             raise
 
     # Extract only the highest values of y_points.
-    y_outputs = np.amax(y_outputs, axis=0)
+    y_values = np.amax(y_values, axis=0)
 
-    return np.array(y_outputs, dtype=float)
+    return np.array(y_values, dtype=float)

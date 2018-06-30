@@ -17,7 +17,7 @@ import misc_functions as misc
 def gaussian_bessel_fit(x_values, y_values,
                         # Arbitrary values.
                         arbitrary={'fft_cutoff': 0.01, 'prominence': 0.25,
-                                   'prom_height_ratio': 0.25,'gauss_toler':0.1,
+                                   'prom_height_ratio': 0.25, 'gauss_toler': 0.1,
                                    'bess_mask_toler': 0.01}):
     """
     This function detects and fits multiple gaussian functions on a bessel 
@@ -51,7 +51,7 @@ def gaussian_bessel_fit(x_values, y_values,
         # Perform a fft and cut the first and last percents of values.
         y_fft = np.fft.fft(y_values)
         y_fft[int(n_datapoints*fft_cutoff):-int(n_datapoints*fft_cutoff)] = 0
-        print(fft_cutoff)
+
         # Revert the fft transform
         y_ifft = np.fft.ifft(y_fft)
 
@@ -84,7 +84,7 @@ def gaussian_bessel_fit(x_values, y_values,
                                    y_values=y_values,
                                    **arbitrary)
 
-    fitted_order = bessfit.fit_bessel_function_1st_integer(clear_bessel_x, 
+    fitted_order = bessfit.fit_bessel_function_1st_integer(clear_bessel_x,
                                                            clear_bessel_y)
 
     def _bessel_mask(x_values, y_values, order, bess_mask_toler,
@@ -105,7 +105,7 @@ def gaussian_bessel_fit(x_values, y_values,
         passed_index = np.where(np.abs(y_values - bessel_y) > bess_mask_toler)
 
         # Return only the valid values via the valid index.
-        return x_values[passed_index],y_values[passed_index]
+        return x_values[passed_index], y_values[passed_index]
 
     # Get gaussian only data.
     clear_gauss_x, clear_gauss_y = _bessel_mask(x_values=x_values,
