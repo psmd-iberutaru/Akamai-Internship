@@ -208,3 +208,19 @@ def generate_function_envelope(x_values, functions, parameters):
     y_values = np.amax(y_values, axis=0)
 
     return np.array(y_values, dtype=float)
+
+
+def Stokes_parameter_polarization_angle(Q,U):
+    """
+    This function returns an angle of polarization in radians based on the 
+    values of two stoke parameters. The angle is signed.
+    """
+
+    # Type check
+    Q = valid.validate_float_array(Q)
+    U = valid.validate_float_value(U)
+
+    # Based off of Wikipedia and computational testing
+    angle = 0.5*np.arctan2(U,Q)
+
+    return angle

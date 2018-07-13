@@ -2,6 +2,7 @@
 
 \RequirePackage{Polarization_Modeling__research_documentation}
 
+
 \begin{document}
 %% Define the title properties and author information.
 %%%%%%%%%%%%%%%%%%%%
@@ -140,8 +141,6 @@ It is, of course, the case that \texttt{scipy} already has a family of functions
 	\end{itemize}
 \end{meetingnotes*}
 
-08:30
-08:30==10:00-10:30 (most days)
 
 \subsection{2018 June 28}:
 \label{subsec:2018_June_28}
@@ -152,7 +151,7 @@ These are by no mean always true, but, for a large range of values (to numerical
 
 For $\alpha \in \mathbb{Z}$:
 \begin{equation*}
-	J_{-\alpha} (x) = \left( -1 \right)^{\alpha) J_{\alpha}(x)
+	J_{-\alpha} (x) = \left( -1 \right)^{\alpha} J_{\alpha}(x)
 \end{equation*}
 This is a true relationship as it also proves that $J_{\alpha} (x)$ and $J_{-\alpha} (x)$ are not linearly independent.
 
@@ -203,7 +202,56 @@ For $\alpha = \frac{1}{2}k \quad \text{For:} \quad \left\{ \left. k \in \mathbb{
 \end{meetingnotes*}
 
 
+\subsection{9 July 2018}
+\label{subsec:9_July_2018}
+
+Today, two main projects were finished up. A programable form of the equations of the magnetic fields in a `hourglass' shape for a cylindrical coordinate system was completed. Although it was attempted to bring the two dimensional equations ($\vect{B} = f(r,z)$) into three dimensions via an invariant $phi$ parameter ($\vect{B} = f(r,\phi,z)$), it is so far unsuccessful in visualization, but seems to be alright in terms of actual functionality.
+
+The equations for the magnetic field is given by \cite{Ewertowski_Basu_2013}, where $h$ is a free parameter and \textit{not} Planck's constant.
+\begin{align}
+	B_r =& \sum_{m=1}^{\infty} k_m \sqrt{\lambda_m} J_1(\sqrt{\lambda_m} r) \left\lbrack \erfc{\frac{\sqrt{\lambda_m} h}{2} - \frac{z}{h}} \exp{-\sqrt{\lambda_m} z} \right. \nonumber \\ 
+	&\left. - \erfc{\frac{\sqrt{\lambda_m} h}{2} + \frac{z}{h}} \exp{\sqrt{\lambda_m} z} \right\rbrack
+	\label{eq:Ewertowski_Basu_B_r_equation}
+\end{align}
+\begin{align}
+	B_z =& \sum_{m=1}^{\infty} k_m \sqrt{\lambda_m} J_0(\sqrt{\lambda_m} r) \left\lbrack \erfc{\frac{\sqrt{\lambda_m} h}{2} + \frac{z}{h}} \exp{\sqrt{\lambda_m} z} \right.  \nonumber \\ 
+	&\left. + \erfc{\frac{\sqrt{\lambda_m} h}{2} - \frac{z}{h}} \exp{-\sqrt{\lambda_m} z} \right\rbrack
+	\label{eq:Ewertowski_Basu_B_r_equation}
+\end{align}
+
+For $a_{m,1}$ is the $m$th positive root of $J_1(x)$, whereas $a_{m,1} > a_{m+1,1}$, such that $\lambda_m$ is given by, provided $R$ the radius of the protoplanetary disk of the system simulation.
+\begin{equation*}
+	\lambda_m = \left( \frac{a_{m,1}}{R} \right)^2 \qquad \text{For: } m \in \mathbb{R}
+\end{equation*}
+
+The paper also defines the coefficient $k_m$ as,
+\begin{equation*}
+	k_m \triangleq \frac{2 h \pi^{\frac{3}{2}} \exp{\frac{h^2 \lambda_m}{4}}}{c R^2 \sqrt{\lambda_m} \left( J_2(\sqrt{\lambda_m} R) \right)^2} \int_0^R f(\xi) J_1(\sqrt{\lambda_m} \xi) \xi \diff{\xi}
+\end{equation*}
+with some custom defined function $f(x)$; but, for all intents and purposes, we use $k_m$ also as a parameter as does the paper.
+
+\subsection{10 July 2018}
+\label{subsec:10_July_2018}
+
+The presentation to the Akamai Internship program is due tomorrow. Recent things have came up about the motivation of this project and the purpose and contributions that magnetic fields make to star forming regions.
+
+One of the big issues with star formation is that of the conservation of angular momentum. By the time a protoplanetary disk can form into a star, the total angular momentum of the system is estimated to be too great; possibly tearing the star apart. Thus, in order to stop the star from spinning too much, it is believed that magnetic breaking is involved (see \Fref{fig:yoyo_despin_animation} for a mechanical demonstration, else see \url{https://en.wikipedia.org/wiki/Magnetic_braking}).
+
+\begin{figure}
+	\includemedia[width=\columnwidth,height=4cm]{Yoyo despin animation}{Resources/yoyo_despin_animation.mp4}
+	\caption{This is a small animation that demonstrates the lessening of a ship's angular momentum because of the objects on the tethers stealing the momentum. Ionized particles caught in protoplanetary stellar magnetic fields act similar to objects on tethers, slowing down the rotation of the proto-star.}
+	\label{fig:yoyo_despin_animation}
+\end{figure}
+
+A second reason for the research into the magnetic field of protoplanetary regions (star forming regions) is because magnetic fields prevent the collapse of clouds, preventing star formation. For a gas cloud with less mass than $M_{B,cr}$, given by
+\begin{align*}
+	M_{B,cr} &= 0.12 \frac{\Phi}{\sqrt{G}} \\ 
+	& \simeq 10^3 \left( \frac{B}{30 \mu G} \right) \left( \frac{R}{pc} \right)^2 M_{\odot}
+\end{align*}
+
+For masses below this critical limit, $M_\text{cloud} < M_{B,cr}$, the magnetic field can support the cloud, preventing it from collapsing and turning it into a star. 
 
 
 
+\printbibliography
 \end{document}

@@ -1,3 +1,5 @@
+import inspect
+
 import numpy as np
 import scipy as sp
 
@@ -113,7 +115,7 @@ def validate_int_value(int_value_input,
     if (greater_than is not None):
         # Type check the optional test inputs.
         greater_than = validate_float_value(greater_than)
-        if (int_value_input < greater_than):
+        if (int_value_input <= greater_than):
             raise ValueError('Input int value is less than the stipulated '
                              'value. '
                              'Expected: {expt}  Actual: {act}'
@@ -122,7 +124,7 @@ def validate_int_value(int_value_input,
     if (less_than is not None):
         # Type check the optional test inputs.
         less_than = validate_float_value(less_than)
-        if (int_value_input > less_than):
+        if (int_value_input >= less_than):
             raise ValueError('Input int value is greater than the stipulated '
                              'value. '
                              'Expected: {expt}  Actual: {act}'
@@ -216,7 +218,7 @@ def validate_float_value(float_value_input,
     if (greater_than is not None):
         # Type check the optional test inputs.
         greater_than = validate_float_value(greater_than)
-        if (float_value_input < greater_than):
+        if (float_value_input <= greater_than):
             raise ValueError('Input float value is less than the stipulated '
                              'value. '
                              'Expected: {expt}  Actual: {act}'
@@ -224,7 +226,7 @@ def validate_float_value(float_value_input,
                              .format(expt=greater_than, act=float_value_input))
     if (less_than is not None):
         less_than = validate_float_value(less_than)
-        if (float_value_input > less_than):
+        if (float_value_input >= less_than):
             raise ValueError('Input int value is greater than the stipulated '
                              'value. '
                              'Expected: {expt}  Actual: {act}'
@@ -382,3 +384,32 @@ def validate_string(input_string, length=None, contain_substr=None):
                              '    --Kyubey')
 
     return str(input_string)
+
+
+def validate_function_call(input_function,
+                           n_parameters=None):
+    """
+    Check if the input function is a valid callable function.
+    """
+    # Type check, test if the input function is callable.
+    if not (callable(input_function)):
+        raise TypeError('Input function is not callable. This is an '
+                        'indication that it is not a function.'
+                        '    --Kyubey')
+    
+    # Type check the optional parameters.
+    if (n_parameters is not None):
+        n_parameters = validate_int_value(n_parameters,greater_than=0)
+
+        # Inspect the function.
+        input_function_sig = inspect.signature(input_function)
+        input_function_params = input_function_sig.parameters
+        if (len(input_function_params) != n_parameters):
+            raise TypeError('Function does not have the correct number of '
+                            'expected parameters. '
+                            'Expected: {expt}   Actual: {act}'
+                            '    --Kyubey'
+                            .format(expt=n_parameters,
+                                    act=len(input_function_params)))
+
+    return input_function

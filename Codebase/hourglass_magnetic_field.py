@@ -156,7 +156,6 @@ def hourglass_magnetic_field_cart(x, y, z,  # Cartesian cords
     # Convert to cylindrical cords.
     r = np.hypot(x,y)
     phi = np.arctan2(y,x)
-    phi[phi < 0] += 2*np.pi
     z = z 
 
     # Find the values of the magnetic field.

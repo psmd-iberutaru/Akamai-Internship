@@ -39,6 +39,7 @@
 \usepackage{pgfplots}
 \usepackage{tikz}
 \usepackage[framemethod=tikz]{mdframed}
+\usepackage{media9}
 
 % Authoring styles.
 \usepackage{authblk}
@@ -49,6 +50,12 @@
 % Referencing and linking.
 \usepackage[plain]{fancyref}
 \usepackage{hyperref}
+
+% Bibliography
+\usepackage[style=numeric]{biblatex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % Change the format style for section headers.
@@ -167,6 +174,7 @@
 % Specific functions, like the exponent and the absolute function, should also have their own parenthetical outline.
 \let\oldexp\exp \renewcommand*{\exp}[1]{\oldexp \! \left( #1 \right)}
 \newcommand*{\erf}[1]{\text{erf} \! \left( #1 \right)}
+\newcommand*{\erfc}[1]{\text{erfc} \! \left( #1 \right)}
 \newcommand*{\abs}[1]{\left| #1 \right|}
 \let\olddet\det \renewcommand{\det}[1]{\olddet\left( #1 \right)}
 
@@ -253,3 +261,12 @@
   \end{mdframed} %
   \par\bigskip % Make vertical offset.
 }
+
+
+
+% If the organization holds, this should always be the general solution for 
+% the directory orgnaization. However, if it is not, only change the bibroot 
+% field, as the rest are all reletive to it.
+
+% Model and simulation based citations.
+\addbibresource{./../../../Citations/Models_and_Simulations/electromagnetic_models_and_simulations.bib}
