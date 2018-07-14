@@ -38,8 +38,7 @@ def combine_hourglass_circular(percent_hg_to_cr,
                                     h, k_array, disk_radius, uniform_B0)
 
         # The circular magnetic field should overlap perpendicular to the
-        # hourglass, such that axis are, for hourglass and circular:
-        # z -> x,y. We shall use z -> x.
+        # hourglass.
         cr_B_x, cr_B_y= crm.circular_magnetic_field_cart(
             cr_x_value, cr_y_value, cir_function)
 

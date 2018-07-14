@@ -167,14 +167,11 @@ def fit_bessel_function_1st(x_points, y_points,
     fit_order = The value of the order of the fit bessel function.
     """
     # The total number of points, useful.
-    try:
-        n_datapoints = len(x_points)
-    except:
-        raise InputError('It does not make sense to try and fit a '
-                         'single point.'
+    n_datapoints = len(x_points)
+    n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
+    if (n_datapoints <= 1):
+        raise InputError('It does not make sense to fit one or less points.'
                          '    --Kyubey')
-    else:
-        n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
 
     # Type check
     x_points = valid.validate_float_array(x_points, size=n_datapoints)
@@ -216,14 +213,11 @@ def fit_bessel_function_2nd(x_points, y_points,
     fit_order = The value of the order of the fit bessel function.
     """
     # The total number of points, useful.
-    try:
-        n_datapoints = len(x_points)
-    except:
-        raise InputError('It does not make sense to try and fit a '
-                         'single point.'
+    n_datapoints = len(x_points)
+    n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
+    if (n_datapoints <= 1):
+        raise InputError('It does not make sense to fit one or less points.'
                          '    --Kyubey')
-    else:
-        n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
 
     # Type check
     x_points = valid.validate_float_array(x_points, size=n_datapoints)
@@ -269,16 +263,17 @@ def fit_bessel_function_1st_integer(x_values, y_values,
     Output:
     fit_order = The primary positive fit order
     """
-    # Important information and validate.
-    try:
-        n_datapoints = len(x_values)
-    except:
-        x_values = valid.validate_float_array(x_values)
-        n_datapoints = len(x_values)
-    finally:
-        # Type check
-        x_values = valid.validate_float_array(x_values, size=n_datapoints)
-        y_values = valid.validate_float_array(y_values, size=n_datapoints)
+
+    # The total number of points, useful.
+    n_datapoints = len(x_values)
+    n_datapoints = valid.validate_int_value(n_datapoints, greater_than=0)
+    if (n_datapoints <= 1):
+        raise InputError('It does not make sense to fit one or less points.'
+                         '    --Kyubey')
+
+    # Type check
+    x_values = valid.validate_float_array(x_values, size=n_datapoints)
+    y_values = valid.validate_float_array(y_values, size=n_datapoints)
     negative_order = valid.validate_boolean_value(negative_order)
 
     # Because an order of 0 is a thing.

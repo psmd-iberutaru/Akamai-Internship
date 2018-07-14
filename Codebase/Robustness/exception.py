@@ -104,8 +104,8 @@ def kyubey_warning(warn_class, message,
         if (validation_number == user_answer):
             return None
         else:
-            raise TerminateError('The warning verification process has failed.'
+            raise TerminateError('The warning verification process has failed. '
                                  'The incorrect value has been inputted. '
-                                 'Terminating program to prevent damage.'
+                                 'Terminating program to prevent damage. '
                                  '    --Kyubey')
 

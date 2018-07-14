@@ -72,6 +72,7 @@ Both of these functions have been completed as of this date, written in Python. 
 In order to share the functions and code work done with the Mentor, a Github repository has been created. It can be found at \url{https://github.com/psmd-iberutaru/Akamai_Internship}.
 
 \subsection{2018 June 22}
+\label{subsec:2018_June_22}
 
 \begin{meetingnotes*}
 	Modifications to the gaussian program is desired. In particular, the program should be somewhat more robust. In essence, the following modifications and tests to the fitting function is as follows.
@@ -94,6 +95,7 @@ A field trip on Monday, 2018 June 25, to Mauna Loa's Yuan-Tseh Lee Array (YTLA),
 
 
 \subsection{2018 June 26}
+\label{2018_June_26}
 The gaussian fitting functions have been completed. They work accurately unless the separation between two gaussian functions is such that the peak of one is obscured in the body of the other (in the case of multi-gaussian fitting). 
 
 In the case of multi-gaussian fitting, the peaks of each gaussian (if not already obscured) is detected using \texttt{scipy} based peak finding algorithms. To prevent the intrusion of other gaussians, the domain that the data points for any one particular gaussian is determined by the \texttt{peak\_widths} function, with the start and ending points of the gaussian being determined by the function's 2nd and 3rd returns in index space.
@@ -202,8 +204,8 @@ For $\alpha = \frac{1}{2}k \quad \text{For:} \quad \left\{ \left. k \in \mathbb{
 \end{meetingnotes*}
 
 
-\subsection{9 July 2018}
-\label{subsec:9_July_2018}
+\subsection{2018 July 9}
+\label{subsec:2018_July_9}
 
 Today, two main projects were finished up. A programable form of the equations of the magnetic fields in a `hourglass' shape for a cylindrical coordinate system was completed. Although it was attempted to bring the two dimensional equations ($\vect{B} = f(r,z)$) into three dimensions via an invariant $phi$ parameter ($\vect{B} = f(r,\phi,z)$), it is so far unsuccessful in visualization, but seems to be alright in terms of actual functionality.
 
@@ -230,8 +232,8 @@ The paper also defines the coefficient $k_m$ as,
 \end{equation*}
 with some custom defined function $f(x)$; but, for all intents and purposes, we use $k_m$ also as a parameter as does the paper.
 
-\subsection{10 July 2018}
-\label{subsec:10_July_2018}
+\subsection{2018 July 10}
+\label{subsec:2018_July_10}
 
 The presentation to the Akamai Internship program is due tomorrow. Recent things have came up about the motivation of this project and the purpose and contributions that magnetic fields make to star forming regions.
 
@@ -245,12 +247,29 @@ One of the big issues with star formation is that of the conservation of angular
 
 A second reason for the research into the magnetic field of protoplanetary regions (star forming regions) is because magnetic fields prevent the collapse of clouds, preventing star formation. For a gas cloud with less mass than $M_{B,cr}$, given by
 \begin{align*}
-	M_{B,cr} &= 0.12 \frac{\Phi}{\sqrt{G}} \\ 
+	M_{B,\text{cr}} &= 0.12 \frac{\Phi}{\sqrt{G}} \\ 
 	& \simeq 10^3 \left( \frac{B}{30 \mu G} \right) \left( \frac{R}{pc} \right)^2 M_{\odot}
 \end{align*}
 
-For masses below this critical limit, $M_\text{cloud} < M_{B,cr}$, the magnetic field can support the cloud, preventing it from collapsing and turning it into a star. 
+For masses below this critical limit, $M_\text{cloud} < M_{B,\text{cr}}$, the magnetic field can support the cloud, preventing it from collapsing and turning it into a star. 
 
+
+\subsection{2018 July 13}
+\label{subsec:2018_July_13}
+
+Today two or three main things have been completed. First off, the implementation of the linear combination of a circular function and the hourglass function has been completed.
+
+There has been the observation that this hybrid function is not symmetric with respect to the yz-plane projection. This is explained by the circular function being rotationally symmetric along the x-axis, while the hourglass function is symmetric along the z-axis. These competing symmetries lead to the asymmetry of a reflection across the xz-plane. The reflective symmetry is restored if the contribution of the circular function is $0$, and the rotational symmetry along the x-axis for the circular function is restored if the contribution of the hourglass function is $0$.
+
+Secondly, an implementation of a function to return the angle of polarization given two Stoke numbers/parameters (see \url{https://en.wikipedia.org/wiki/Stokes_parameters}). In particular, assuming the definition of the polarization ellipse as given in the article, the functional form is given as,
+\begin{equation}
+	\phi = \frac{1}{2} \arctan{\frac{U}{Q}}
+\end{equation}
+for the Stoke parameters of $S_1 = Q$, $S_2 = U$. Currently, this is actually implemented via the $\text{arctan2}$ function.
+
+Next, in order to compute a line integral of a sightline through a three dimensional object like a gaseous cloud, a function was written to both determine the bounds for the regions of the sightline is within the cloud and not, and to also compte the integral. The cloud acts only as the bounds for the integration constrained by the path of the sightline. The medium integrating over is a field. As of current, a single parameter field is working. It is not known how this function will work with multi-parameter return functions. It does not seem like a difficult fix. It might be best to generalize the function (but it is too early to tell). The cloud, field function, and sightline are all modifiable according to user specifications. 
+
+A small thing to note as of right now, the programs are not very user-friendly. Some effort will need to be put into making this entire codebase into something much more user-friendly. Perhaps not as large as a themed module, but enough to be rather useful. In fact, some of the older functions like Bessel fitting and the gaussian fitting functional groups are considered to be obsolete because of their shoddy implementations.
 
 
 \printbibliography
