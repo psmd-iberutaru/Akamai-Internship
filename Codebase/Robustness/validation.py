@@ -17,7 +17,7 @@ def validate_boolean_value(boolean_value_input):
     if not isinstance(boolean_value_input, bool):
         try:
             boolean_value_input = bool(boolean_value_input)
-        except:
+        except Exception:
             raise TypeError('Input boolean value is not transformable into a '
                             'boolean value.    --Kyubey')
 
@@ -39,13 +39,13 @@ def validate_boolean_array(boolean_array_input,
     if not isinstance(boolean_array_input, (bool, np.ndarray)):
         try:
             boolean_array_input = np.array(boolean_array_input, dtype=bool)
-        except:
+        except Exception:
             raise TypeError('Input boolean array is not transformable into a '
                             'boolean array.    --Kyubey')
     elif (boolean_array_input.dtype != bool):
         try:
             boolean_array_input = np.array(boolean_array_input, dtype=bool)
-        except:
+        except Exception:
             raise TypeError('Input boolean array is not transformable into a '
                             'boolean array.    --Kyubey')
 
@@ -97,7 +97,7 @@ def validate_int_value(int_value_input,
     if not isinstance(int_value_input, int):
         try:
             int_value_input = int(int_value_input)
-        except:
+        except Exception:
             raise TypeError('Input int value is not transformable into a '
                             'int value.    --Kyubey')
 
@@ -150,13 +150,13 @@ def validate_int_array(int_array_input,
     if not isinstance(int_array_input, (int, np.ndarray)):
         try:
             int_array_input = np.array(int_array_input, dtype=int)
-        except:
+        except Exception:
             raise TypeError('Input integer array is not transformable into a '
                             'integer array.    --Kyubey')
     elif (int_array_input.dtype != int):
         try:
             int_array_input = np.array(int_array_input, dtype=int)
-        except:
+        except Exception:
             raise TypeError('Input integer array is not transformable into a '
                             'integer array.    --Kyubey')
 
@@ -210,7 +210,7 @@ def validate_float_value(float_value_input,
     if not isinstance(float_value_input, float):
         try:
             float_value_input = float(float_value_input)
-        except:
+        except Exception:
             raise TypeError('Input float value is not transformable into a '
                             'float value.    -Kyubey')
 
@@ -252,13 +252,13 @@ def validate_float_array(float_array_input,
     if not isinstance(float_array_input, (float, np.ndarray)):
         try:
             float_array_input = np.array(float_array_input, dtype=float)
-        except:
+        except Exception:
             raise TypeError('Input float array is not transformable into a '
                             'float array.    --Kyubey')
     elif (float_array_input.dtype != float):
         try:
             float_array_input = np.array(float_array_input, dtype=float)
-        except:
+        except Exception:
             raise TypeError('Input float array is not transformable into a '
                             'float array.    --Kyubey')
 
@@ -309,7 +309,7 @@ def validate_list(input_list,
     if not isinstance(input_list, list):
         try:
             input_list = list(input_list)
-        except:
+        except Exception:
             raise TypeError('Input list cannot be turned into a list.'
                             '    --Kyubey')
 
@@ -336,7 +336,7 @@ def validate_tuple(input_tuple,
     if not isinstance(input_tuple, tuple):
         try:
             input_tuple = tuple(input_tuple)
-        except:
+        except Exception:
             raise TypeError('Input tuple cannot be turned into a tuple.'
                             '    --Kyubey')
 
@@ -364,7 +364,7 @@ def validate_string(input_string, length=None, contain_substr=None):
     if not isinstance(input_string, str):
         try:
             input_string = str(input_string)
-        except:
+        except Exception:
             raise TypeError('Input string cannot be turned into a string.'
                             '    --Kyubey')
 

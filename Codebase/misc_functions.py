@@ -2,6 +2,7 @@ import numpy as np
 import scipy as sp
 import scipy.optimize as sp_opt
 import scipy.signal as sp_sig
+import sympy as sy
 import matplotlib.pyplot as plt
 import copy
 import inspect
@@ -120,7 +121,7 @@ def generate_function_envelope(x_values, functions, parameters):
         # Attempt to get a function signature.
         try:
             function_signature = inspect.signature(functions[functiondex])
-        except:
+        except Exception:
             raise InputError('Cannot get function signature from function '
                              'number {funt_num}. Ensure the input is correct.'
                              '    --Kyubey'
@@ -154,7 +155,7 @@ def generate_function_envelope(x_values, functions, parameters):
             try:
                 parameters[functiondex] = copy.deepcopy(
                     {**x_input_dict, **parameters[functiondex]})
-            except:
+            except Exception:
                 parameters[functiondex] = \
                     merge_two_dicts(x_input_dict, parameters[functiondex])
 
@@ -171,7 +172,7 @@ def generate_function_envelope(x_values, functions, parameters):
             except TypeError:
                 try:
                     parameters[functiondex] = list(parameters[functiondex])
-                except:
+                except Exception:
                     raise TypeError('The parameters for function {funt_num} '
                                     'is not and cannot be turned into the '
                                     'accepted input types.'
@@ -196,7 +197,7 @@ def generate_function_envelope(x_values, functions, parameters):
                 # Use argument slicing based on aligned tuples or lists.
                 y_values.append(
                     functions[functiondex](*parameters[functiondex]))
-        except:
+        except Exception:
             print('Error occurred on function {funt_num} '
                   '( functiondex = {functdex}.'
                   '    --Kyubey'
@@ -224,3 +225,88 @@ def Stokes_parameter_polarization_angle(Q,U):
     angle = 0.5*np.arctan2(U,Q)
 
     return angle
+
+
+def user_equation_parse(user_eq_input,variables):
+    """
+    This function returns a functional form of a user's input expression. 
+    Only standard python math functions are to be used, and nothing else. 
+    The functional form will be in return f(x), for the user inputs some string
+    for f(x).
+
+    Variables is a string tuple that contains the list of variables expected in
+    the equation parse.
+    """
+
+    # Find the number of variables expected, and map to required inputs.
+    try:
+        variables = valid.validate_tuple(variables)
+        n_variables = len(variables)
+    except Exception:
+        print('Double check input variable stipulations:   {input}'
+              .format(input=str(variables)))
+        raise
+
+    # Type check.
+    try:
+        user_eq_input = valid.validate_string(user_eq_input)
+    except TypeError:
+        try:
+            # Test to see if the user input a function instead for whatever 
+            # reason.
+            user_eq_input = valid.validate_function_call(
+                user_eq_input,n_parameters=n_variables)
+
+            # If it hits here, the user has input their own function. This 
+            # could be dangerous, warn the user.
+            valid.kyubey_warning(DangerWarning,
+                                 ('It has been detected that an input string '
+                                  'for equation parsing is actually a '
+                                  'function with the following name: '
+                                  '{funt_name}. If this is correct, continue'
+                                  'with prompt.'
+                                  '    --Kyubey'),
+                                 halt_input=True)
+            
+            # This is chancy, and should be avoided.
+            return user_eq_input
+
+        except Exception:
+            # It seems it is not a function either. Raise the user once more.
+            raise InputError('The string input cannot be turned into a '
+                             'parseable function call.'
+                             '    --Kyubey')
+    
+    # Else, try sympy methods or base methods.
+    try:
+        # The string should be valid in equation form now. Define some symbols.
+        sy_variables = sy.symbols(variables)
+        sy_variables = sy.utilities.flatten(sy_variables)
+        # Attempt to convert the string function input into a lambda equation.
+        function = sy.utilities.lambdify(sy_variables,eval(user_eq_input))
+        
+    except Exception:
+        # It does not seem like it can be done with Sympy. Try with base
+        # functionality, but, also be very cautious.
+        variable_string = ''
+        for variabledex in variables:
+            variable_string += variabledex + ','
+        # Knock off the extra ','
+        variable_string = copy.deepcopy(variable_string[:-1])
+
+        # Define the execute function line.
+        eval_string = 'lambda ' + variable_string + ' : ' + user_eq_input
+
+        # Warn the user before executing the execution of the string just in
+        # case.
+        kyubey_warning(DangerWarning,('The following string is going to be'
+                                      'passed through the "eval" function. '
+                                      'Is this a safe to pass this string? \n'
+                                      '< {eval_str} > \n'
+                                      '    --Kyubey'
+                                      .format(eval_str=eval_string)),
+                                      halt_input=True)
+        # If the user is very sure.
+        function = eval(eval_string)
+
+    return function
