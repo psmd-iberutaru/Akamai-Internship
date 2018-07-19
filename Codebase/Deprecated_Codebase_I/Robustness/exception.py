@@ -79,7 +79,7 @@ class OutputWarning(Warning):
 
 # Begin the main warning function.
 def kyubey_warning(warn_class, message, 
-                   stacklevel=2,halt_input=False):
+                   stacklevel=2,input_halt=False):
     """
     General warning for the Robustness module/function package. If the warning
     is serious enough (like a DangerWarning), then force the user to ensure
@@ -88,7 +88,7 @@ def kyubey_warning(warn_class, message,
     # Warn user.
     warnings.warn(message, category=warn_class, stacklevel=stacklevel)
     # If a halt is desired.
-    if (halt_input):
+    if (input_halt):
         # Employ random interger returning value to verification.
         validation_number = int(random.randint(0,9999))
         # Print message.

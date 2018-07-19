@@ -266,7 +266,7 @@ def user_equation_parse(user_eq_input,variables):
                                   '{funt_name}. If this is correct, continue'
                                   'with prompt.'
                                   '    --Kyubey'),
-                                 halt_input=True)
+                                 input_halt=True)
             
             # This is chancy, and should be avoided.
             return user_eq_input
@@ -299,13 +299,13 @@ def user_equation_parse(user_eq_input,variables):
 
         # Warn the user before executing the execution of the string just in
         # case.
-        kyubey_warning(DangerWarning,('The following string is going to be'
+        kyubey_warning(DangerWarning,('The following string is going to be '
                                       'passed through the "eval" function. '
                                       'Is this a safe to pass this string? \n'
                                       '< {eval_str} > \n'
                                       '    --Kyubey'
                                       .format(eval_str=eval_string)),
-                                      halt_input=True)
+                                      input_halt=True)
         # If the user is very sure.
         function = eval(eval_string)
 
