@@ -7,10 +7,9 @@ Model for an Hourglass Magnetic Field".
 The functions here are almost explicitly for magnetic field functions.
 """
 
-import numpy as np 
+import numpy as np
 import scipy as sp
 import scipy.special as sp_spcl
-
 
 
 def bessel_zeros(order, index):
@@ -20,7 +19,7 @@ def bessel_zeros(order, index):
     For some reason, the Scipy function returns all zeros between the given
     number and the first zero. This function extracts only the wanted zero
     given the index. 
-    
+
     This is for Bessel functions of the first kind.
 
     Parameters:
@@ -66,7 +65,7 @@ def Ewer_Basu__eigenvalues(index_m, disk_radius):
     eigenvalue : float
         The value of the corresponding eigenvalue given the parameters.
     """
-    
+
     # Basic type checking
     index_m = int(index_m)
     disk_radius = float(disk_radius)
@@ -104,18 +103,20 @@ def Ewer_Basu__B_r(r, z, h, k_array, disk_radius):
         The value of the magnetic field in the r-axial direction.
     """
     # Basic type check
-    r = np.array(r,dtype=float)
-    z = np.array(z,dtype=float)
+    r = np.array(r, dtype=float)
+    z = np.array(z, dtype=float)
     h = float(h)
-    k_array = np.array(k_array,dtype=float)
+    k_array = np.array(k_array, dtype=float)
     disk_radius = float(np.abs(disk_radius))
 
     # Shorthand for the squareroot of the eigenvalues. Account for 0 indexing
     def evsq(m): return np.sqrt(Ewer_Basu__eigenvalues(m + 1, disk_radius))
     # Shorthand for bessel function of order 1.
+
     def bess1(x): return sp_spcl.jv(1, x)
     # Pylint does not like the Scipy complementary error function.
-    def _erfc(x): return sp_spcl.erfc(x) # pylint: disable=no-member
+
+    def _erfc(x): return sp_spcl.erfc(x)  # pylint: disable=no-member
 
     Bfield_r = 0
     for kdex, k_value in enumerate(k_array):
@@ -128,12 +129,11 @@ def Ewer_Basu__B_r(r, z, h, k_array, disk_radius):
         neg_exp = np.exp(-evsq(kdex) * z)
         pos_exp = np.exp(evsq(kdex) * z)
 
-        Bfield_r = (Bfield_r 
-                    + (coefficient * (minus_erfc * neg_exp 
+        Bfield_r = (Bfield_r
+                    + (coefficient * (minus_erfc * neg_exp
                                       - plus_erfc * pos_exp)))
 
     return Bfield_r
-
 
 
 def Ewer_Basu__B_z(r, z, h, k_array, disk_radius, uniform_B0):
@@ -165,19 +165,21 @@ def Ewer_Basu__B_z(r, z, h, k_array, disk_radius, uniform_B0):
         The value of the magnetic field in the z-axial direction.
     """
     # Basic type check
-    r = np.array(r,dtype=float)
-    z = np.array(z,dtype=float)
+    r = np.array(r, dtype=float)
+    z = np.array(z, dtype=float)
     h = float(h)
-    k_array = np.array(k_array,dtype=float)
+    k_array = np.array(k_array, dtype=float)
     disk_radius = float(np.abs(disk_radius))
     uniform_B0 = float(uniform_B0)
 
     # Shorthand for the squareroot of the eigenvalues. Account for 0 indexing.
     def evsq(m): return np.sqrt(Ewer_Basu__eigenvalues(m + 1, disk_radius))
     # Shorthand for bessel function of order 1.
+
     def bess0(x): return sp_spcl.jv(0, x)
     # Pylint does not like Scipy's complementary error function.
-    def _erfc(x): return sp_spcl.erfc(x) # pylint: disable=no-member
+
+    def _erfc(x): return sp_spcl.erfc(x)  # pylint: disable=no-member
 
     Bfeild_z = 0
     for kdex, k_value in enumerate(k_array):
@@ -190,8 +192,8 @@ def Ewer_Basu__B_z(r, z, h, k_array, disk_radius, uniform_B0):
         pos_exp = np.exp(evsq(kdex) * z)
         neg_exp = np.exp(-evsq(kdex) * z)
 
-        Bfeild_z = (Bfeild_z 
-                    + (coefficient * (plus_erfc * pos_exp 
+        Bfeild_z = (Bfeild_z
+                    + (coefficient * (plus_erfc * pos_exp
                                       + minus_erfc * neg_exp)))
 
     return Bfeild_z + uniform_B0

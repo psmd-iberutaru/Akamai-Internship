@@ -9,7 +9,8 @@ import sympy as sy
 
 import Robustness as Robust
 
-def user_equation_parse(user_eq_input,variables):
+
+def user_equation_parse(user_eq_input, variables):
     """Convert input implicit equation into a function.
 
     This function returns a functional form of a user's input expression. 
@@ -61,12 +62,12 @@ def user_equation_parse(user_eq_input,variables):
         user_eq_input = Robust.valid.validate_string(user_eq_input)
     except TypeError:
         try:
-            # Test to see if the user input a function instead for whatever 
+            # Test to see if the user input a function instead for whatever
             # reason.
             user_eq_input = Robust.valid.validate_function_call(
-                user_eq_input,n_parameters=n_variables)
+                user_eq_input, n_parameters=n_variables)
 
-            # If it hits here, the user has input their own function. This 
+            # If it hits here, the user has input their own function. This
             # could be dangerous, warn the user.
             Robust.valid.kyubey_warning(Robust.DangerWarning,
                                         ('It has been detected that an input '
@@ -77,7 +78,7 @@ def user_equation_parse(user_eq_input,variables):
                                          'continue with prompt.'
                                          '    --Kyubey'),
                                         input_halt=True)
-            
+
             # This is chancy, and should be avoided.
             return user_eq_input
 
@@ -86,15 +87,15 @@ def user_equation_parse(user_eq_input,variables):
             raise Robust.InputError('The string input cannot be turned into a '
                                     'parseable function call.'
                                     '    --Kyubey')
-    
+
     # Else, try sympy methods or base methods.
     try:
         # The string should be valid in equation form now. Define some symbols.
         sy_variables = sy.symbols(variables)
         sy_variables = sy.utilities.flatten(sy_variables)
         # Attempt to convert the string function input into a lambda equation.
-        function = sy.utilities.lambdify(sy_variables,eval(user_eq_input))
-        
+        function = sy.utilities.lambdify(sy_variables, eval(user_eq_input))
+
     except Exception:
         # It does not seem like it can be done with Sympy. Try with base
         # functionality, but, also be very cautious.
@@ -116,7 +117,7 @@ def user_equation_parse(user_eq_input,variables):
                                '< {eval_str} > \n '
                                '    --Kyubey'
                                .format(eval_str=eval_string)),
-                               input_halt=True)
+                              input_halt=True)
         # If the user is very sure.
         function = eval(eval_string)
 

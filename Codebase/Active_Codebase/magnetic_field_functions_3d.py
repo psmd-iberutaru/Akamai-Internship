@@ -10,7 +10,6 @@ import scipy as sp
 import scipy.special as sp_spcl
 
 import Robustness as Robust
-from Robustness.exception import *
 import Backend
 import magnetic_field_functions_2d as mff2d
 
@@ -22,8 +21,8 @@ import magnetic_field_functions_2d as mff2d
 #####             3D Magnetic Field Cartesian Functions            #####
 ########################################################################
 
-def circular_magnetic_field_cart_3d(x,y,z,
-                                    center=[0,0,0],
+def circular_magnetic_field_cart_3d(x, y, z,
+                                    center=[0, 0, 0],
                                     mag_function=lambda r: 1/r**2,
                                     reference_axis='z'):
     """Compute the cartesian magnetic field vectors of a circular field.
@@ -68,12 +67,11 @@ def circular_magnetic_field_cart_3d(x,y,z,
     x = Robust.valid.validate_float_array(x)
     y = Robust.valid.validate_float_array(y)
     z = Robust.valid.validate_float_array(z)
-    center = Robust.valid.validate_float_array(center,shape=(3,))
+    center = Robust.valid.validate_float_array(center, shape=(3,))
     mag_function = Robust.valid.validate_function_call(mag_function,
                                                        n_parameters=3)
-    reference_axis = Robust.valid.validate_string(reference_axis.lower(),
-                                                  length=1,
-                                                  contain_substr=('x','y','z'))
+    reference_axis = Robust.valid.validate_string(
+        reference_axis.lower(), length=1, contain_substr=('x', 'y', 'z'))
 
     # Do a transformation based on the relocation of the center.
     x = x - center[0]
@@ -83,23 +81,23 @@ def circular_magnetic_field_cart_3d(x,y,z,
     # Calculate the magnetic field based on what the user desired on for
     # the axis of symmetry.
     if (reference_axis == 'x'):
-        axis1,axis2 = mff2d.circular_magnetic_field_cart_2d(
-            y,z,mag_function=mag_function)
+        axis1, axis2 = mff2d.circular_magnetic_field_cart_2d(
+            y, z, mag_function=mag_function)
         # The x axis is determined to have zero contribution.
         Bfield_x = 0
         Bfield_y = axis1
         Bfield_z = axis2
     elif (reference_axis == 'y'):
-        axis1,axis2 = mff2d.circular_magnetic_field_cart_2d(
-            -x,z,mag_function=mag_function)
+        axis1, axis2 = mff2d.circular_magnetic_field_cart_2d(
+            -x, z, mag_function=mag_function)
         # The x axis is determined to have zero contribution. The negatives
         # keep the orientation consistant.
         Bfield_x = axis1 * -1
         Bfield_y = 0
         Bfield_z = axis2
-    elif (reference_axis =='z'):
-        axis1,axis2 = mff2d.circular_magnetic_field_cart_2d(
-            x,y,mag_function=mag_function)
+    elif (reference_axis == 'z'):
+        axis1, axis2 = mff2d.circular_magnetic_field_cart_2d(
+            x, y, mag_function=mag_function)
         # The z axis is determined to have zero contribution.
         Bfield_x = axis1
         Bfield_y = axis2
@@ -112,12 +110,12 @@ def circular_magnetic_field_cart_3d(x,y,z,
                                 '    --Kyubey')
 
     # Return the values of the magnetic field.
-    return Bfield_x,Bfield_y,Bfield_z
+    return Bfield_x, Bfield_y, Bfield_z
 
 
 def hourglass_magnetic_field_cart_3d(x, y, z,
                                      h, k_array, disk_radius, uniform_B0,
-                                     center=[0,0,0]):
+                                     center=[0, 0, 0]):
     """Equation for hourglass magnetic fields given by Ewertowshi & Basu 2013.
 
     This function is the three dimensional version of the equations given by 
@@ -161,22 +159,23 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
     z = Robust.valid.validate_float_array(z)
     h = Robust.valid.validate_float_value(h)
     k_array = Robust.valid.validate_float_array(k_array)
-    disk_radius = Robust.valid.validate_float_value(disk_radius,greater_than=0)
+    disk_radius = Robust.valid.validate_float_value(
+        disk_radius, greater_than=0)
     uniform_B0 = Robust.valid.validate_float_value(uniform_B0)
-    center = Robust.valid.validate_float_array(center,shape=(3,))
+    center = Robust.valid.validate_float_array(center, shape=(3,))
 
     # Convert the cartesian cords to cylindrical cords.
-    rho,phi,z = Backend.cst.cartesian_to_cylindrical_3d(x,y,z)
+    rho, phi, z = Backend.cst.cartesian_to_cylindrical_3d(x, y, z)
 
     # Compute the magnetic fields.
-    Bfield_rho,Bfield_phi,Bfield_z = hourglass_magnetic_field_cyln_3d(
-        rho,phi,z,h,k_array,disk_radius,uniform_B0,center=center)
+    Bfield_rho, Bfield_phi, Bfield_z = hourglass_magnetic_field_cyln_3d(
+        rho, phi, z, h, k_array, disk_radius, uniform_B0, center=center)
 
     # Convert back to the cartesian cords.
-    Bfield_x,Bfield_y,Bfield_z = \
-        Backend.cst.cylindrical_to_cartesian_3d(Bfield_rho,phi,Bfield_z)
+    Bfield_x, Bfield_y, Bfield_z = \
+        Backend.cst.cylindrical_to_cartesian_3d(Bfield_rho, phi, Bfield_z)
 
-    return Bfield_x,Bfield_y,Bfield_z
+    return Bfield_x, Bfield_y, Bfield_z
 
 
 ########################################################################
@@ -185,7 +184,7 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
 
 def hourglass_magnetic_field_cyln_3d(rho, phi, z,
                                      h, k_array, disk_radius, uniform_B0,
-                                     center=[0,0,0]):
+                                     center=[0, 0, 0]):
     """Equation for hourglass magnetic fields given by Ewertowshi & Basu 2013.
 
     This function is the three dimensional version of the equations given by 
@@ -246,4 +245,4 @@ def hourglass_magnetic_field_cyln_3d(rho, phi, z,
     Bfield_z = Backend.Ewertowski_Basu_2013.Ewer_Basu__B_z(
         rho, z, h, k_array, disk_radius, uniform_B0)
 
-    return Bfield_rho,Bfield_phi,Bfield_z
+    return Bfield_rho, Bfield_phi, Bfield_z

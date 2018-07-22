@@ -310,3 +310,6 @@ def user_equation_parse(user_eq_input,variables):
         function = eval(eval_string)
 
     return function
+
+
+    

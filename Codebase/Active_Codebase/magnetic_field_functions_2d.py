@@ -21,7 +21,7 @@ import Backend
 ########################################################################
 
 def circular_magnetic_field_cart_2d(x, y,
-                                    center=[0,0],
+                                    center=[0, 0],
                                     mag_function=lambda r: 1/r**2):
     """Compute the cartesian magnetic field vectors of a circular field.
 
@@ -55,7 +55,7 @@ def circular_magnetic_field_cart_2d(x, y,
     # Type check.
     x = Robust.valid.validate_float_array(x)
     y = Robust.valid.validate_float_array(y)
-    center = Robust.valid.validate_float_array(center,shape=(2,))
+    center = Robust.valid.validate_float_array(center, shape=(2,))
     mag_function = Robust.valid.validate_function_call(mag_function,
                                                        n_parameters=2)
 
@@ -84,7 +84,7 @@ def circular_magnetic_field_cart_2d(x, y,
 
 def hourglass_magnetic_field_cart_2d(r, z,
                                      h, k_array, disk_radius, uniform_B0,
-                                     center=[0,0]):
+                                     center=[0, 0]):
     """Equation for hourglass magnetic fields given by Ewertowshi & Basu 2013.
 
     This function is the two dimensional version of the equations given by 

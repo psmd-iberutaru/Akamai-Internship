@@ -6,14 +6,14 @@
 \begin{document}
 %% Define the title properties and author information.
 %%%%%%%%%%%%%%%%%%%%
-\title{Dust Scattering Polarization Modeling \\
+\title{Modeling Polarization Morphologies in Young Star-Forming Regions \\
 \textit{\Large Dissipatone Lucem Pulvis Magneticus Unus}}
 
 \author[1]{Kenji Emerson}
 \author[2]{Ramprasad Rao (Mentor)}
 
 \affil[1]{\footnotesize University of Hawaii at Hilo}
-\affil[2]{\footnotesize SMA - Smithsoanian Institute}
+\affil[2]{\footnotesize SMA - Smithsoanian Institution & ASIAA - Academia Sinica Institute of Astronomy and Astrophysics}
 
 %% Begin to create the abstract of the article.
 %%%%%%%%%%%%%%%%%%%%
@@ -25,7 +25,7 @@
 \begin{minipage}{0.8\textwidth}
 	\begin{abstract}
 
-	Abstract!
+	The orientation of oblong shaped dust grains in protoplanetary regions is heavily influenced by the prevailing magnetic field. Dust grains influence observed polarization angles by reflecting with a vector algined with the grain's longest axis. The magnetic field vectors are therefore algined perpendicular to the polarization vectors. We model/fit the magnetic field vectors, attempting to fit a simple magnetic field to the vectors. In this study, our simple magnetic field is some linear combination of hourglass shaped and circularlly shaped magnetic fields. 
 	
 	\end{abstract}
 \end{minipage}
@@ -125,7 +125,7 @@ For non-integer $\alpha$ ($\left\{ \left. \alpha \right| \alpha \notin \mathbb{Z
 	\label{eq:Bessel_equation_secondkind_noninterger}
 \end{equation}
 
-For an integer order $n$ ($\left\{ \left. n \right| n \in \mathbb{Z} \right\}$):
+For an integer order $n \in \mathbb{Z}$:
 \begin{equation}
 	Y_{n}(x) = \lim_{\alpha \rightarrow n} \left[ {Y_{\alpha(x)}} \right]
 	\label{eq:Bessel_equation_secondkind_interger}
@@ -216,9 +216,13 @@ The equations for the magnetic field is given by \cite{Ewertowski_Basu_2013}, wh
 	\label{eq:Ewertowski_Basu_B_r_equation}
 \end{align}
 \begin{align}
+	B_phi = 0
+	\label{Ewertowski_Basu_B_phi_equation}
+\end{align}
+\begin{align}
 	B_z =& \sum_{m=1}^{\infty} k_m \sqrt{\lambda_m} J_0(\sqrt{\lambda_m} r) \left\lbrack \erfc{\frac{\sqrt{\lambda_m} h}{2} + \frac{z}{h}} \exp{\sqrt{\lambda_m} z} \right.  \nonumber \\ 
 	&\left. + \erfc{\frac{\sqrt{\lambda_m} h}{2} - \frac{z}{h}} \exp{-\sqrt{\lambda_m} z} \right\rbrack
-	\label{eq:Ewertowski_Basu_B_r_equation}
+	\label{eq:Ewertowski_Basu_B_z_equation}
 \end{align}
 
 For $a_{m,1}$ is the $m$th positive root of $J_1(x)$, whereas $a_{m,1} > a_{m+1,1}$, such that $\lambda_m$ is given by, provided $R$ the radius of the protoplanetary disk of the system simulation.
@@ -270,6 +274,8 @@ for the Stoke parameters of $S_1 = Q$, $S_2 = U$. Currently, this is actually im
 Next, in order to compute a line integral of a sightline through a three dimensional object like a gaseous cloud, a function was written to both determine the bounds for the regions of the sightline is within the cloud and not, and to also compte the integral. The cloud acts only as the bounds for the integration constrained by the path of the sightline. The medium integrating over is a field. As of current, a single parameter field is working. It is not known how this function will work with multi-parameter return functions. It does not seem like a difficult fix. It might be best to generalize the function (but it is too early to tell). The cloud, field function, and sightline are all modifiable according to user specifications. 
 
 A small thing to note as of right now, the programs are not very user-friendly. Some effort will need to be put into making this entire codebase into something much more user-friendly. Perhaps not as large as a themed module, but enough to be rather useful. In fact, some of the older functions like Bessel fitting and the gaussian fitting functional groups are considered to be obsolete because of their shoddy implementations.
+
+
 
 
 \printbibliography

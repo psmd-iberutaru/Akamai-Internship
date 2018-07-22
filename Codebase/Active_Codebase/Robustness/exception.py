@@ -1,6 +1,11 @@
 import warnings
 import random
 
+
+########################################################################
+# Errors
+########################################################################
+
 class TerminateError(BaseException):
     """
     A very serious error that should override the try, except functions
@@ -38,6 +43,20 @@ class ShapeError(Exception):
         self.message = message
 
 
+class AstronomyError(Exception):
+    """
+    An error to be used if some of the programs executed are trying to 
+    do something that is nonsensical in the context of astronomy.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
+########################################################################
+# Warnings
+########################################################################
+
 class TimeWarning(ResourceWarning):
     """
     A warning to be used when some computation or flag might take a long time
@@ -54,8 +73,9 @@ class DangerWarning(Warning):
     system or program itself and may be disastrous with unexpected inputs.
     """
 
-    def __init__(self,message):
+    def __init__(self, message):
         self.message = message
+
 
 class InputWarning(Warning):
     """
@@ -73,13 +93,13 @@ class OutputWarning(Warning):
     inputs given, or that it might become unexpected because of bugs.
     """
 
-    def __init__(self,message):
+    def __init__(self, message):
         self.message = message
 
 
 # Begin the main warning function.
-def kyubey_warning(warn_class, message, 
-                   stacklevel=2,input_halt=False):
+def kyubey_warning(warn_class, message,
+                   stacklevel=2, input_halt=False):
     """
     General warning for the Robustness module/function package. If the warning
     is serious enough (like a DangerWarning), then force the user to ensure
@@ -90,7 +110,7 @@ def kyubey_warning(warn_class, message,
     # If a halt is desired.
     if (input_halt):
         # Employ random interger returning value to verification.
-        validation_number = int(random.randint(0,9999))
+        validation_number = int(random.randint(0, 9999))
         # Print message.
         print('')
         print('A halt input has been issued by the program. Your input is '
@@ -99,7 +119,7 @@ def kyubey_warning(warn_class, message,
               .format(valid_int=str(validation_number)))
         # Check for the correct validation number.
         user_answer = int(input('Input above integer number:  '))
-        print('',end='\n\n')
+        print('', end='\n\n')
         # Validate for correct answer.
         if (validation_number == user_answer):
             return None
@@ -108,4 +128,3 @@ def kyubey_warning(warn_class, message,
                                  'The incorrect value has been inputted. '
                                  'Terminating program to prevent damage. '
                                  '    --Kyubey')
-
