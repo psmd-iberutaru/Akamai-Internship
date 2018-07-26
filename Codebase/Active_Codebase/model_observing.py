@@ -391,7 +391,7 @@ class ObservingRun():
         # Decompose the stokes parameters into I,Q,U,V along with the angle
         # of polarization.
         I, Q, U, V = stokes_parameters
-        hypt = np.hypot(Q, U)
+        polar_I = Q**2 + U**2
         angle = Backend.efp.angle_from_Stokes_parameters(Q, U)
 
         # Arrange the values into plottable values. The x-axis is RA, and the
@@ -401,7 +401,7 @@ class ObservingRun():
 
         # Extrapolate and plot a contour based on irregularly spaced data.
         ax1_o = ax1.tricontourf(plotting_x_axis, plotting_y_axis, I, 50)
-        ax2_o = ax2.tricontourf(plotting_x_axis, plotting_y_axis, hypt, 50)
+        ax2_o = ax2.tricontourf(plotting_x_axis, plotting_y_axis, polar_I, 50)
         ax3_o = ax3.tricontourf(plotting_x_axis, plotting_y_axis, Q, 50)
         ax4_o = ax4.tricontourf(plotting_x_axis, plotting_y_axis, U, 50)
         ax5_o = ax5.tricontourf(plotting_x_axis, plotting_y_axis, angle, 50)

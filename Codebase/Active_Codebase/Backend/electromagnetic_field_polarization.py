@@ -185,7 +185,7 @@ def Stokes_parameters_from_field(E_i, E_j,
                                 '    --Kyubey')
 
     # Find the overall intensity of the EM wave.
-    intensity = np.hypot(E_i, E_j)
+    intensity = E_i**2 +  E_j**2
     p = percent_polarized
 
     # Find the angle between the semi-major axis and the x-axis.
