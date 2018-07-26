@@ -88,9 +88,18 @@ def line_integral_boundaries(view_line_point, cloud_equation, box_width,
 
     # Find all of the roots of the parameterized function.
     initial_guesses = np.linspace(-box_width, box_width, n_guesses)
-    eq_roots = sp_opt.fsolve(parameterized_cloud_equation, initial_guesses,
-                             xtol=1e-10)
+    eq_roots, info, int_err, message = \
+        sp_opt.fsolve(parameterized_cloud_equation, initial_guesses,
+                      xtol=1e-8, full_output=True)
     sort_eq_roots = np.sort(eq_roots)
+
+    # If there were no detected bounds, it is likely that there was no
+    # intersection to begin with, and thus no bounds. Scipy documentation
+    # specifies that 1 means it is fine.
+    if (int(int_err) != 1):
+        lower_bounds = np.array([])
+        upper_bounds = np.array([])
+        return lower_bounds, upper_bounds
 
     # Have only unique roots.
     unique_index = (np.abs(sort_eq_roots[1:] - sort_eq_roots[:-1])) > 1e-8
@@ -186,13 +195,23 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
     # The total integrated number.
     integrated_value = 0
     error = []  # Error array
-    for lowerdex, upperdex in zip(lower_bounds, upper_bounds):
-        integration = sp_int.quad(parameterized_field_equation,
-                                  lowerdex, upperdex)
-        integrated_value += integration[0]
-        error.append(integration[1])
 
-    # Errors add in quadrature.
-    error = np.sqrt(np.dot(error, error))
+    # Begin integration, ensure the integration is logical and possible.
+    if ((len(lower_bounds) == 0) or (len(upper_bounds) == 0)):
+        # If there are no detected bounds, then there is nothing to integrate
+        # over. To integrate would be nonsensical. Returning handleable values.
+        integrated_value = 0
+        error = 0
+        return integrated_value, error
+    else:
+        # It is assumed that the integration is doable.
+        for lowerdex, upperdex in zip(lower_bounds, upper_bounds):
+            integration = sp_int.quad(parameterized_field_equation,
+                                      lowerdex, upperdex)
+            integrated_value += integration[0]
+            error.append(integration[1])
+
+        # Errors add in quadrature.
+        error = np.sqrt(np.dot(error, error))
 
     return integrated_value, error

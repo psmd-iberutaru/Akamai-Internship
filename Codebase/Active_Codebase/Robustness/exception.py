@@ -97,6 +97,16 @@ class OutputWarning(Warning):
         self.message = message
 
 
+class AstronomyWarning(Warning):
+    """
+    A warning to be used when the current program is doing something a bit
+    risky or something that would not make normal sense in astronomical terms.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
 # Begin the main warning function.
 def kyubey_warning(warn_class, message,
                    stacklevel=2, input_halt=False):
