@@ -59,13 +59,13 @@ class Sightline():
             formatted in the Astropy SkyCord format: `` '±00d00m00.00s' ``. For
             the values of the seconds are decimal and may extend to any 
             precision.
-        Skycord_object : SkyCord object, optional
+        Skycord_object : SkyCord object; optional
             It may be easier to also just pass an Astropy Skycord object in
             general. The other strings are ignored if it is successful.
 
         Parameters:
         -----------
-        ra_wrap_angle : float, optional
+        ra_wrap_angle : float; optional
             This angle, in radians, specifies where the RA values should wrap.
             Wrapping is considered to be very bad and should be avoided. 
             Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)
@@ -168,7 +168,8 @@ class ProtostarModel():
     """
 
     def __init__(self, coordinates, cloud_model, magnetic_field_model,
-                 density_model=None, ra_wrap_angle=2*np.pi):
+                 density_model=None, polarization_model=None,
+                 ra_wrap_angle=2*np.pi):
         """Object form of a model object to be observed.
 
         This is the object representation of an object in the sky. The 
@@ -189,14 +190,18 @@ class ProtostarModel():
             A function that, given a single point in cartesian space, will 
             return the value of the magnitude of the magnetic field's three 
             orthogonal vectors in xyz-space.
-        density_model : function or string, optional
+        density_model : function or string; optional
             A function that, given a point in cartesian space, will return
             a value pertaining to the density of the gas/dust within at that
             point. Defaults to uniform.
+        polarization_model: function, string, or float; optional
+            This is the percent of polarization of the light. Either given as 
+            a function (or string representing a function) ``f(x,y,z)``, or 
+            as a constant float value. Default is uniform value of 1.
 
         Parameters:
         -----------
-        ra_wrap_angle : float, optional
+        ra_wrap_angle : float; optional
             This angle, in radians, specifies where the RA values should wrap.
             Wrapping is considered to be very bad and should be avoided. 
             Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)
@@ -225,9 +230,7 @@ class ProtostarModel():
             Robust.valid.validate_function_call(magnetic_field_model,
                                                 n_parameters=3)
 
-        ra_wrap_angle = Robust.valid.validate_float_value(ra_wrap_angle)
-        ra_wrap_angle = ra_wrap_angle * ay_u.rad
-
+        # Test density model.
         if (callable(density_model)):
             density_model = \
                 Robust.valid.validate_function_call(density_model,
@@ -239,18 +242,46 @@ class ProtostarModel():
         elif (density_model is None):
             # The user likely did not input a density model, the default
             # is uniform distribution.
-            def uniform_function(x, y, z): return 1
-            density_model = uniform_function
+            def uniform_density_function(x, y, z): return 1
+            density_model = uniform_density_function
         else:
             raise TypeError('The input for the density equation must either '
                             'be a callable function or a string that can '
                             'be converted into an implicit callable function.'
                             '    --Kyubey')
+        # Test polarization model factor
+        if (callable(polarization_model)):
+            polarization_model = \
+                Robust.valid.validate_function_call(polarization_model,
+                                                    n_parameters=3)
+        elif (isinstance(polarization_model, str)):
+            polarization_model = \
+                Robust.inparse.user_equation_parse(polarization_model,
+                                                   ('x', 'y', 'z'))
+        elif (isinstance(polarization_model, (float, int))):
+            # The user desires a constant value for the percent polarization.
+            def constant_function(x, y, z): return polarization_model
+            polarization_model = constant_function
+        elif (polarization_model is None):
+            # The user likely did not input a density model, the default
+            # is uniform distribution.
+            def uniform_polarization_function(x, y, z): return 1
+            polarization_model = uniform_polarization_function
+        else:
+            raise TypeError('The input for the polarization model must either '
+                            'be a callable function, a string that can '
+                            'be converted into an implicit callable function,'
+                            'or a constant float/int value.'
+                            '    --Kyubey')
+
+        ra_wrap_angle = Robust.valid.validate_float_value(ra_wrap_angle)
+        ra_wrap_angle = ra_wrap_angle * ay_u.rad
 
         self.coordinates = coordinates
         self.cloud_model = cloud_model
         self.magnetic_field = magnetic_field_model
         self.density_model = density_model
+        self.polarization_model = polarization_model
         self._ra_wrap_angle = ra_wrap_angle
 
     def _radianize_coordinates(self):
@@ -363,7 +394,7 @@ class ObservingRun():
 
         Parameters:
         -----------
-        n_axial_samples : int, optional
+        n_axial_samples : int; optional
             The number of points along one RA or DEC axis to be sampled. The
             resulting sample is a mesh n**2 between the bounds. Default is 25.
 
@@ -391,7 +422,7 @@ class ObservingRun():
         # Decompose the stokes parameters into I,Q,U,V along with the angle
         # of polarization.
         I, Q, U, V = stokes_parameters
-        polar_I = Q**2 + U**2
+        polar_I = np.hypot(Q, U)
         angle = Backend.efp.angle_from_Stokes_parameters(Q, U)
 
         # Arrange the values into plottable values. The x-axis is RA, and the
@@ -407,8 +438,8 @@ class ObservingRun():
         ax5_o = ax5.tricontourf(plotting_x_axis, plotting_y_axis, angle, 50)
 
         # Assign titles.
-        ax1.set_title('Intensity')
-        ax2.set_title('hypot(Q,U)')
+        ax1.set_title('Total Intensity')
+        ax2.set_title('Polar Intensity')
         ax3.set_title('Q Values')
         ax4.set_title('U Values')
         ax5.set_title('Angle')
@@ -443,6 +474,9 @@ class ObservingRun():
         --------
         integrated_intensity : float
             The total integrated intensity.
+        polarized_integrated_intensity : float
+            The total integrated intensity from polarization contribution,
+            given by the polarization model function.
         error : float
             The error of the integrated intensity.
         """
@@ -459,13 +493,32 @@ class ObservingRun():
         # Extract sightline information
         sightline_center, sightline_slopes = sightline.sightline_parameters()
 
+        # Integration function with a polarization dependence, as the amount of
+        # polarization influences. The polarization model must be sqrt(f(x)) 
+        # because the user expects a I_p = I_t * p, while the most efficient 
+        # method of implementation (modifying the E-fields), produces a 
+        # relationship of I_p = I_t * p**2.
+        def polarization_intensity(x, y, z):
+            total = (self.target.density_model(x, y, z)
+                     * np.sqrt(np.abs(self.target.polarization_model(x, y, z))))
+            return total
+
         # Integrate over the density function.
-        integrated_intensity, error = Backend.cli.cloud_line_integral(
+        integrated_intensity, int_error = Backend.cli.cloud_line_integral(
             self.target.density_model, self.target.cloud_model,
             sightline_center, box_width, view_line_deltas=sightline_slopes)
 
+        # Also find out the total polarized intensity.
+        polarized_integrated_intensity, pol_error = \
+            Backend.cli.cloud_line_integral(
+                polarization_intensity, self.target.cloud_model,
+                sightline_center, box_width, view_line_deltas=sightline_slopes)
+
+        # Error propagates in q.uadrature
+        error = np.hypot(int_error, pol_error)
+
         # Return
-        return integrated_intensity, error
+        return integrated_intensity, polarized_integrated_intensity, error
 
     def _compute_integrated_magnetic_field(self, sightline):
         """Computes total magnetic field vectors over a sightline.
@@ -597,25 +650,28 @@ class ObservingRun():
         # It is best if it is not vectored like other numpy operations.
         # Because it deals with specific classes and whatnot.
         intensity_array = []
+        polarized_intensity = []
         Bfield_x_array = []
         Bfield_y_array = []
         Bfield_z_array = []
         error_array = []
         for sightlinedex in sightline_list:
-            temp_intensity, intensity_error = \
+            temp_intensity, temp_polarized_intensity, intensity_error = \
                 self._compute_integrated_intensity(sightlinedex)
             Bfield_x, Bfield_y, Bfield_z, Bfield_error = \
                 self._compute_integrated_magnetic_field(sightlinedex)
             # Append
             intensity_array.append(temp_intensity)
+            polarized_intensity.append(temp_polarized_intensity)
             Bfield_x_array.append(Bfield_x)
             Bfield_y_array.append(Bfield_y)
             Bfield_z_array.append(Bfield_z)
             # Combine errors in quadrature.
-            error_array.append(np.hypot(intensity_error,Bfield_error))
+            error_array.append(np.hypot(intensity_error, Bfield_error))
 
         # Vectorize.
         intensity_array = np.array(intensity_array, dtype=float)
+        polarized_intensity = np.array(polarized_intensity, dtype=float)
         Bfield_x_array = np.array(Bfield_x_array, dtype=float)
         Bfield_y_array = np.array(Bfield_y_array, dtype=float)
         Bfield_z_array = np.array(Bfield_z_array, dtype=float)
@@ -629,15 +685,24 @@ class ObservingRun():
         # Convert the magnetic fields to electric fields. Because the strength
         # of the magnetic field is independent of the strength of the E field
         # through the virtue of the reflecting dust grains, scale by intensity.
-        Efield_y_array, Efield_z_array = \
+        Efield_y_array_norm, Efield_z_array_norm = \
             Backend.efp.magnetic_to_electric(Bfield_y_array, Bfield_z_array,
                                              normalize=True)
-        Efield_y_array *= intensity_array
-        Efield_z_array *= intensity_array
+        Efield_y_array = Efield_y_array_norm * intensity_array
+        Efield_z_array = Efield_z_array_norm * intensity_array
+
+        # Polarized light.
+        Efield_y_array_polar = Efield_y_array_norm * polarized_intensity
+        Efield_z_array_polar = Efield_z_array_norm * polarized_intensity
 
         # Get all of the Stokes parameters.
-        I, Q, U, V = Backend.efp.Stokes_parameters_from_field(Efield_y_array,
-                                                              Efield_z_array)
+        I, Q, U, V = \
+            Backend.efp.Stokes_parameters_from_field(
+                Efield_y_array_polar, Efield_z_array_polar)
+
+        # Total intensity is actually from the Efield of the total light, not
+        # just polarized light.
+        I = Efield_y_array**2 + Efield_z_array**2
 
         # Return all of the parameters as this is a hidden function. The front
         # end contour functions take care of producing only the one the user

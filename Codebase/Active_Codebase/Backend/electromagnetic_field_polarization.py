@@ -26,7 +26,7 @@ def electric_to_magnetic(E_i, E_j,
         The component of the electric field in the i-hat direction.
     E_j : float or array_like
         The component of the electric field in the j-hat direction.
-    normalize : bool, optional
+    normalize : bool; optional
         If True, then the returned E field vector components are of a unitary
         vector. Default is False.
 
@@ -83,7 +83,7 @@ def magnetic_to_electric(B_i, B_j,
         The component of the magnetic field in the i-hat direction.
     B_j : float or array_like
         The component of the magnetic field in the j-hat direction.
-    normalize : bool, optional
+    normalize : bool; optional
         If true, then the returned E field vector components are of a unitary
         vector. Default is False.
 
