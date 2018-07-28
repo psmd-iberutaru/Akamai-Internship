@@ -115,7 +115,7 @@ class Sightline():
 
         - The x-axis of the object is equal to the r-axis of the telescope. Both pointing away from the telescope, deeper into space.
         - The y-axis of the object is equal to the RA-axis/phi-axis of the 
-        telescope, eastward.
+        telescope, westward (as y increases, RA decreases)
         - The z-axis of the object is equal to the DEC-axis of the telescope. It is also equal to the negative of the theta-axis 
         when it is centered on theta = pi/2. Points north-south of the 
         telescope.
@@ -169,7 +169,7 @@ class ProtostarModel():
 
     def __init__(self, coordinates, cloud_model, magnetic_field_model,
                  density_model=None, polarization_model=None,
-                 ra_wrap_angle=2*np.pi):
+                 ra_wrap_angle=2*np.pi,zeros_guess_count=100):
         """Object form of a model object to be observed.
 
         This is the object representation of an object in the sky. The 
@@ -205,6 +205,10 @@ class ProtostarModel():
             This angle, in radians, specifies where the RA values should wrap.
             Wrapping is considered to be very bad and should be avoided. 
             Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)
+        zeros_guess_count : int; optional
+            This value stipulates how many spread out test points there should 
+            be when finding sightline intersection points. A higher number 
+            should be used for complex shapes. Defaults at 100.
         """
         # Type check
         if (not isinstance(coordinates, ay_coord.SkyCoord)):
@@ -277,12 +281,16 @@ class ProtostarModel():
         ra_wrap_angle = Robust.valid.validate_float_value(ra_wrap_angle)
         ra_wrap_angle = ra_wrap_angle * ay_u.rad
 
+        zeros_guess_count =Robust.valid.validate_int_value(zeros_guess_count,
+                                                           greater_than=0)
+
         self.coordinates = coordinates
         self.cloud_model = cloud_model
         self.magnetic_field = magnetic_field_model
         self.density_model = density_model
         self.polarization_model = polarization_model
         self._ra_wrap_angle = ra_wrap_angle
+        self._zeros_guess_count = zeros_guess_count
 
     def _radianize_coordinates(self):
         """This method returns the RA and DEC in radians.
@@ -506,13 +514,15 @@ class ObservingRun():
         # Integrate over the density function.
         integrated_intensity, int_error = Backend.cli.cloud_line_integral(
             self.target.density_model, self.target.cloud_model,
-            sightline_center, box_width, view_line_deltas=sightline_slopes)
+            sightline_center, box_width, view_line_deltas=sightline_slopes,
+            n_guesses=self.target._zeros_guess_count)
 
         # Also find out the total polarized intensity.
         polarized_integrated_intensity, pol_error = \
             Backend.cli.cloud_line_integral(
                 polarization_intensity, self.target.cloud_model,
-                sightline_center, box_width, view_line_deltas=sightline_slopes)
+                sightline_center, box_width, view_line_deltas=sightline_slopes,
+                n_guesses=self.target._zeros_guess_count)
 
         # Error propagates in q.uadrature
         error = np.hypot(int_error, pol_error)
@@ -575,13 +585,16 @@ class ObservingRun():
         # Begin computation.
         Bfield_x_integrated, error_x = Backend.cli.cloud_line_integral(
             target_cloud_Bfield_x, self.target.cloud_model,
-            sightline_center, box_width, view_line_deltas=sightline_slopes)
+            sightline_center, box_width, view_line_deltas=sightline_slopes,
+            n_guesses=self.target._zeros_guess_count)
         Bfield_y_integrated, error_y = Backend.cli.cloud_line_integral(
             target_cloud_Bfield_y, self.target.cloud_model,
-            sightline_center, box_width, view_line_deltas=sightline_slopes)
+            sightline_center, box_width, view_line_deltas=sightline_slopes,
+            n_guesses=self.target._zeros_guess_count)
         Bfield_z_integrated, error_z = Backend.cli.cloud_line_integral(
             target_cloud_Bfield_z, self.target.cloud_model,
-            sightline_center, box_width, view_line_deltas=sightline_slopes)
+            sightline_center, box_width, view_line_deltas=sightline_slopes,
+            n_guesses=self.target._zeros_guess_count)
 
         error = np.array([error_x, error_y, error_z], dtype=float)
 

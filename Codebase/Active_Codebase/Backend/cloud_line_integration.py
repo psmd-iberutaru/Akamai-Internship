@@ -90,7 +90,7 @@ def line_integral_boundaries(view_line_point, cloud_equation, box_width,
     initial_guesses = np.linspace(-box_width, box_width, n_guesses)
     eq_roots, info, int_err, message = \
         sp_opt.fsolve(parameterized_cloud_equation, initial_guesses,
-                      xtol=1e-8, full_output=True)
+                      xtol=1e-12, maxfev=int(1e6),full_output=True)
     sort_eq_roots = np.sort(eq_roots)
 
     # If there were no detected bounds, it is likely that there was no
@@ -102,7 +102,7 @@ def line_integral_boundaries(view_line_point, cloud_equation, box_width,
         return lower_bounds, upper_bounds
 
     # Have only unique roots.
-    unique_index = (np.abs(sort_eq_roots[1:] - sort_eq_roots[:-1])) > 1e-8
+    unique_index = (np.abs(sort_eq_roots[1:] - sort_eq_roots[:-1])) > 1e-5
     neg_bound_roots = sort_eq_roots[:-1][unique_index]
     pos_bound_roots = sort_eq_roots[1:][unique_index]
 
