@@ -13,7 +13,7 @@
 \author[2]{Ramprasad Rao (Mentor)}
 
 \affil[1]{\footnotesize University of Hawaii at Hilo}
-\affil[2]{\footnotesize SMA - Smithsoanian Institution \& ASIAA - Academia Sinica Institute of Astronomy and Astrophysics}
+\affil[2]{\footnotesize SMA - Smithsoanian Institution & ASIAA - Academia Sinica Institute of Astronomy and Astrophysics}
 
 %% Begin to create the abstract of the article.
 %%%%%%%%%%%%%%%%%%%%
@@ -25,9 +25,8 @@
 \begin{minipage}{0.8\textwidth}
 	\begin{abstract}
 
-	We present a modeling program designed to simulate polarization and magnetic field morphologies of star-forming protoplanetary disk objects. Through modeling the properties of dust grain interactions with magnetic fields and light, Stokes parameters, measurements of polarization, which are normally observed can be simulated. The orientation of oblong shaped dust grains in protoplanetary regions is heavily influenced by the prevailing magnetic field. Dust grains influence observed polarization angles by reflecting with a vector aligned with the grain's longest axis. The magnetic field vectors are therefore aligned perpendicular to the polarization vectors. The simulation, generalized for any shape of cloud, magnetic field, density, or polarization factor function, allows for the generation of integrated 2D polarization maps. Comparing these 2D maps to observed data allows for fitting of model parameters to recreate the observed object's properties. 
+	We present an algorithmic method of simulating the intensity and polarization results of protoplanetary star-forming regions for the backwards comparisons to observational results. The orientation of oblong shaped dust grains in protoplanetary regions is heavily influenced by the prevailing magnetic field. Dust grains influence observed polarization angles by reflecting with a vector aligned with the grain's longest axis. The magnetic field vectors are therefore aligned perpendicular to the polarization vectors. We generate models of protoplanetary regions. By toggling functions that describe the geometries, density profile, polarization models, and magnetic fields of these regions, we attempt to generate similar conditions in our simulations to observational data. Matching correlations between the simulations, and the constraints and data from observational studies, inform us of the possible arrangements that a protoplanetary region might have.
 
-	
 	\end{abstract}
 \end{minipage}
 \end{center}
@@ -276,6 +275,12 @@ Next, in order to compute a line integral of a sightline through a three dimensi
 
 A small thing to note as of right now, the programs are not very user-friendly. Some effort will need to be put into making this entire codebase into something much more user-friendly. Perhaps not as large as a themed module, but enough to be rather useful. In fact, some of the older functions like Bessel fitting and the gaussian fitting functional groups are considered to be obsolete because of their shoddy implementations.
 
+
+Buildup to modeling for correlations to observation
+Takeaway:
+	Modeling observations
+	Spacial/geometrical representation of the program's functions.
+	Proof of concept, at least 1 model matching observation.
 
 
 
