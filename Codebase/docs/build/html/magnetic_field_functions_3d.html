@@ -51,7 +51,7 @@ functions take in 2 parameters, the x,y values or rho,phi values, and return
 the u,v vector components of the given magnetic field</p>
 <dl class="function">
 <dt id="magnetic_field_functions_3d.circular_magnetic_field_cart_3d">
-<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">circular_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;, reference_axis='z'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#circular_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.circular_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">circular_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;, curl_axis='z'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#circular_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.circular_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the cartesian magnetic field vectors of a circular field.</p>
 <p>The circular magnetic field is radially symmetric. This function
 returns the values of the components of a magnetic field given some
@@ -69,7 +69,7 @@ redefined. The axis of symmetry can also be redefined.</p>
 array <code class="docutils literal notranslate"><span class="pre">[x0,y0]</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">[0,0,0]</span></code></li>
 <li><strong>mag_function</strong> (function <code class="docutils literal notranslate"><span class="pre">f(r)</span></code>; optional) – The value of the magnitude of the vector field at some radius from
 the center. Default is <code class="docutils literal notranslate"><span class="pre">f(r)</span> <span class="pre">=</span> <span class="pre">1/r**2</span></code>.</li>
-<li><strong>reference_axis</strong> (<em>string; optional</em>) – The specified axis that the magnetic field curls around. Default is
+<li><strong>curl_axis</strong> (<em>string; optional</em>) – The specified axis that the magnetic field curls around. Default is
 the <code class="docutils literal notranslate"><span class="pre">z</span></code> axis.</li>
 </ul>
 </td>

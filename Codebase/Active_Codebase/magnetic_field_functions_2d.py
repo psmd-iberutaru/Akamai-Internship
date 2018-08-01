@@ -57,7 +57,7 @@ def circular_magnetic_field_cart_2d(x, y,
     y = Robust.valid.validate_float_array(y)
     center = Robust.valid.validate_float_array(center, shape=(2,))
     mag_function = Robust.valid.validate_function_call(mag_function,
-                                                       n_parameters=2)
+                                                       n_parameters=1)
 
     # Do a transformation based on the relocation of the center.
     x = x - center[0]

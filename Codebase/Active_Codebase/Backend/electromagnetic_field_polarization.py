@@ -164,8 +164,8 @@ def Stokes_parameters_from_field(E_i, E_j,
         The fourth Stokes parameter, equivalent to S_3. The circular 
         polarization aspect.
 
-    Notes:
-    ------
+    Notes
+    -----
     [1]  This function's notation is based on the following diagram. 
     https://en.wikipedia.org/wiki/File:Polarisation_ellipse2.svg
 

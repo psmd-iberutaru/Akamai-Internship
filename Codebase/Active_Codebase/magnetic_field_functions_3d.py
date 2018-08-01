@@ -24,7 +24,7 @@ import magnetic_field_functions_2d as mff2d
 def circular_magnetic_field_cart_3d(x, y, z,
                                     center=[0, 0, 0],
                                     mag_function=lambda r: 1/r**2,
-                                    reference_axis='z'):
+                                    curl_axis='z'):
     """Compute the cartesian magnetic field vectors of a circular field.
 
     The circular magnetic field is radially symmetric. This function  
@@ -46,7 +46,7 @@ def circular_magnetic_field_cart_3d(x, y, z,
     mag_function : function ``f(r)``; optional
         The value of the magnitude of the vector field at some radius from
         the center. Default is ``f(r) = 1/r**2``.
-    reference_axis : string; optional
+    curl_axis : string; optional
         The specified axis that the magnetic field curls around. Default is 
         the ``z`` axis.
 
@@ -69,9 +69,9 @@ def circular_magnetic_field_cart_3d(x, y, z,
     z = Robust.valid.validate_float_array(z)
     center = Robust.valid.validate_float_array(center, shape=(3,))
     mag_function = Robust.valid.validate_function_call(mag_function,
-                                                       n_parameters=3)
-    reference_axis = Robust.valid.validate_string(
-        reference_axis.lower(), length=1, contain_substr=('x', 'y', 'z'))
+                                                       n_parameters=1)
+    curl_axis = Robust.valid.validate_string(
+        curl_axis.lower(), length=1, contain_substr=('x', 'y', 'z'))
 
     # Do a transformation based on the relocation of the center.
     x = x - center[0]
@@ -80,14 +80,14 @@ def circular_magnetic_field_cart_3d(x, y, z,
 
     # Calculate the magnetic field based on what the user desired on for
     # the axis of symmetry.
-    if (reference_axis == 'x'):
+    if (curl_axis == 'x'):
         axis1, axis2 = mff2d.circular_magnetic_field_cart_2d(
             y, z, mag_function=mag_function)
         # The x axis is determined to have zero contribution.
         Bfield_x = 0
         Bfield_y = axis1
         Bfield_z = axis2
-    elif (reference_axis == 'y'):
+    elif (curl_axis == 'y'):
         axis1, axis2 = mff2d.circular_magnetic_field_cart_2d(
             -x, z, mag_function=mag_function)
         # The x axis is determined to have zero contribution. The negatives
@@ -95,7 +95,7 @@ def circular_magnetic_field_cart_3d(x, y, z,
         Bfield_x = axis1 * -1
         Bfield_y = 0
         Bfield_z = axis2
-    elif (reference_axis == 'z'):
+    elif (curl_axis == 'z'):
         axis1, axis2 = mff2d.circular_magnetic_field_cart_2d(
             x, y, mag_function=mag_function)
         # The z axis is determined to have zero contribution.
@@ -173,7 +173,9 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
 
     # Convert back to the cartesian cords.
     Bfield_x, Bfield_y, Bfield_z = \
-        _Backend.cst.cylindrical_to_cartesian_3d(Bfield_rho, phi, Bfield_z)
+        _Backend.cst.cylindrical_to_cartesian_3d(Bfield_rho, 
+                                                 phi + Bfield_phi, 
+                                                 Bfield_z)
 
     return Bfield_x, Bfield_y, Bfield_z
 

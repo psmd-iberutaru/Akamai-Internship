@@ -63,7 +63,7 @@
 <div class="viewcode-block" id="circular_magnetic_field_cart_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.circular_magnetic_field_cart_3d">[docs]</a><span class="k">def</span> <span class="nf">circular_magnetic_field_cart_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
                                     <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                     <span class="n">mag_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
-                                    <span class="n">reference_axis</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">):</span>
+                                    <span class="n">curl_axis</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the cartesian magnetic field vectors of a circular field.</span>
 
 <span class="sd">    The circular magnetic field is radially symmetric. This function  </span>
@@ -85,7 +85,7 @@
 <span class="sd">    mag_function : function ``f(r)``; optional</span>
 <span class="sd">        The value of the magnitude of the vector field at some radius from</span>
 <span class="sd">        the center. Default is ``f(r) = 1/r**2``.</span>
-<span class="sd">    reference_axis : string; optional</span>
+<span class="sd">    curl_axis : string; optional</span>
 <span class="sd">        The specified axis that the magnetic field curls around. Default is </span>
 <span class="sd">        the ``z`` axis.</span>
 
@@ -109,8 +109,8 @@
     <span class="n">center</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
     <span class="n">mag_function</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">mag_function</span><span class="p">,</span>
                                                        <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-    <span class="n">reference_axis</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span>
-        <span class="n">reference_axis</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">contain_substr</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">))</span>
+    <span class="n">curl_axis</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span>
+        <span class="n">curl_axis</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">contain_substr</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">))</span>
 
     <span class="c1"># Do a transformation based on the relocation of the center.</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -119,14 +119,14 @@
 
     <span class="c1"># Calculate the magnetic field based on what the user desired on for</span>
     <span class="c1"># the axis of symmetry.</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">reference_axis</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">curl_axis</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">):</span>
         <span class="n">axis1</span><span class="p">,</span> <span class="n">axis2</span> <span class="o">=</span> <span class="n">mff2d</span><span class="o">.</span><span class="n">circular_magnetic_field_cart_2d</span><span class="p">(</span>
             <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mag_function</span><span class="o">=</span><span class="n">mag_function</span><span class="p">)</span>
         <span class="c1"># The x axis is determined to have zero contribution.</span>
         <span class="n">Bfield_x</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">Bfield_y</span> <span class="o">=</span> <span class="n">axis1</span>
         <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">axis2</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">reference_axis</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">curl_axis</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">):</span>
         <span class="n">axis1</span><span class="p">,</span> <span class="n">axis2</span> <span class="o">=</span> <span class="n">mff2d</span><span class="o">.</span><span class="n">circular_magnetic_field_cart_2d</span><span class="p">(</span>
             <span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mag_function</span><span class="o">=</span><span class="n">mag_function</span><span class="p">)</span>
         <span class="c1"># The x axis is determined to have zero contribution. The negatives</span>
@@ -134,7 +134,7 @@
         <span class="n">Bfield_x</span> <span class="o">=</span> <span class="n">axis1</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
         <span class="n">Bfield_y</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">axis2</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">reference_axis</span> <span class="o">==</span> <span class="s1">&#39;z&#39;</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">curl_axis</span> <span class="o">==</span> <span class="s1">&#39;z&#39;</span><span class="p">):</span>
         <span class="n">axis1</span><span class="p">,</span> <span class="n">axis2</span> <span class="o">=</span> <span class="n">mff2d</span><span class="o">.</span><span class="n">circular_magnetic_field_cart_2d</span><span class="p">(</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mag_function</span><span class="o">=</span><span class="n">mag_function</span><span class="p">)</span>
         <span class="c1"># The z axis is determined to have zero contribution.</span>
