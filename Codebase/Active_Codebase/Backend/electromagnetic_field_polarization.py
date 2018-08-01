@@ -21,7 +21,8 @@ def electric_to_magnetic(E_i, E_j,
     Or one vector with positive and negative magnitude. In three, there are
     infinitely many, so it is much harder to give a good vector.
 
-    Parameters:
+    Parameters
+    ----------
     E_i : float or array_like
         The component of the electric field in the i-hat direction.
     E_j : float or array_like
@@ -30,7 +31,8 @@ def electric_to_magnetic(E_i, E_j,
         If True, then the returned E field vector components are of a unitary
         vector. Default is False.
 
-    Returns:
+    Returns
+    -------
     B_i : ndarray
         The component of the magnetic field in the i-hat direction.
     B_j : ndarray
@@ -78,7 +80,8 @@ def magnetic_to_electric(B_i, B_j,
     Or one vector with positive and negative magnitude. In three, there are
     infinitely many, so it is much harder to give a good vector.
 
-    Parameters:
+    Parameters
+    ----------
     B_i : float or array_like
         The component of the magnetic field in the i-hat direction.
     B_j : float or array_like
@@ -87,7 +90,8 @@ def magnetic_to_electric(B_i, B_j,
         If true, then the returned E field vector components are of a unitary
         vector. Default is False.
 
-    Returns:
+    Returns
+    -------
     E_i : ndarray
         The component of the electric field in the i-hat direction.
     E_j : ndarray
@@ -133,8 +137,8 @@ def Stokes_parameters_from_field(E_i, E_j,
     polarization ellipse and the line segment connecting between two points 
     on the ellipse and the semi-major and semi-minor axes. See note [1].
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     E_i : float or array_like
         The component of the electric field in the i-hat direction.
     E_j : float or array_like
@@ -145,7 +149,8 @@ def Stokes_parameters_from_field(E_i, E_j,
     chi : float or array_like
         The parameter for circularly polarized light.
 
-    Returns:
+    Returns
+    -------
     I : ndarray
         The first Stokes parameter, equivalent to S_0. The intensity of the 
         light.
@@ -206,8 +211,8 @@ def angle_from_Stokes_parameters(Q,U):
     This function returns an angle of polarization in radians based on the 
     values of two stoke parameters. The angle is signed.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     Q : array_like
         The second Stokes parameter, equivalent to S_1. The x,y polarization
         aspect. 
@@ -215,8 +220,8 @@ def angle_from_Stokes_parameters(Q,U):
         The third Stokes parameter, equivalent to S_2. The a,b (45 deg off set 
         of x,y) polarization aspect.
 
-    Returns:
-    --------
+    Returns
+    -------
     angle : ndarray
         The angle of the polarization corresponding to the given Q and U value
         pairs. The angle array is parallel to the Q and U array_like inputs.

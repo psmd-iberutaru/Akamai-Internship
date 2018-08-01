@@ -4,17 +4,20 @@ object is known, and given sight parameters, the data is given. In particular,
 these functions actually give the values of terms derived from the object
 model also provided.
 """
+import copy
 
 import numpy as np
 import scipy as sp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import astropy as ay
-import astropy.units as ay_u
-import astropy.coordinates as ay_coord
+import astropy as ap
+import astropy.units as ap_u
+import astropy.coordinates as ap_coord
 
 import Robustness as Robust
-import Backend
+import Backend as _Backend
+
+import data_systematization as d_systize
 
 
 class Sightline():
@@ -25,14 +28,14 @@ class Sightline():
     The notation for the accepted values of RA and DEC is found in the 
     Astropy module's SkyCord class.
 
-    Attributes:
-    -----------
+    Attributes
+    ----------
     self.coordinates : Astropy SkyCord object.
         This is the sky coordinates of the sightline.
 
-    Methods:
-    --------
-    sightline_parameters() : ndarray,ndarray
+    Methods
+    -------
+    sightline_parameters() : function (returns | ndarray,ndarray)
         This method returns back both the sightline's center and slopes for
         an actual geometrical representation of the line. Converting from 
         the equatorial coordinate system to the cartesian coordinate system.
@@ -47,42 +50,42 @@ class Sightline():
         of the sightline is the location that it is throughout space. This
         is a specific wrapper around SkyCord.
 
-        Arguments:
-        ----------
+        Arguments
+        ---------
         right_ascension : string
             The right ascension value for the sightline. This term must be 
-            formatted in the Astropy SkyCord format: `` '00h00m00.00s' ``. For
-            the values of the seconds are decimal and may extend to any 
+            formatted in the Astropy SkyCord format: `` '00h00m00.00s' ``.
+            For the values of the seconds are decimal and may extend to any 
             precision.
         declination : string
             The declination value for the sightline. This term must be 
-            formatted in the Astropy SkyCord format: `` '±00d00m00.00s' ``. For
-            the values of the seconds are decimal and may extend to any 
+            formatted in the Astropy SkyCord format: `` '±00d00m00.00s' ``.
+            For the values of the seconds are decimal and may extend to any 
             precision.
         Skycord_object : SkyCord object; optional
             It may be easier to also just pass an Astropy Skycord object in
             general. The other strings are ignored if it is successful.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         ra_wrap_angle : float; optional
             This angle, in radians, specifies where the RA values should wrap.
             Wrapping is considered to be very bad and should be avoided. 
             Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)
         """
         # Type check.
-        if (isinstance(Skycord_object, ay_coord.SkyCoord)):
+        if (isinstance(Skycord_object, ap_coord.SkyCoord)):
             sky_coordinates = Skycord_object
         else:
             # Type check for RA and dec before conversion
             right_ascension = Robust.valid.validate_string(right_ascension)
             declination = Robust.valid.validate_string(declination)
             # Convert the strings to sky cords.
-            sky_coordinates = ay_coord.SkyCoord(right_ascension,
+            sky_coordinates = ap_coord.SkyCoord(right_ascension,
                                                 declination,
                                                 frame='icrs')
         ra_wrap_angle = Robust.valid.validate_float_value(ra_wrap_angle)
-        ra_wrap_angle = ra_wrap_angle * ay_u.rad
+        ra_wrap_angle = ra_wrap_angle * ap_u.rad
 
         # Define the member arguments.
         self.coordinates = sky_coordinates
@@ -96,8 +99,8 @@ class Sightline():
         of the object. This function returns first the central defining
         point, then the deltas for the equation.
 
-        Returns:
-        --------
+        Returns
+        -------
         sightline_center : ndarray
             This returns a cartsian point based on the approximation 
             that, if the x-axis and the r-axis are the same of cartesian 
@@ -108,8 +111,8 @@ class Sightline():
             by the center. Because of the approximation from above, it is 
             always [1,0,0].
 
-        Notes:
-        ------
+        Notes
+        -----
         The coordinates of the sightline in relation to the object are as
         follows:
 
@@ -135,8 +138,8 @@ class Sightline():
         This method converts the RA and DEC coordinate measurements into
         radians for better accounting.
 
-        Returns:
-        --------
+        Returns
+        -------
         ra_radians : float
             The RA coordinate in radians.
         dec_radians : float
@@ -158,49 +161,62 @@ class ProtostarModel():
     contains all the required functions and parameters associated with 
     one of the objects that would be observed for polarimetry data.
 
-    Attributes:
-    -----------
+    Attributes
+    ----------
     self.coordinates : Astropy SkyCord object
         This is the coordinates of the object that this class defines.
     self.cloud_model : function
-        This is an implicit function of the shape of the protostar cloud. 
+        This is an implicit function (or a numerical approximation thereof) of 
+        the shape of the protostar cloud. 
     self.magnetic_field : function
+        This is an implicit function (or a numerical approximation thereof) of 
+        the shape of the magnetic field.
+    self.density_model : function
+        This is an implicit function (or a numerical approximation thereof) of
+        the shape of the density model of the cloud.
+    self.polarization_model : function
+        This is an implicit function (or a numerical approximation thereof) of 
+        the polarization model of the cloud.
     """
 
     def __init__(self, coordinates, cloud_model, magnetic_field_model,
                  density_model=None, polarization_model=None,
-                 ra_wrap_angle=2*np.pi,zeros_guess_count=100):
+                 ra_wrap_angle=2*np.pi, zeros_guess_count=100):
         """Object form of a model object to be observed.
 
         This is the object representation of an object in the sky. The 
         required terms are present.
 
-        Arguments:
-        -----------
+        Arguments
+        ---------
         coordinates : Astropy SkyCord object
             These are the coordinates of the observation object. It is up
             to the user to put as complete information as possible.
-        cloud_model : function or string
+        cloud_model : function or string,
             An implicit equation of the cloud. The origin of this equation 
             must also be the coordinate specified by self.coordinates. Must
             be cartesian in the form ``f(x,y,z) = 0``, for the function or
             string is ``f(x,y,z)``. The x-axis is always aligned with a 
             telescope as it is the same as a telescope's r-axis.
-        magnetic_field_model : function
+        magnetic_field_model : function or InterpolationTable
             A function that, given a single point in cartesian space, will 
             return the value of the magnitude of the magnetic field's three 
-            orthogonal vectors in xyz-space.
-        density_model : function or string; optional
+            orthogonal vectors in xyz-space. If an interpolation table is 
+            given, a numerical approximation function will be used instead.
+        density_model : function or string, or InterpolationTable; optional
             A function that, given a point in cartesian space, will return
             a value pertaining to the density of the gas/dust within at that
-            point. Defaults to uniform.
-        polarization_model: function, string, or float; optional
+            point. Defaults to uniform. If an interpolation table is 
+            given, a numerical approximation function will be used instead.
+        polarization_model: function, string, float or InterpolationTable; optional
             This is the percent of polarization of the light. Either given as 
             a function (or string representing a function) ``f(x,y,z)``, or 
-            as a constant float value. Default is uniform value of 1.
+            as a constant float value. Default is uniform value of 1. If an 
+            interpolation table is given, a numerical approximation function 
+            will be used instead.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         ra_wrap_angle : float; optional
             This angle, in radians, specifies where the RA values should wrap.
             Wrapping is considered to be very bad and should be avoided. 
@@ -210,8 +226,13 @@ class ProtostarModel():
             be when finding sightline intersection points. A higher number 
             should be used for complex shapes. Defaults at 100.
         """
+        # Initialization of boolean checks.
+        # Check if the user input a interpolated data table instead of a 
+        # function. The integration method must change if so.
+        input_interpolated_tables = False
+
         # Type check
-        if (not isinstance(coordinates, ay_coord.SkyCoord)):
+        if (not isinstance(coordinates, ap_coord.SkyCoord)):
             raise TypeError('The input for coordinates must be an Astropy '
                             'SkyCord object.'
                             '    --Kyubey')
@@ -230,9 +251,23 @@ class ProtostarModel():
                             'be converted into an implicit callable function.'
                             '    --Kyubey')
 
-        magnetic_field_model = \
-            Robust.valid.validate_function_call(magnetic_field_model,
-                                                n_parameters=3)
+        # Test magnetic field model.
+        if (callable(magnetic_field_model)):
+            magnetic_field_model = \
+                Robust.valid.validate_function_call(magnetic_field_model,
+                                                    n_parameters=3)
+        elif (isinstance(magnetic_field_model, d_systize.InterpolationTable)):
+            # The user has inputted an interpolation table, record such.
+            input_interpolated_tables = True
+            if (magnetic_field_model.classification == 'vector'):
+                magnetic_field_model = \
+                    magnetic_field_model.numerical_function()
+            else:
+                raise TypeError('The magnetic field lookup table must be a '
+                                'vector based table. It is currently a '
+                                '< {tb} > based table.'
+                                '    --Kyubey'
+                                .format(tb=magnetic_field_model.classification))
 
         # Test density model.
         if (callable(density_model)):
@@ -243,10 +278,21 @@ class ProtostarModel():
             density_model = \
                 Robust.inparse.user_equation_parse(density_model,
                                                    ('x', 'y', 'z'))
+        elif (isinstance(density_model, d_systize.InterpolationTable)):
+            # The user has inputted an interpolation table, record such.
+            input_interpolated_tables = True
+            if (density_model.classification == 'scalar'):
+                density_model = density_model.numerical_function()
+            else:
+                raise TypeError('The density model lookup table must be a '
+                                'scalar based table. It is currently a '
+                                '< {tb} > based table.'
+                                '    --Kyubey'
+                                .format(tb=density_model.classification))
         elif (density_model is None):
             # The user likely did not input a density model, the default
             # is uniform distribution.
-            def uniform_density_function(x, y, z): return 1
+            def uniform_density_function(x, y, z): return np.ones_like(x)
             density_model = uniform_density_function
         else:
             raise TypeError('The input for the density equation must either '
@@ -263,13 +309,26 @@ class ProtostarModel():
                 Robust.inparse.user_equation_parse(polarization_model,
                                                    ('x', 'y', 'z'))
         elif (isinstance(polarization_model, (float, int))):
+            percent_polarized = float(copy.deepcopy(polarization_model))
             # The user desires a constant value for the percent polarization.
-            def constant_function(x, y, z): return polarization_model
+            def constant_function(x, y, z): 
+                return np.full_like(x,percent_polarized)
             polarization_model = constant_function
+        elif (isinstance(polarization_model, d_systize.InterpolationTable)):
+            # The user has inputted an interpolation table, record such.
+            input_interpolated_tables = True
+            if (polarization_model.classification == 'scalar'):
+                polarization_model = polarization_model.numerical_function()
+            else:
+                raise TypeError('The polarization model lookup table must be '
+                                'a scalar based table. It is currently a '
+                                '< {tb} > based table.'
+                                '    --Kyubey'
+                                .format(tb=polarization_model.classification))
         elif (polarization_model is None):
             # The user likely did not input a density model, the default
-            # is uniform distribution.
-            def uniform_polarization_function(x, y, z): return 1
+            # is uniform total distribution.
+            def uniform_polarization_function(x, y, z): return np.ones_like(x)
             polarization_model = uniform_polarization_function
         else:
             raise TypeError('The input for the polarization model must either '
@@ -279,10 +338,10 @@ class ProtostarModel():
                             '    --Kyubey')
 
         ra_wrap_angle = Robust.valid.validate_float_value(ra_wrap_angle)
-        ra_wrap_angle = ra_wrap_angle * ay_u.rad
+        ra_wrap_angle = ra_wrap_angle * ap_u.rad
 
-        zeros_guess_count =Robust.valid.validate_int_value(zeros_guess_count,
-                                                           greater_than=0)
+        zeros_guess_count = Robust.valid.validate_int_value(zeros_guess_count,
+                                                            greater_than=0)
 
         self.coordinates = coordinates
         self.cloud_model = cloud_model
@@ -290,6 +349,7 @@ class ProtostarModel():
         self.density_model = density_model
         self.polarization_model = polarization_model
         self._ra_wrap_angle = ra_wrap_angle
+        self._interpolated_tables = input_interpolated_tables
         self._zeros_guess_count = zeros_guess_count
 
     def _radianize_coordinates(self):
@@ -298,7 +358,7 @@ class ProtostarModel():
         This method converts the RA and DEC coordinate measurements into
         radians for better accounting.
 
-        Returns:
+        Returns
         --------
         ra_radians : float
             The RA coordinate in radians.
@@ -324,6 +384,27 @@ class ObservingRun():
 
     The class itself does the computation in its methods, returning back 
     a heatmap/contour object plot from the observing depending on the method.
+
+    Attributes
+    ----------
+    self.observe_target : ProtostarModel object
+        The model target for simulated observing. Conceptually, the object
+        that the telescope observes.
+    self.sightline : Sightline object
+        The primary sightline that is used for the model observing, 
+        conceptually where the telescope is aimed at.
+    self.field_of_view : float
+        The field of view value of the observation, given as the length
+        of the observing chart.
+
+    Methods
+    -------
+    Stokes_parameter_contours() : function {returns | ndarray,ndarray}
+        Compute the value of Stoke parameters at random sightlines from the
+        primary sightline and plot them. Returns the values that was used 
+        to plot.
+
+
     """
 
     def __init__(self, observe_target, sightline, field_of_view):
@@ -332,8 +413,8 @@ class ObservingRun():
         Create an observing run object, compiling the primary sightline and
         the field of view. 
 
-        Attributes:
-        -----------
+        Arguments
+        ---------
         observe_target : ProtostarModel object
             This is the object to be observed. 
         sightline : Sightline object
@@ -348,10 +429,10 @@ class ObservingRun():
         # Basic type checking
         if (not isinstance(observe_target, ProtostarModel)):
             raise TypeError('The observed target must be a ProtostarModel '
-                            'class.'
+                            'class object.'
                             '    --Kyubey')
         if (not isinstance(sightline, Sightline)):
-            raise TypeError('The sightline must be a Sightline class.'
+            raise TypeError('The sightline must be a Sightline class object.'
                             '    --Kyubey')
         field_of_view = Robust.valid.validate_float_value(field_of_view,
                                                           greater_than=0)
@@ -400,17 +481,18 @@ class ObservingRun():
         The values of the intensity, I, the two polarization values, Q,U, and
         the polarization intensity, hypt(Q,U) is plotted.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         n_axial_samples : int; optional
             The number of points along one RA or DEC axis to be sampled. The
             resulting sample is a mesh n**2 between the bounds. Default is 25.
 
-        Returns:
-        tuple(ndarray) : ra_dec_array
+        Returns
+        -------
+        ra_dec_array : tuple(ndarray)
             This is a tuple of the values of the RA and DEC of the random
             sightlines (arranged in parallel arrays).
-        tuple(ndarray) : stokes_parameters
+        stokes_parameters : tuple(ndarray)
             This is a tuple of ndarrays of the stoke parameters calculated by 
             the random sightlines.
         """
@@ -431,7 +513,7 @@ class ObservingRun():
         # of polarization.
         I, Q, U, V = stokes_parameters
         polar_I = np.hypot(Q, U)
-        angle = Backend.efp.angle_from_Stokes_parameters(Q, U)
+        angle = _Backend.efp.angle_from_Stokes_parameters(Q, U)
 
         # Arrange the values into plottable values. The x-axis is RA, and the
         # y-axis is DEC.
@@ -472,14 +554,14 @@ class ObservingRun():
         is assumed that the magnitude of the E-field is directly related to 
         energy given by the Poynting vector.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         sightline : Sightline object
             The sightline through which the intensity will be calculated 
             through, using the density function.
 
-        Returns:
-        --------
+        Returns
+        -------
         integrated_intensity : float
             The total integrated intensity.
         polarized_integrated_intensity : float
@@ -501,10 +583,17 @@ class ObservingRun():
         # Extract sightline information
         sightline_center, sightline_slopes = sightline.sightline_parameters()
 
+        # If the Protostar model contains an interpolation table instead of
+        # a normal function. Assume the usage of a Simpson's integration.
+        if (self.target._interpolated_tables):
+            integral_method = 'simpsons'
+        else:
+            integral_method = 'scipy'
+
         # Integration function with a polarization dependence, as the amount of
-        # polarization influences. The polarization model must be sqrt(f(x)) 
-        # because the user expects a I_p = I_t * p, while the most efficient 
-        # method of implementation (modifying the E-fields), produces a 
+        # polarization influences. The polarization model must be sqrt(f(x))
+        # because the user expects a I_p = I_t * p, while the most efficient
+        # method of implementation (modifying the E-fields), produces a
         # relationship of I_p = I_t * p**2.
         def polarization_intensity(x, y, z):
             total = (self.target.density_model(x, y, z)
@@ -512,17 +601,21 @@ class ObservingRun():
             return total
 
         # Integrate over the density function.
-        integrated_intensity, int_error = Backend.cli.cloud_line_integral(
+        integrated_intensity, int_error = _Backend.cli.cloud_line_integral(
             self.target.density_model, self.target.cloud_model,
-            sightline_center, box_width, view_line_deltas=sightline_slopes,
-            n_guesses=self.target._zeros_guess_count)
+            sightline_center, box_width, 
+            view_line_deltas=sightline_slopes,
+            n_guesses=self.target._zeros_guess_count,
+            integral_method=integral_method)
 
         # Also find out the total polarized intensity.
         polarized_integrated_intensity, pol_error = \
-            Backend.cli.cloud_line_integral(
+            _Backend.cli.cloud_line_integral(
                 polarization_intensity, self.target.cloud_model,
-                sightline_center, box_width, view_line_deltas=sightline_slopes,
-                n_guesses=self.target._zeros_guess_count)
+                sightline_center, box_width, 
+                view_line_deltas=sightline_slopes,
+                n_guesses=self.target._zeros_guess_count,
+                integral_method=integral_method)
 
         # Error propagates in q.uadrature
         error = np.hypot(int_error, pol_error)
@@ -538,13 +631,14 @@ class ObservingRun():
         is of little importance because of their computation of an improper summation, but the angles are most important. Nonetheless, magnitude
         is preserved.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         sightline : Sightline object
             The sightline through which the magnetic fields will be calculated
             through.
 
-        Returns:
+        Returns
+        -------
         Bfield_x_integrated : float
             The total value of all x-axial magnetic field vectors added 
             together through the sightline and object cloud.
@@ -568,6 +662,13 @@ class ObservingRun():
         # arbitrary.
         box_width = 10 * self.offset
 
+        # If the Protostar model contains an interpolation table instead of
+        # a normal function. Assume the usage of a Simpson's integration.
+        if (self.target._interpolated_tables):
+            integral_method = 'simpsons'
+        else:
+            integral_method = 'scipy'
+
         # Define custom functions such that integrating over a vector function
         # is instead an integration over the three independent dimensions.
         def target_cloud_Bfield_x(x, y, z):
@@ -583,18 +684,24 @@ class ObservingRun():
         sightline_center, sightline_slopes = sightline.sightline_parameters()
 
         # Begin computation.
-        Bfield_x_integrated, error_x = Backend.cli.cloud_line_integral(
+        Bfield_x_integrated, error_x = _Backend.cli.cloud_line_integral(
             target_cloud_Bfield_x, self.target.cloud_model,
-            sightline_center, box_width, view_line_deltas=sightline_slopes,
-            n_guesses=self.target._zeros_guess_count)
-        Bfield_y_integrated, error_y = Backend.cli.cloud_line_integral(
+            sightline_center, box_width, 
+            view_line_deltas=sightline_slopes,
+            n_guesses=self.target._zeros_guess_count,
+            integral_method=integral_method)
+        Bfield_y_integrated, error_y = _Backend.cli.cloud_line_integral(
             target_cloud_Bfield_y, self.target.cloud_model,
-            sightline_center, box_width, view_line_deltas=sightline_slopes,
-            n_guesses=self.target._zeros_guess_count)
-        Bfield_z_integrated, error_z = Backend.cli.cloud_line_integral(
+            sightline_center, box_width, 
+            view_line_deltas=sightline_slopes,
+            n_guesses=self.target._zeros_guess_count,
+            integral_method=integral_method)
+        Bfield_z_integrated, error_z = _Backend.cli.cloud_line_integral(
             target_cloud_Bfield_z, self.target.cloud_model,
-            sightline_center, box_width, view_line_deltas=sightline_slopes,
-            n_guesses=self.target._zeros_guess_count)
+            sightline_center, box_width, 
+            view_line_deltas=sightline_slopes,
+            n_guesses=self.target._zeros_guess_count,
+            integral_method=integral_method)
 
         error = np.array([error_x, error_y, error_z], dtype=float)
 
@@ -610,14 +717,14 @@ class ObservingRun():
         generating random sightlines within the field of view of the primary
         sightline. This function is the precursor for all of the contour plots.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         n_axial_samples : int
             The number of points along one RA or DEC axis to be sampled. The
             resulting sample is a mesh n**2 between the bounds.
 
-        Returns:
-        --------
+        Returns
+        -------
         stokes_parameters : ndarray
             This is the array of all four Stoke parameters over all of the 
             random sightlines.
@@ -655,7 +762,7 @@ class ObservingRun():
         # Compile the sightlines in a list.
         sightline_list = []
         for radex, decdex in zip(ra_array, dec_array):
-            temp_skycoord = ay_coord.SkyCoord(radex, decdex,
+            temp_skycoord = ap_coord.SkyCoord(radex, decdex,
                                               frame='icrs', unit='rad')
             sightline_list.append(Sightline(None, None, temp_skycoord,
                                             ra_wrap_angle=ra_wrap_angle_value))
@@ -699,8 +806,8 @@ class ObservingRun():
         # of the magnetic field is independent of the strength of the E field
         # through the virtue of the reflecting dust grains, scale by intensity.
         Efield_y_array_norm, Efield_z_array_norm = \
-            Backend.efp.magnetic_to_electric(Bfield_y_array, Bfield_z_array,
-                                             normalize=True)
+            _Backend.efp.magnetic_to_electric(Bfield_y_array, Bfield_z_array,
+                                              normalize=True)
         Efield_y_array = Efield_y_array_norm * intensity_array
         Efield_z_array = Efield_z_array_norm * intensity_array
 
@@ -710,7 +817,7 @@ class ObservingRun():
 
         # Get all of the Stokes parameters.
         I, Q, U, V = \
-            Backend.efp.Stokes_parameters_from_field(
+            _Backend.efp.Stokes_parameters_from_field(
                 Efield_y_array_polar, Efield_z_array_polar)
 
         # Total intensity is actually from the Efield of the total light, not

@@ -17,15 +17,15 @@ def cartesian_to_polar_2d(x, y):
     This function uses the notation convention of ISO 80000-2:2009 and its 
     related successors.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array_like
         The x values of the points to be transformed.
     y : array_like
         The y values of the points to be transformed.
 
-    Returns:
-    --------
+    Returns
+    -------
     rho : array_like
         The rho (radial) values of the points after transformation.
     phi : array_like
@@ -50,8 +50,8 @@ def cartesian_to_cylindrical_3d(x, y, z):
     in 3D. This function uses the notation convention of ISO 80000-2:2009 and 
     its related successors.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array_like
         The x values of the points to be transformed.
     y : array_like
@@ -59,8 +59,8 @@ def cartesian_to_cylindrical_3d(x, y, z):
     z : array_like
         The z values of the points to be transformed.
 
-    Returns:
-    --------
+    Returns
+    -------
     rho : array_like
         The rho (radial) values of the points after transformation.
     phi : array_like
@@ -89,8 +89,8 @@ def cartesian_to_spherical_3d(x, y, z):
     in 3D. This function uses the notation convention of ISO 80000-2:2009 and 
     its related successors.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array_like
         The x values of the points to be transformed.
     y : array_like
@@ -98,8 +98,8 @@ def cartesian_to_spherical_3d(x, y, z):
     z : array_like
         The z values of the points to be transformed.
 
-    Returns:
-    --------
+    Returns
+    -------
     r : array_like
         The rho (radial) values of the points after transformation.
     theta : array_like
@@ -133,15 +133,15 @@ def polar_to_cartesian_2d(rho, phi):
     This function uses the notation convention of ISO 80000-2:2009 and its 
     related successors.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rho : array_like
         The rho values of the points to be transformed.
     phi : array_like
         The phi values of the points to be transformed.
 
-    Returns:
-    --------
+    Returns
+    -------
     x : array_like
         The x values of the points after transformation.
     y : array_like
@@ -170,8 +170,8 @@ def cylindrical_to_cartesian_3d(rho, phi, z):
     in 3D. This function uses the notation convention of ISO 80000-2:2009 and  
     its related successors.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rho : array_like
         The rho values of the points to be transformed.
     phi : array_like
@@ -179,8 +179,8 @@ def cylindrical_to_cartesian_3d(rho, phi, z):
     z : array_like
         The z values of the points to be transformed.
 
-    Returns:
-    --------
+    Returns
+    -------
     x : array_like
         The x values of the points after transformation.
     y : array_like
@@ -209,8 +209,8 @@ def cylindrical_to_spherical_3d(rho, phi, z):
     in 3D. This function uses the notation convention of ISO 80000-2:2009 and  
     its related successors.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rho : array_like
         The rho values of the points to be transformed.
     phi : array_like
@@ -218,8 +218,8 @@ def cylindrical_to_spherical_3d(rho, phi, z):
     z : array_like
         The z values of the points to be transformed.
 
-    Returns:
-    --------
+    Returns
+    -------
     r : array_like
         The rho (radial) values of the points after transformation.
     theta : array_like
@@ -253,8 +253,8 @@ def spherical_to_cartesian_3d(r, theta, phi):
     in 3D. This function uses the notation convention of ISO 80000-2:2009 and  
     its related successors.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     r : array_like
         The r values of the points to be transformed.
     theta : array_like
@@ -262,8 +262,8 @@ def spherical_to_cartesian_3d(r, theta, phi):
     phi : array_like
         The phi values of the points to be transformed.
 
-    Returns:
-    --------
+    Returns
+    -------
     x : array_like
         The x values of the points after transformation.
     y : array_like
@@ -292,8 +292,8 @@ def spherical_to_cylindrical_3d(r, theta, phi):
     in 3D. This function uses the notation convention of ISO 80000-2:2009 and  
     its related successors.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     r : array_like
         The r values of the points to be transformed.
     theta : array_like
@@ -301,8 +301,8 @@ def spherical_to_cylindrical_3d(r, theta, phi):
     phi : array_like
         The phi values of the points to be transformed.
 
-    Returns:
-    --------
+    Returns
+    -------
     rho : array_like
         The rho values of the points after transformation.
     phi : array_like

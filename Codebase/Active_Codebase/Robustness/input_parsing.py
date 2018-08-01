@@ -19,8 +19,8 @@ def user_equation_parse(user_eq_input, variables):
     for f(x). Variables is a string tuple that contains the list of variables 
     expected in the equation parse.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     user_eq_input : string or function
         This is the wanted string or function to be converted. If it is a 
         function, there is simple verification before passing it back.
@@ -28,22 +28,22 @@ def user_equation_parse(user_eq_input, variables):
         This is the symbols within the equation for parsing as the input (e.g. 
         the ``x`` and ``y`` in ``f(x,y)``)
 
-    Returns:
-    --------
+    Returns
+    -------
     function : function
         A callable function that executes the mathematical expression given in
         the string. The order of parameters from variables are kept.
 
-    Raises:
-    -------
+    Raises
+    ------
     DangerWarning : Warning
         This is used because the eval() function is used in this code.
     TerminateError : BaseException
         This is done if the verification of the continuation of the program
         fails.
 
-    Notes:
-    ------
+    Notes
+    -----
     This function does use the eval function and excessive precautions are
     used. 
     """

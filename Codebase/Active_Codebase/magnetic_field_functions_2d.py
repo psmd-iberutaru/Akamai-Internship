@@ -10,7 +10,7 @@ import scipy as sp
 import scipy.special as sp_spcl
 
 import Robustness as Robust
-import Backend
+import Backend as _Backend
 
 
 # In order from least complex field to most complex field, first in cartesian
@@ -29,8 +29,8 @@ def circular_magnetic_field_cart_2d(x, y,
     the values of the components of a magnetic field given some point(s) x,y. 
     The center of the circular magnetic field can be redefined.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array_like
         The x values of the points for magnetic field computation.
     y : array_like
@@ -42,8 +42,8 @@ def circular_magnetic_field_cart_2d(x, y,
         The value of the magnitude of the vector field at some radius from
         the center. Default is ``f(r) = 1/r**2``.
 
-    Returns:
-    --------
+    Returns
+    -------
     Bfield_x : ndarray
         The x component of the magnetic field at the given points. Order
         is perserved.
@@ -92,8 +92,8 @@ def hourglass_magnetic_field_cart_2d(r, z,
     form to the r-z plane in cylindrical coordinates. In practice, r,z can be 
     mapped to x,y. The center can also be changed.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     r : array_like
         The input values of the radial direction for the equation.
     z : array_like
@@ -111,8 +111,8 @@ def hourglass_magnetic_field_cart_2d(r, z,
         The center of the hourglass shaped magnetic field function, passed
         as an array ``[r0,z0]``. Defaults to ``[0,0]``
 
-    Returns:
-    --------
+    Returns
+    -------
     Bfield_r : ndarray
         The value of the magnetic field in the r-axial direction.
     Bfield_z : ndarray
@@ -134,9 +134,9 @@ def hourglass_magnetic_field_cart_2d(r, z,
     z = z - center[1]
 
     # Compute the magnetic fields from Ewertowski and Basu 2013 equations.
-    Bfield_r = Backend.EwBa13.Ewer_Basu__B_r(
+    Bfield_r = _Backend.EwBa13.Ewer_Basu__B_r(
         r, z, h, k_array, disk_radius)
-    Bfield_z = Backend.EwBa13.Ewer_Basu__B_z(
+    Bfield_z = _Backend.EwBa13.Ewer_Basu__B_z(
         r, z, h, k_array, disk_radius, uniform_B0)
 
     return Bfield_r, Bfield_z

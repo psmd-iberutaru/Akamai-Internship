@@ -10,7 +10,7 @@ import scipy as sp
 import scipy.special as sp_spcl
 
 import Robustness as Robust
-import Backend
+import Backend as _Backend
 import magnetic_field_functions_2d as mff2d
 
 
@@ -32,8 +32,8 @@ def circular_magnetic_field_cart_3d(x, y, z,
     point(s) x,y,z. The center of the circular magnetic field can be 
     redefined. The axis of symmetry can also be redefined.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array_like
         The x values of the points for magnetic field computation.
     y : array_like
@@ -50,8 +50,8 @@ def circular_magnetic_field_cart_3d(x, y, z,
         The specified axis that the magnetic field curls around. Default is 
         the ``z`` axis.
 
-    Returns:
-    --------
+    Returns
+    -------
     Bfield_x : ndarray
         The x component of the magnetic field at the given points. Order
         is perserved.
@@ -122,8 +122,8 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
     Ewertowshi & Basu 2013. This function assumes, as the paper does, that the
     magnetic field is invariant with respect to phi.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array_like
         The input values of the x direction for the equation.
     y : array_like
@@ -143,8 +143,8 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
         The center of the hourglass shaped magnetic field function, passed
         as an array ``[r0,phi0,z0]``. Defaults to ``[0,0,0]``
 
-    Returns:
-    --------
+    Returns
+    -------
     Bfield_x : ndarray
         The value of the magnetic field in the x-axial direction.
     Bfield_y : ndarray
@@ -165,7 +165,7 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
     center = Robust.valid.validate_float_array(center, shape=(3,))
 
     # Convert the cartesian cords to cylindrical cords.
-    rho, phi, z = Backend.cst.cartesian_to_cylindrical_3d(x, y, z)
+    rho, phi, z = _Backend.cst.cartesian_to_cylindrical_3d(x, y, z)
 
     # Compute the magnetic fields.
     Bfield_rho, Bfield_phi, Bfield_z = hourglass_magnetic_field_cyln_3d(
@@ -173,7 +173,7 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
 
     # Convert back to the cartesian cords.
     Bfield_x, Bfield_y, Bfield_z = \
-        Backend.cst.cylindrical_to_cartesian_3d(Bfield_rho, phi, Bfield_z)
+        _Backend.cst.cylindrical_to_cartesian_3d(Bfield_rho, phi, Bfield_z)
 
     return Bfield_x, Bfield_y, Bfield_z
 
@@ -191,8 +191,8 @@ def hourglass_magnetic_field_cyln_3d(rho, phi, z,
     Ewertowshi & Basu 2013. This function assumes, as the paper does, that the
     magnetic field is invariant with respect to phi.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rho : array_like
         The input values of the radial direction for the equation.
     phi : array_like
@@ -212,8 +212,8 @@ def hourglass_magnetic_field_cyln_3d(rho, phi, z,
         The center of the hourglass shaped magnetic field function, passed
         as an array ``[r0,phi0,z0]``. Defaults to ``[0,0,0]``
 
-    Returns:
-    --------
+    Returns
+    -------
     Bfield_rho : ndarray
         The value of the magnetic field in the rho-axial direction.
     Bfield_phi : ndarray
@@ -239,10 +239,10 @@ def hourglass_magnetic_field_cyln_3d(rho, phi, z,
     z = z - center[2]
 
     # Compute the magnetic fields from Ewertowski and Basu 2013 equations.
-    Bfield_rho = Backend.Ewertowski_Basu_2013.Ewer_Basu__B_r(
+    Bfield_rho = _Backend.Ewertowski_Basu_2013.Ewer_Basu__B_r(
         rho, z, h, k_array, disk_radius)
     Bfield_phi = 0
-    Bfield_z = Backend.Ewertowski_Basu_2013.Ewer_Basu__B_z(
+    Bfield_z = _Backend.Ewertowski_Basu_2013.Ewer_Basu__B_z(
         rho, z, h, k_array, disk_radius, uniform_B0)
 
     return Bfield_rho, Bfield_phi, Bfield_z

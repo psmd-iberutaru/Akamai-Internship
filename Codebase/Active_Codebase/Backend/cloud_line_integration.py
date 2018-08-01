@@ -26,8 +26,8 @@ def line_integral_boundaries(view_line_point, cloud_equation, box_width,
     should be at least a string that contains the python syntax expression of
     the shape for f(x,y,z) = 0, i.e., left-hand side of the equation only.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     view_line_point : array_like 
         Expected in three dimensions. It specifies the point that the viewline 
         is positioned at in cartesian space.
@@ -45,8 +45,8 @@ def line_integral_boundaries(view_line_point, cloud_equation, box_width,
         An order of magnitude overestimate of the number of intersections 
         between the cloud and the sightline. Defaults to 100.
 
-    Returns:
-    --------
+    Returns
+    -------
     lower_bounds : ndarray
         An array of the lower bound(s) if each integration needed that is
         within the cloud along the sightline.
@@ -120,7 +120,8 @@ def line_integral_boundaries(view_line_point, cloud_equation, box_width,
 
 def cloud_line_integral(field_function, cloud_equation, view_line_point,
                         box_width,
-                        view_line_deltas=(1, 0, 0), n_guesses=100):
+                        view_line_deltas=(1, 0, 0), n_guesses=100,
+                        integral_method='scipy'):
     """Computs the line integral over a field given bounds of a cloud ans path.
 
     This function computes the total summation of the line integrals given
@@ -128,8 +129,8 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
     boundary that only the section of the line within a cloud would be 
     computed as it is the upper and lower bounds for the integral(s).
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     field_function : function
         The function of the field. Must be three dimensional in the form
         ``def f(x,y,z): return a``. Does not accept non-numerical returns.
@@ -142,16 +143,19 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
     box_width : float
         An overestimated value of the size of the cloud along any given axis.
         Used for finding locations of intersections of the cloud and sightline.
-    view_line_deltas : array_like
+    view_line_deltas : array_like; optional
         Expected in three dimensions. It specifies the linear coefficient that 
         the sightline travels through space. Defaults to (1,0,0), a line 
         parallel to the x-axis.
-    n_guesses : int
+    n_guesses : int; optional
         An order of magnitude overestimate of the number of intersections 
         between the cloud and the sightline. Defaults to 100.
+    integral_method; optional
+        The method of which the integration will be computed. Defaults to 
+        Scipy's scipy.integrate.quad().
 
-    Returns:
-    --------
+    Returns
+    -------
     integrated_value : float
         The integrated value of the given field bounded by the sightline and
         the shape of the cloud.
@@ -168,6 +172,7 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
     box_width = Robust.valid.validate_float_value(box_width, greater_than=0)
     view_line_deltas = Robust.valid.validate_tuple(view_line_deltas, length=3)
     n_guesses = Robust.valid.validate_int_value(n_guesses, greater_than=0)
+    integral_method = Robust.valid.validate_string(integral_method).lower()
 
     # Integrating function. Parameterize the field function to integrate over
     # the curve given by the sightline.
@@ -206,8 +211,9 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
     else:
         # It is assumed that the integration is doable.
         for lowerdex, upperdex in zip(lower_bounds, upper_bounds):
-            integration = sp_int.quad(parameterized_field_equation,
-                                      lowerdex, upperdex)
+            integration = _integration_function(parameterized_field_equation,
+                                                lowerdex, upperdex, 
+                                                int_method=integral_method)
             integrated_value += integration[0]
             error.append(integration[1])
 
@@ -215,3 +221,62 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
         error = np.sqrt(np.dot(error, error))
 
     return integrated_value, error
+
+
+def _integration_function(intergrand,lower,upper,int_method):
+    """Integration methods to be used.
+
+    This function is a list of the possible integration functions that
+    would be used.
+
+    Parameters
+    ----------
+    intergrand : function
+        The function to be integrated.
+    lower : float
+        The lower bound of the integral.
+    upper : float
+        The upper bound of the integral.
+    
+    Returns
+    -------
+    integral : float
+        The total value of the integral
+    error : float
+        The total error value of the integral's computation.
+    """
+
+    # Type check.
+    if (not callable(intergrand)):
+        raise TypeError('The integrand function must be callable as '
+                        'it is impossible to integrate otherwise.'
+                        '    --Kyubey')
+    lower = float(lower)
+    upper = float(upper)
+
+    n_divisions = 1000
+
+    if (int_method == 'scipy'):
+        # Just use Scipy's integrate functionality.
+        integral,error = sp_int.quad(intergrand,lower,upper)
+    elif (int_method == 'simpsons'):
+        # Use Scipy's simpson's method, it does not seem like it needs to be
+        # changed to be manually implemented.
+        x_spread = np.linspace(lower,upper,n_divisions)
+        y_spread = intergrand(x_spread)
+        integral = sp_int.simps(y_spread,x=x_spread)
+        error = 0
+    elif (int_method == 'trapezoidal'):
+        # Assume a uniform grid.
+        delta_x = (upper - lower) / n_divisions
+        x_spread = np.linspace(lower,upper,n_divisions)
+        y_spread = intergrand(x_spread)
+        integral = ((delta_x/2) 
+                    * (y_spread[0] + 2*np.sum(y_spread[1:-2]) + y_spread[-1]))
+        error = 0
+    else:
+        raise Robust.InputError('Integral method is not one of the specified '
+                                'or accepted methods.'
+                                '    --Kyubey')
+    
+    return integral,error
