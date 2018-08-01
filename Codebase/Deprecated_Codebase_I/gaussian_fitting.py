@@ -306,7 +306,7 @@ def fit_gaussian(x_values, y_values,
         std_dev_guess = a starting point for the std_dev
         height_guess = a starting point for the height
 
-    Returns: center,std_dev,height,covariance
+    Returns center,std_dev,height,covariance
         center = the central value of the gaussian
         std_dev = the standard deviation of the gaussian
         height = the height of the gaussian function along the x-axis
@@ -403,7 +403,7 @@ def fit_multigaussian(x_values, y_values,
             little patterns.
 
 
-    Returns: center_array,std_dev_array,height_array,covariance_array
+    Returns center_array,std_dev_array,height_array,covariance_array
         center_array = the central value of the gaussian
         std_dev_array = the standard deviation of the gaussian
         height_array = the height of the gaussian function along the x-axis

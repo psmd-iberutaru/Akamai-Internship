@@ -1,0 +1,302 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>model_observing module &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="magnetic_field_functions_3d module" href="magnetic_field_functions_3d.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="magnetic_field_functions_3d.html" title="magnetic_field_functions_3d module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Active_Codebase</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-model_observing">
+<span id="model-observing-module"></span><h1>model_observing module<a class="headerlink" href="#module-model_observing" title="Permalink to this headline">¶</a></h1>
+<p>Model observing, this module is built to simulate actual observing. The
+object is known, and given sight parameters, the data is given. In particular,
+these functions actually give the values of terms derived from the object
+model also provided.</p>
+<dl class="class">
+<dt id="model_observing.ObservingRun">
+<em class="property">class </em><code class="descclassname">model_observing.</code><code class="descname">ObservingRun</code><span class="sig-paren">(</span><em>observe_target</em>, <em>sightline</em>, <em>field_of_view</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#ObservingRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.ObservingRun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Execute a mock observing run of an object.</p>
+<p>This class is the main model observations of an object. Taking a
+central sightline and the field of view, it then gives back a set of
+plots, similar to those that an observer would see after data reduction.</p>
+<p>The class itself does the computation in its methods, returning back
+a heatmap/contour object plot from the observing depending on the method.</p>
+<dl class="attribute">
+<dt id="model_observing.ObservingRun.self.observe_target">
+<code class="descclassname">self.</code><code class="descname">observe_target</code><a class="headerlink" href="#model_observing.ObservingRun.self.observe_target" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>ProtostarModel object</em> – The model target for simulated observing. Conceptually, the object
+that the telescope observes.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="model_observing.ObservingRun.self.sightline">
+<code class="descclassname">self.</code><code class="descname">sightline</code><a class="headerlink" href="#model_observing.ObservingRun.self.sightline" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Sightline object</em> – The primary sightline that is used for the model observing,
+conceptually where the telescope is aimed at.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="model_observing.ObservingRun.self.field_of_view">
+<code class="descclassname">self.</code><code class="descname">field_of_view</code><a class="headerlink" href="#model_observing.ObservingRun.self.field_of_view" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – The field of view value of the observation, given as the length
+of the observing chart.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">Stokes_parameter_contours() : function {returns | ndarray,ndarray}</code></dt>
+<dd><p>Compute the value of Stoke parameters at random sightlines from the
+primary sightline and plot them. Returns the values that was used
+to plot.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#model_observing.ObservingRun.Stokes_parameter_contours" title="model_observing.ObservingRun.Stokes_parameter_contours"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Stokes_parameter_contours</span></code></a>([n_axial_samples])</td>
+<td>This function produces a contour plot of the stoke values.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="model_observing.ObservingRun.Stokes_parameter_contours">
+<code class="descname">Stokes_parameter_contours</code><span class="sig-paren">(</span><em>n_axial_samples=25</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#ObservingRun.Stokes_parameter_contours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.ObservingRun.Stokes_parameter_contours" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function produces a contour plot of the stoke values.</p>
+<p>This function generates a large number of random sightlines to
+traceout contour information of the of the fields. From
+there, is creates and returns a contour plot.</p>
+<p>The values of the intensity, I, the two polarization values, Q,U, and
+the polarization intensity, hypt(Q,U) is plotted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_axial_samples</strong> (<em>int; optional</em>) – The number of points along one RA or DEC axis to be sampled. The
+resulting sample is a mesh n**2 between the bounds. Default is 25.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>tuple(ndarray)</strong> (<em>ra_dec_array</em>) – This is a tuple of the values of the RA and DEC of the random
+sightlines (arranged in parallel arrays).</li>
+<li><strong>tuple(ndarray)</strong> (<em>stokes_parameters</em>) – This is a tuple of ndarrays of the stoke parameters calculated by
+the random sightlines.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="model_observing.ProtostarModel">
+<em class="property">class </em><code class="descclassname">model_observing.</code><code class="descname">ProtostarModel</code><span class="sig-paren">(</span><em>coordinates</em>, <em>cloud_model</em>, <em>magnetic_field_model</em>, <em>density_model=None</em>, <em>polarization_model=None</em>, <em>ra_wrap_angle=6.283185307179586</em>, <em>zeros_guess_count=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#ProtostarModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.ProtostarModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This is an object that represents a model of an object in space. It
+contains all the required functions and parameters associated with
+one of the objects that would be observed for polarimetry data.</p>
+<dl class="attribute">
+<dt id="model_observing.ProtostarModel.self.coordinates">
+<code class="descclassname">self.</code><code class="descname">coordinates</code><a class="headerlink" href="#model_observing.ProtostarModel.self.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Astropy SkyCord object</em> – This is the coordinates of the object that this class defines.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="model_observing.ProtostarModel.self.cloud_model">
+<code class="descclassname">self.</code><code class="descname">cloud_model</code><a class="headerlink" href="#model_observing.ProtostarModel.self.cloud_model" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>function</em> – This is an implicit function (or a numerical approximation thereof) of
+the shape of the protostar cloud.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="model_observing.ProtostarModel.self.magnetic_field">
+<code class="descclassname">self.</code><code class="descname">magnetic_field</code><a class="headerlink" href="#model_observing.ProtostarModel.self.magnetic_field" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>function</em> – This is an implicit function (or a numerical approximation thereof) of
+the shape of the magnetic field.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="model_observing.ProtostarModel.self.density_model">
+<code class="descclassname">self.</code><code class="descname">density_model</code><a class="headerlink" href="#model_observing.ProtostarModel.self.density_model" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>function</em> – This is an implicit function (or a numerical approximation thereof) of
+the shape of the density model of the cloud.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="model_observing.ProtostarModel.self.polarization_model">
+<code class="descclassname">self.</code><code class="descname">polarization_model</code><a class="headerlink" href="#model_observing.ProtostarModel.self.polarization_model" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>function</em> – This is an implicit function (or a numerical approximation thereof) of
+the polarization model of the cloud.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="model_observing.Sightline">
+<em class="property">class </em><code class="descclassname">model_observing.</code><code class="descname">Sightline</code><span class="sig-paren">(</span><em>right_ascension</em>, <em>declination</em>, <em>Skycord_object=None</em>, <em>ra_wrap_angle=6.283185307179586</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#Sightline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.Sightline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This is a sightline. It contains the information for a given sightline
+through space. The sightline is always given by the RA and DEC values.</p>
+<p>The notation for the accepted values of RA and DEC is found in the
+Astropy module’s SkyCord class.</p>
+<dl class="attribute">
+<dt id="model_observing.Sightline.self.coordinates">
+<code class="descclassname">self.</code><code class="descname">coordinates</code><a class="headerlink" href="#model_observing.Sightline.self.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Astropy SkyCord object.</em> – This is the sky coordinates of the sightline.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model_observing.Sightline.sightline_parameters">
+<code class="descname">sightline_parameters</code><span class="sig-paren">(</span><em>) : function (returns | ndarray</em>, <em>ndarray</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#Sightline.sightline_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.Sightline.sightline_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns back both the sightline’s center and slopes for
+an actual geometrical representation of the line. Converting from
+the equatorial coordinate system to the cartesian coordinate system.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#model_observing.Sightline.sightline_parameters" title="model_observing.Sightline.sightline_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sightline_parameters</span></code></a>()</td>
+<td>This function returns the sightline linear parameters.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt>
+<code class="descname">sightline_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#Sightline.sightline_parameters"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>This function returns the sightline linear parameters.</p>
+<p>The sightline is by definition always parallel to the x-axis
+of the object to be observed. The plane of the sky is the yz-plane
+of the object. This function returns first the central defining
+point, then the deltas for the equation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>sightline_center</strong> (<em>ndarray</em>) – This returns a cartsian point based on the approximation
+that, if the x-axis and the r-axis are the same of cartesian
+and spherical cordinates, then so too are the yz-plane and the
+theta-phi plane.</li>
+<li><strong>sightline_slopes</strong> (<em>ndarray</em>) – This returns the slopes of the cartesian point values given
+by the center. Because of the approximation from above, it is
+always [1,0,0].</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The coordinates of the sightline in relation to the object are as
+follows:</p>
+<ul class="simple">
+<li>The x-axis of the object is equal to the r-axis of the telescope. Both pointing away from the telescope, deeper into space.</li>
+<li>The y-axis of the object is equal to the RA-axis/phi-axis of the</li>
+</ul>
+<p>telescope, westward (as y increases, RA decreases)
+- The z-axis of the object is equal to the DEC-axis of the telescope. It is also equal to the negative of the theta-axis
+when it is centered on theta = pi/2. Points north-south of the
+telescope.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="magnetic_field_functions_3d.html"
+                        title="previous chapter">magnetic_field_functions_3d module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/model_observing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="magnetic_field_functions_3d.html" title="magnetic_field_functions_3d module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

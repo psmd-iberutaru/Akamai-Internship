@@ -1,0 +1,256 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Backend.electromagnetic_field_polarization module &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Backend.table_interpolation module" href="Backend.table_interpolation.html" />
+    <link rel="prev" title="Backend.coordinate_system_transformation module" href="Backend.coordinate_system_transformation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Backend.table_interpolation.html" title="Backend.table_interpolation module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Backend.coordinate_system_transformation.html" title="Backend.coordinate_system_transformation module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Backend.html" accesskey="U">Backend package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Backend.electromagnetic_field_polarization">
+<span id="backend-electromagnetic-field-polarization-module"></span><h1>Backend.electromagnetic_field_polarization module<a class="headerlink" href="#module-Backend.electromagnetic_field_polarization" title="Permalink to this headline">¶</a></h1>
+<p>This file deals with the functions regarding polarization and the
+relationship between the electric and magnetic fields.</p>
+<dl class="function">
+<dt id="Backend.electromagnetic_field_polarization.Stokes_parameters_from_field">
+<code class="descclassname">Backend.electromagnetic_field_polarization.</code><code class="descname">Stokes_parameters_from_field</code><span class="sig-paren">(</span><em>E_i</em>, <em>E_j</em>, <em>percent_polarized=1</em>, <em>chi=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/electromagnetic_field_polarization.html#Stokes_parameters_from_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.electromagnetic_field_polarization.Stokes_parameters_from_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns Stokes parameters based off non-circularly polarized light.</p>
+<p>This function returns the Stokes parameters based off a given
+electric field vector.</p>
+<p>Technically it can handle circularly polarized light, the value that
+must be given is chi, the angle between the semi-major axis of the
+polarization ellipse and the line segment connecting between two points
+on the ellipse and the semi-major and semi-minor axes. See note [1].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>E_i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em> or </em><em>array_like</em>) – The component of the electric field in the i-hat direction.</li>
+<li><strong>E_j</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em> or </em><em>array_like</em>) – The component of the electric field in the j-hat direction.</li>
+<li><strong>percent_polarized</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The percent of the EM wave that is polarized. It should not be too
+far off the value of 1.</li>
+<li><strong>chi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em> or </em><em>array_like</em>) – The parameter for circularly polarized light.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>I</strong> (<em>ndarray</em>) – The first Stokes parameter, equivalent to S_0. The intensity of the
+light.</li>
+<li><strong>Q</strong> (<em>ndarray</em>) – The second Stokes parameter, equivalent to S_1. The x,y polarization
+aspect.</li>
+<li><strong>U</strong> (<em>ndarray</em>) – The third Stokes parameter, equivalent to S_2. The a,b (45 deg off set
+of x,y) polarization aspect.</li>
+<li><strong>V</strong> (<em>ndarray</em>) – The fourth Stokes parameter, equivalent to S_3. The circular
+polarization aspect.</li>
+<li><em>Notes</em></li>
+<li><em>——</em></li>
+<li><em>[1]  This function’s notation is based on the following diagram.</em></li>
+<li><strong>https</strong> (<em>//en.wikipedia.org/wiki/File:Polarisation_ellipse2.svg</em>)</li>
+<li><strong>[2] The equations for Stoke’s parameters used is from the following</strong> (<em>https://en.wikipedia.org/wiki/Stokes_parameters#Definitions.</em>)</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Backend.electromagnetic_field_polarization.angle_from_Stokes_parameters">
+<code class="descclassname">Backend.electromagnetic_field_polarization.</code><code class="descname">angle_from_Stokes_parameters</code><span class="sig-paren">(</span><em>Q</em>, <em>U</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/electromagnetic_field_polarization.html#angle_from_Stokes_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.electromagnetic_field_polarization.angle_from_Stokes_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given Stoke parameters Q,U, return the angle of polarization.</p>
+<p>This function returns an angle of polarization in radians based on the
+values of two stoke parameters. The angle is signed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Q</strong> (<em>array_like</em>) – The second Stokes parameter, equivalent to S_1. The x,y polarization
+aspect.</li>
+<li><strong>U</strong> (<em>array_like</em>) – The third Stokes parameter, equivalent to S_2. The a,b (45 deg off set
+of x,y) polarization aspect.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>angle</strong> – The angle of the polarization corresponding to the given Q and U value
+pairs. The angle array is parallel to the Q and U array_like inputs.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Backend.electromagnetic_field_polarization.electric_to_magnetic">
+<code class="descclassname">Backend.electromagnetic_field_polarization.</code><code class="descname">electric_to_magnetic</code><span class="sig-paren">(</span><em>E_i</em>, <em>E_j</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/electromagnetic_field_polarization.html#electric_to_magnetic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.electromagnetic_field_polarization.electric_to_magnetic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a 2D electric field vector set to a magnetic field set.</p>
+<p>This function takes the electric field that would normally be seen
+in a polarization ellipse and converts it to the magnetic field
+vectors. This function returns a perpendicular vector of the
+magnetic field, perserving the magnitude.</p>
+<p>In two dimensions, there are always two vectors perpendicular to a vector.
+Or one vector with positive and negative magnitude. In three, there are
+infinitely many, so it is much harder to give a good vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>E_i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em> or </em><em>array_like</em>) – The component of the electric field in the i-hat direction.</li>
+<li><strong>E_j</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em> or </em><em>array_like</em>) – The component of the electric field in the j-hat direction.</li>
+<li><strong>normalize</strong> (<em>bool; optional</em>) – If True, then the returned E field vector components are of a unitary
+vector. Default is False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>B_i</strong> (<em>ndarray</em>) – The component of the magnetic field in the i-hat direction.</li>
+<li><strong>B_j</strong> (<em>ndarray</em>) – The component of the magnetic field in the j-hat direction.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Backend.electromagnetic_field_polarization.magnetic_to_electric">
+<code class="descclassname">Backend.electromagnetic_field_polarization.</code><code class="descname">magnetic_to_electric</code><span class="sig-paren">(</span><em>B_i</em>, <em>B_j</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/electromagnetic_field_polarization.html#magnetic_to_electric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.electromagnetic_field_polarization.magnetic_to_electric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a 2D magnetic field vector set to a electric field set.</p>
+<p>This function takes the magnetic field that would normally be seen
+in a polarization ellipse and converts it to the electric field
+vectors. This function returns a perpendicular vector of the
+magnetic field, perserving the magnitude.</p>
+<p>In two dimensions, there are always two vectors perpendicular to a vector.
+Or one vector with positive and negative magnitude. In three, there are
+infinitely many, so it is much harder to give a good vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>B_i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em> or </em><em>array_like</em>) – The component of the magnetic field in the i-hat direction.</li>
+<li><strong>B_j</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em> or </em><em>array_like</em>) – The component of the magnetic field in the j-hat direction.</li>
+<li><strong>normalize</strong> (<em>bool; optional</em>) – If true, then the returned E field vector components are of a unitary
+vector. Default is False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>E_i</strong> (<em>ndarray</em>) – The component of the electric field in the i-hat direction.</li>
+<li><strong>E_j</strong> (<em>ndarray</em>) – The component of the electric field in the j-hat direction.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Backend.coordinate_system_transformation.html"
+                        title="previous chapter">Backend.coordinate_system_transformation module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Backend.table_interpolation.html"
+                        title="next chapter">Backend.table_interpolation module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Backend.electromagnetic_field_polarization.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Backend.table_interpolation.html" title="Backend.table_interpolation module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Backend.coordinate_system_transformation.html" title="Backend.coordinate_system_transformation module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Backend.html" >Backend package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

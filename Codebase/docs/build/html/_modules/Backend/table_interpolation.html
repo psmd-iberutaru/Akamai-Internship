@@ -1,0 +1,227 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Backend.table_interpolation &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Backend.table_interpolation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file contains an entire list of functions that would interpolate</span>
+<span class="sd">a table of values into a numerical approximation of a function. Although</span>
+<span class="sd">it cannot be an analytical function, these functions attempt to return an</span>
+<span class="sd">function which would mimic such analytical functions by extrapolating tables. </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">sp_inter</span>
+
+<span class="kn">import</span> <span class="nn">Robustness</span> <span class="k">as</span> <span class="nn">Robust</span>
+
+
+<div class="viewcode-block" id="funt_interpolate_scalar_table"><a class="viewcode-back" href="../../Backend.table_interpolation.html#Backend.table_interpolation.funt_interpolate_scalar_table">[docs]</a><span class="k">def</span> <span class="nf">funt_interpolate_scalar_table</span><span class="p">(</span><span class="n">x_array</span><span class="p">,</span> <span class="n">y_array</span><span class="p">,</span> <span class="n">z_array</span><span class="p">,</span> <span class="n">ans_array</span><span class="p">,</span>
+                                  <span class="n">interp_method</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate functional interpolation of a scalar table.</span>
+
+<span class="sd">    This function takes a table of x,y,z points which correspond to some scalar</span>
+<span class="sd">    answer and attempts to interpolate to generate a function which would </span>
+<span class="sd">    allow for the computation of the scalar at any arbitrary x,y,z point. </span>
+
+<span class="sd">    Parallel array representation of the able is assumed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x_array : array_like</span>
+<span class="sd">        The x values of the scalar table.</span>
+<span class="sd">    y_array : array_like</span>
+<span class="sd">        The y values of the scalar table.</span>
+<span class="sd">    z_array : array_like</span>
+<span class="sd">        The z values of the scalar table.</span>
+<span class="sd">    ans_array : array_like</span>
+<span class="sd">        The scalar answers of the table.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    interpolated_scalar_function : function</span>
+<span class="sd">        The numerical approximation to the generalized function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic type checking</span>
+    <span class="n">x_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">y_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">z_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">ans_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ans_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+
+    <span class="c1"># Ensure that all arrays are the same length.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">y_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">z_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">ans_array</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">Robust</span><span class="o">.</span><span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;The length of each column of the table&#39;</span>
+                                <span class="s1">&#39;should be the same. Parallel arrays for &#39;</span>
+                                <span class="s1">&#39;the table</span><span class="se">\&#39;</span><span class="s1">s values are assumed.&#39;</span>
+                                <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Begin the creation of the function.</span>
+    <span class="k">def</span> <span class="nf">interpolated_scalar_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="c1"># Basic type check.</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="c1"># Usage of scipy&#39;s functionality.</span>
+        <span class="n">extrap_ans</span> <span class="o">=</span> <span class="n">sp_inter</span><span class="o">.</span><span class="n">griddata</span><span class="p">((</span><span class="n">x_array</span><span class="p">,</span> <span class="n">y_array</span><span class="p">,</span> <span class="n">z_array</span><span class="p">),</span> <span class="n">ans_array</span><span class="p">,</span>
+                                       <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span>
+                                       <span class="n">method</span><span class="o">=</span><span class="n">interp_method</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">extrap_ans</span>
+
+    <span class="c1"># Return the interpolated function.</span>
+    <span class="k">return</span> <span class="n">interpolated_scalar_function</span></div>
+
+
+<div class="viewcode-block" id="funt_interpolate_vector_table"><a class="viewcode-back" href="../../Backend.table_interpolation.html#Backend.table_interpolation.funt_interpolate_vector_table">[docs]</a><span class="k">def</span> <span class="nf">funt_interpolate_vector_table</span><span class="p">(</span><span class="n">x_array</span><span class="p">,</span> <span class="n">y_array</span><span class="p">,</span> <span class="n">z_array</span><span class="p">,</span>
+                                  <span class="n">x_ans_array</span><span class="p">,</span><span class="n">y_ans_array</span><span class="p">,</span><span class="n">z_ans_array</span><span class="p">,</span>
+                                  <span class="n">interp_method</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate functional interpolation of a scalar table.</span>
+
+<span class="sd">    This function takes a table of x,y,z points which correspond to some scalar</span>
+<span class="sd">    answer and attempts to interpolate to generate a function which would </span>
+<span class="sd">    allow for the computation of the scalar at any arbitrary x,y,z point. </span>
+
+<span class="sd">    Parallel array representation of the able is assumed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x_array : array_like</span>
+<span class="sd">        The x values of the scalar table.</span>
+<span class="sd">    y_array : array_like</span>
+<span class="sd">        The y values of the scalar table.</span>
+<span class="sd">    z_array : array_like</span>
+<span class="sd">        The z values of the scalar table.</span>
+<span class="sd">    x_ans_array : array_like</span>
+<span class="sd">        The x component of the answer vector.</span>
+<span class="sd">    y_ans_array : array_like</span>
+<span class="sd">        The y component of the answer vector.</span>
+<span class="sd">    z_ans_array : array_like</span>
+<span class="sd">        The z component of the answer vector.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    interpolated_vector_function : function</span>
+<span class="sd">        The numerical approximation to the generalized function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic type checking</span>
+    <span class="n">x_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">y_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">z_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">x_ans_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_ans_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">y_ans_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_ans_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">z_ans_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z_ans_array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+
+    <span class="c1"># Ensure that all arrays are the same length.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">y_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">z_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span>
+            <span class="n">x_ans_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">y_ans_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">z_ans_array</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">Robust</span><span class="o">.</span><span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;The length of each column of the table&#39;</span>
+                                <span class="s1">&#39;should be the same. Parallel arrays for &#39;</span>
+                                <span class="s1">&#39;the table</span><span class="se">\&#39;</span><span class="s1">s values are assumed.&#39;</span>
+                                <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Begin the creation of the function.</span>
+    <span class="k">def</span> <span class="nf">interpolated_vector_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="c1"># Basic type check.</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="c1"># Usage of scipy&#39;s functionality. Split along all three dimensions in</span>
+        <span class="c1"># rather brute force sort of way.</span>
+        <span class="n">extrap_x_ans</span> <span class="o">=</span> <span class="n">sp_inter</span><span class="o">.</span><span class="n">griddata</span><span class="p">((</span><span class="n">x_array</span><span class="p">,</span> <span class="n">y_array</span><span class="p">,</span> <span class="n">z_array</span><span class="p">),</span>
+                                         <span class="n">x_ans_array</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span>
+                                         <span class="n">method</span><span class="o">=</span><span class="n">interp_method</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">extrap_y_ans</span> <span class="o">=</span> <span class="n">sp_inter</span><span class="o">.</span><span class="n">griddata</span><span class="p">((</span><span class="n">x_array</span><span class="p">,</span> <span class="n">y_array</span><span class="p">,</span> <span class="n">z_array</span><span class="p">),</span>
+                                         <span class="n">y_ans_array</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span>
+                                         <span class="n">method</span><span class="o">=</span><span class="n">interp_method</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">extrap_z_ans</span> <span class="o">=</span> <span class="n">sp_inter</span><span class="o">.</span><span class="n">griddata</span><span class="p">((</span><span class="n">x_array</span><span class="p">,</span> <span class="n">y_array</span><span class="p">,</span> <span class="n">z_array</span><span class="p">),</span>
+                                         <span class="n">z_ans_array</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span>
+                                         <span class="n">method</span><span class="o">=</span><span class="n">interp_method</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">extrap_vect_ans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">extrap_x_ans</span><span class="p">,</span><span class="n">extrap_y_ans</span><span class="p">,</span><span class="n">extrap_z_ans</span><span class="p">],</span>
+                                   <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">extrap_vect_ans</span>
+
+    <span class="c1"># Return the interpolated function.</span>
+    <span class="k">return</span> <span class="n">interpolated_vector_function</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

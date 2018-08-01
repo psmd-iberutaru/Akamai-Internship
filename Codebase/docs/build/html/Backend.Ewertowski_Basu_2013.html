@@ -1,0 +1,237 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Backend.Ewertowski_Basu_2013 module &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Backend.cloud_line_integration module" href="Backend.cloud_line_integration.html" />
+    <link rel="prev" title="Backend package" href="Backend.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Backend.cloud_line_integration.html" title="Backend.cloud_line_integration module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Backend.html" title="Backend package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Backend.html" accesskey="U">Backend package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Backend.Ewertowski_Basu_2013">
+<span id="backend-ewertowski-basu-2013-module"></span><h1>Backend.Ewertowski_Basu_2013 module<a class="headerlink" href="#module-Backend.Ewertowski_Basu_2013" title="Permalink to this headline">¶</a></h1>
+<p>This file is most of the backend functionality that is required for the
+more important functions within this module that relates to the paper by
+Bartek Ewertowshi and Shantanu Basu on their work in 2013 on “A Mathematical
+Model for an Hourglass Magnetic Field”.</p>
+<p>The functions here are almost explicitly for magnetic field functions.</p>
+<dl class="function">
+<dt id="Backend.Ewertowski_Basu_2013.Ewer_Basu__B_r">
+<code class="descclassname">Backend.Ewertowski_Basu_2013.</code><code class="descname">Ewer_Basu__B_r</code><span class="sig-paren">(</span><em>r</em>, <em>z</em>, <em>h</em>, <em>k_array</em>, <em>disk_radius</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/Ewertowski_Basu_2013.html#Ewer_Basu__B_r"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.Ewertowski_Basu_2013.Ewer_Basu__B_r" title="Permalink to this definition">¶</a></dt>
+<dd><p>An implementation of Eq 45 of Ewertiwski &amp; Basu 2013.</p>
+<p>This implements equation 45 of Ewertiwski &amp; Basu 2013. The k_array (values
+of k) determine the number of summation terms that will be computed. The
+value of r is with respect to the cylindrical cordinate system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r</strong> (<em>array_like</em>) – The input values of the radial direction for the equation.</li>
+<li><strong>z</strong> (<em>array_like</em>) – The input values of the polar direction for the equation.</li>
+<li><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – A free parameter as dictated by the paper.</li>
+<li><strong>k_array</strong> (<em>array_like</em>) – The list of k coefficient values for the summation in Eq 45.</li>
+<li><strong>disk_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The radius of the protoplanetary disk. Relevent for the hourglass
+magnetic field generated by this paper.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Bfield_r</strong> – The value of the magnetic field in the r-axial direction.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Backend.Ewertowski_Basu_2013.Ewer_Basu__B_z">
+<code class="descclassname">Backend.Ewertowski_Basu_2013.</code><code class="descname">Ewer_Basu__B_z</code><span class="sig-paren">(</span><em>r</em>, <em>z</em>, <em>h</em>, <em>k_array</em>, <em>disk_radius</em>, <em>uniform_B0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/Ewertowski_Basu_2013.html#Ewer_Basu__B_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.Ewertowski_Basu_2013.Ewer_Basu__B_z" title="Permalink to this definition">¶</a></dt>
+<dd><p>An implementation of Eq 46 of Ewertiwski &amp; Basu 2013.</p>
+<p>This implements equation 46 of Ewertiwski &amp; Basu 2013. The k_array (values
+of k) determine the number of summation terms that will be computed. The
+value of r is with respect to the cylindrical cordinate system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r</strong> (<em>array_like</em>) – The input values of the radial direction for the equation.</li>
+<li><strong>z</strong> (<em>array_like</em>) – The input values of the polar direction for the equation.</li>
+<li><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – A free parameter as dictated by the paper.</li>
+<li><strong>k_array</strong> (<em>array_like</em>) – The list of k coefficient values for the summation in Eq 45.</li>
+<li><strong>disk_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The radius of the protoplanetary disk. Relevent for the hourglass
+magnetic field generated by this paper.</li>
+<li><strong>uniform_B0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The magnitude of the background magnetic field.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>Bfield_z</strong> – The value of the magnetic field in the z-axial direction.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Backend.Ewertowski_Basu_2013.Ewer_Basu__eigenvalues">
+<code class="descclassname">Backend.Ewertowski_Basu_2013.</code><code class="descname">Ewer_Basu__eigenvalues</code><span class="sig-paren">(</span><em>index_m</em>, <em>disk_radius</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/Ewertowski_Basu_2013.html#Ewer_Basu__eigenvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.Ewertowski_Basu_2013.Ewer_Basu__eigenvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the values of the eigenvalues of some integer index m.</p>
+<p>This computes the eigenvalues (see Equation 28 of Ewer &amp; Basu 2013) of
+the normalized Green functions for the hourglass magnetic field solution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>index_m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – This is the index of the eigenvalue, it links up to the index of the
+positive root of a Bessel function of the first kind of order 1.</li>
+<li><strong>disk_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The radius of the protoplanetary disk. Relevent for the hourglass
+magnetic field generated by this paper.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>eigenvalue</strong> – The value of the corresponding eigenvalue given the parameters.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Backend.Ewertowski_Basu_2013.bessel_zeros">
+<code class="descclassname">Backend.Ewertowski_Basu_2013.</code><code class="descname">bessel_zeros</code><span class="sig-paren">(</span><em>order</em>, <em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/Ewertowski_Basu_2013.html#bessel_zeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.Ewertowski_Basu_2013.bessel_zeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Bessel zero given the function’s order and zero index.</p>
+<p>This function is a wrapper around Scipy’s Bessel function zero generator.
+For some reason, the Scipy function returns all zeros between the given
+number and the first zero. This function extracts only the wanted zero
+given the index.</p>
+<p>This is for Bessel functions of the first kind.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The integer order of the Bessel function of the first kind.</li>
+<li><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The zero’s index that is desired.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>zero</strong> – The value of the zero at the given index of the given Bessel function.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Backend.html"
+                        title="previous chapter">Backend package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Backend.cloud_line_integration.html"
+                        title="next chapter">Backend.cloud_line_integration module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Backend.Ewertowski_Basu_2013.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Backend.cloud_line_integration.html" title="Backend.cloud_line_integration module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Backend.html" title="Backend package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Backend.html" >Backend package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,197 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Robustness.exception module &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Robustness.input_parsing module" href="Robustness.input_parsing.html" />
+    <link rel="prev" title="Robustness package" href="Robustness.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Robustness.input_parsing.html" title="Robustness.input_parsing module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Robustness.html" title="Robustness package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Robustness.html" accesskey="U">Robustness package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Robustness.exception">
+<span id="robustness-exception-module"></span><h1>Robustness.exception module<a class="headerlink" href="#module-Robustness.exception" title="Permalink to this headline">¶</a></h1>
+<dl class="exception">
+<dt id="Robustness.exception.AstronomyError">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">AstronomyError</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#AstronomyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.AstronomyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>An error to be used if some of the programs executed are trying to
+do something that is nonsensical in the context of astronomy.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.AstronomyWarning">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">AstronomyWarning</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#AstronomyWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.AstronomyWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Warning" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+<p>A warning to be used when the current program is doing something a bit
+risky or something that would not make normal sense in astronomical terms.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.DangerWarning">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">DangerWarning</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#DangerWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.DangerWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Warning" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+<p>A warning to be used when some input or output is dangerous for the
+system or program itself and may be disastrous with unexpected inputs.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.InputError">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">InputError</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#InputError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.InputError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>An error to be used when the input from a user is incorrect.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.InputWarning">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">InputWarning</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#InputWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.InputWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Warning" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+<p>A warning to be used when the values of some item is incorrect, but is
+fixed within the program.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.OutputError">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">OutputError</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#OutputError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.OutputError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>An error to be used when the output is grossly unexpected.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.OutputWarning">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">OutputWarning</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#OutputWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.OutputWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Warning" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+<p>A warning to be used when the values of an output may not use all of the
+inputs given, or that it might become unexpected because of bugs.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.ShapeError">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">ShapeError</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#ShapeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.ShapeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>An error to be used when the dimensions or sizes of an array is incorrect.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.TerminateError">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">TerminateError</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#TerminateError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.TerminateError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#BaseException" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseException</span></code></a></p>
+<p>A very serious error that should override the try, except functions
+that are written.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Robustness.exception.TimeWarning">
+<em class="property">exception </em><code class="descclassname">Robustness.exception.</code><code class="descname">TimeWarning</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#TimeWarning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.TimeWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ResourceWarning" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceWarning</span></code></a></p>
+<p>A warning to be used when some computation or flag might take a long time
+to compute.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.exception.kyubey_warning">
+<code class="descclassname">Robustness.exception.</code><code class="descname">kyubey_warning</code><span class="sig-paren">(</span><em>warn_class</em>, <em>message</em>, <em>stacklevel=2</em>, <em>input_halt=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/exception.html#kyubey_warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.exception.kyubey_warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>General warning for the Robustness module/function package. If the warning
+is serious enough (like a DangerWarning), then force the user to ensure
+the continuation of the program.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Robustness.html"
+                        title="previous chapter">Robustness package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Robustness.input_parsing.html"
+                        title="next chapter">Robustness.input_parsing module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Robustness.exception.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Robustness.input_parsing.html" title="Robustness.input_parsing module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Robustness.html" title="Robustness package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Robustness.html" >Robustness package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

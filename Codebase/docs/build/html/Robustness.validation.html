@@ -1,0 +1,193 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Robustness.validation module &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="data_systematization module" href="data_systematization.html" />
+    <link rel="prev" title="Robustness.input_parsing module" href="Robustness.input_parsing.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="data_systematization.html" title="data_systematization module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Robustness.input_parsing.html" title="Robustness.input_parsing module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Robustness.html" accesskey="U">Robustness package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Robustness.validation">
+<span id="robustness-validation-module"></span><h1>Robustness.validation module<a class="headerlink" href="#module-Robustness.validation" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="Robustness.validation.validate_boolean_array">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_boolean_array</code><span class="sig-paren">(</span><em>boolean_array_input</em>, <em>shape=None</em>, <em>size=None</em>, <em>deep_validate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_boolean_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_boolean_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to validate that the boolean
+array is valid. The shape and size of the array can be optionally
+tested.</p>
+<p>deep_validate instructs the program to loop over every element
+array and validate it in turn.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_boolean_value">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_boolean_value</code><span class="sig-paren">(</span><em>boolean_value_input</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_boolean_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_boolean_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to validate that a boolean value
+input is valid.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_float_array">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_float_array</code><span class="sig-paren">(</span><em>float_array_input</em>, <em>shape=None</em>, <em>size=None</em>, <em>deep_validate=False</em>, <em>greater_than=None</em>, <em>less_than=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_float_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_float_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to validate that the float array is
+valid. The shape and size of the array can be optionally tested.</p>
+<p>deep_validate instructs the program to loop over every element array and
+validate it in turn.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_float_value">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_float_value</code><span class="sig-paren">(</span><em>float_value_input</em>, <em>greater_than=None</em>, <em>less_than=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_float_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_float_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to validate that a float value is valid.
+The value, its range (either greater than or less than a number) may
+also be tested. This function will bark if the value is greater than
+less_than or less than greater_than.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_function_call">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_function_call</code><span class="sig-paren">(</span><em>input_function</em>, <em>n_parameters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_function_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_function_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the input function is a valid callable function.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_int_array">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_int_array</code><span class="sig-paren">(</span><em>int_array_input</em>, <em>shape=None</em>, <em>size=None</em>, <em>deep_validate=False</em>, <em>non_zero=None</em>, <em>greater_than=None</em>, <em>less_than=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_int_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_int_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to validate that the integer array is
+valid. The shape and size of the array can be optionally tested.</p>
+<p>deep_validate instructs the program to loop over every element array and
+validate it in turn.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_int_value">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_int_value</code><span class="sig-paren">(</span><em>int_value_input</em>, <em>non_zero=None</em>, <em>greater_than=None</em>, <em>less_than=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_int_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_int_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to validate that a int value is valid.
+The value, its range (either greater than or less than a number) may
+also be tested. This function will bark if the value is greater than
+less_than or less than greater_than. It can also be tested if it is
+non-zero (true for non-zero, false for zero passes).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_list">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_list</code><span class="sig-paren">(</span><em>input_list</em>, <em>length=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to validate that a list is valid.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_string">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_string</code><span class="sig-paren">(</span><em>input_string</em>, <em>length=None</em>, <em>contain_substr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to determine if a string is valid. The
+length of the string can also be tested. If the string contains a substring
+can also be tested. Due to oddities of strings, this function may return
+back false errors.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Robustness.validation.validate_tuple">
+<code class="descclassname">Robustness.validation.</code><code class="descname">validate_tuple</code><span class="sig-paren">(</span><em>input_tuple</em>, <em>length=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/validation.html#validate_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.validation.validate_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>The purpose of this function is to validate that a tuple is valid.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Robustness.input_parsing.html"
+                        title="previous chapter">Robustness.input_parsing module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="data_systematization.html"
+                        title="next chapter">data_systematization module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Robustness.validation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="data_systematization.html" title="data_systematization module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Robustness.input_parsing.html" title="Robustness.input_parsing module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Robustness.html" >Robustness package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

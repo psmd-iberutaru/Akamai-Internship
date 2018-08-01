@@ -1,0 +1,329 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>magnetic_field_functions_3d &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for magnetic_field_functions_3d</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This document highlights 2d versions of magnetic field functions. Thus, these</span>
+<span class="sd">functions take in 2 parameters, the x,y values or rho,phi values, and return </span>
+<span class="sd">the u,v vector components of the given magnetic field</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">scipy.special</span> <span class="k">as</span> <span class="nn">sp_spcl</span>
+
+<span class="kn">import</span> <span class="nn">Robustness</span> <span class="k">as</span> <span class="nn">Robust</span>
+<span class="kn">import</span> <span class="nn">Backend</span> <span class="k">as</span> <span class="nn">_Backend</span>
+<span class="kn">import</span> <span class="nn">magnetic_field_functions_2d</span> <span class="k">as</span> <span class="nn">mff2d</span>
+
+
+<span class="c1"># In order from least complex field to most complex field, first in cartesian</span>
+<span class="c1"># cords.</span>
+
+<span class="c1">########################################################################</span>
+<span class="c1">#####             3D Magnetic Field Cartesian Functions            #####</span>
+<span class="c1">########################################################################</span>
+
+<div class="viewcode-block" id="circular_magnetic_field_cart_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.circular_magnetic_field_cart_3d">[docs]</a><span class="k">def</span> <span class="nf">circular_magnetic_field_cart_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
+                                    <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">mag_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                                    <span class="n">reference_axis</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the cartesian magnetic field vectors of a circular field.</span>
+
+<span class="sd">    The circular magnetic field is radially symmetric. This function  </span>
+<span class="sd">    returns the values of the components of a magnetic field given some </span>
+<span class="sd">    point(s) x,y,z. The center of the circular magnetic field can be </span>
+<span class="sd">    redefined. The axis of symmetry can also be redefined.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        The x values of the points for magnetic field computation.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        The y values of the points for the magnetic field computation</span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z values of the points for magnetic field computation.</span>
+<span class="sd">    center : array_like; optional</span>
+<span class="sd">        The center of the circular magnetic field function, passed as an</span>
+<span class="sd">        array ``[x0,y0]``. Default is ``[0,0,0]``</span>
+<span class="sd">    mag_function : function ``f(r)``; optional</span>
+<span class="sd">        The value of the magnitude of the vector field at some radius from</span>
+<span class="sd">        the center. Default is ``f(r) = 1/r**2``.</span>
+<span class="sd">    reference_axis : string; optional</span>
+<span class="sd">        The specified axis that the magnetic field curls around. Default is </span>
+<span class="sd">        the ``z`` axis.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Bfield_x : ndarray</span>
+<span class="sd">        The x component of the magnetic field at the given points. Order</span>
+<span class="sd">        is perserved.</span>
+<span class="sd">    Bfield_y : ndarray</span>
+<span class="sd">        The y component of the magnetic field at the given points. Order</span>
+<span class="sd">        is perserved.</span>
+<span class="sd">    Bfield_z : ndarray</span>
+<span class="sd">        The z component of the magnetic field at the given points. Order</span>
+<span class="sd">        is perserved.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+    <span class="n">mag_function</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">mag_function</span><span class="p">,</span>
+                                                       <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">reference_axis</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span>
+        <span class="n">reference_axis</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">contain_substr</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Do a transformation based on the relocation of the center.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Calculate the magnetic field based on what the user desired on for</span>
+    <span class="c1"># the axis of symmetry.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">reference_axis</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">):</span>
+        <span class="n">axis1</span><span class="p">,</span> <span class="n">axis2</span> <span class="o">=</span> <span class="n">mff2d</span><span class="o">.</span><span class="n">circular_magnetic_field_cart_2d</span><span class="p">(</span>
+            <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mag_function</span><span class="o">=</span><span class="n">mag_function</span><span class="p">)</span>
+        <span class="c1"># The x axis is determined to have zero contribution.</span>
+        <span class="n">Bfield_x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">Bfield_y</span> <span class="o">=</span> <span class="n">axis1</span>
+        <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">axis2</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">reference_axis</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">):</span>
+        <span class="n">axis1</span><span class="p">,</span> <span class="n">axis2</span> <span class="o">=</span> <span class="n">mff2d</span><span class="o">.</span><span class="n">circular_magnetic_field_cart_2d</span><span class="p">(</span>
+            <span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mag_function</span><span class="o">=</span><span class="n">mag_function</span><span class="p">)</span>
+        <span class="c1"># The x axis is determined to have zero contribution. The negatives</span>
+        <span class="c1"># keep the orientation consistant.</span>
+        <span class="n">Bfield_x</span> <span class="o">=</span> <span class="n">axis1</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">Bfield_y</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">axis2</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">reference_axis</span> <span class="o">==</span> <span class="s1">&#39;z&#39;</span><span class="p">):</span>
+        <span class="n">axis1</span><span class="p">,</span> <span class="n">axis2</span> <span class="o">=</span> <span class="n">mff2d</span><span class="o">.</span><span class="n">circular_magnetic_field_cart_2d</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mag_function</span><span class="o">=</span><span class="n">mag_function</span><span class="p">)</span>
+        <span class="c1"># The z axis is determined to have zero contribution.</span>
+        <span class="n">Bfield_x</span> <span class="o">=</span> <span class="n">axis1</span>
+        <span class="n">Bfield_y</span> <span class="o">=</span> <span class="n">axis2</span>
+        <span class="n">Bfield_z</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Robust</span><span class="o">.</span><span class="n">InputError</span><span class="p">(</span><span class="s1">&#39;The reference axis specified is not a valid &#39;</span>
+                                <span class="s1">&#39;axis in the cartesian cordinate system. &#39;</span>
+                                <span class="s1">&#39;It is not known how this input got past &#39;</span>
+                                <span class="s1">&#39;input validation. &#39;</span>
+                                <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Return the values of the magnetic field.</span>
+    <span class="k">return</span> <span class="n">Bfield_x</span><span class="p">,</span> <span class="n">Bfield_y</span><span class="p">,</span> <span class="n">Bfield_z</span></div>
+
+
+<div class="viewcode-block" id="hourglass_magnetic_field_cart_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.hourglass_magnetic_field_cart_3d">[docs]</a><span class="k">def</span> <span class="nf">hourglass_magnetic_field_cart_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
+                                     <span class="n">h</span><span class="p">,</span> <span class="n">k_array</span><span class="p">,</span> <span class="n">disk_radius</span><span class="p">,</span> <span class="n">uniform_B0</span><span class="p">,</span>
+                                     <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Equation for hourglass magnetic fields given by Ewertowshi &amp; Basu 2013.</span>
+
+<span class="sd">    This function is the three dimensional version of the equations given by </span>
+<span class="sd">    Ewertowshi &amp; Basu 2013. This function assumes, as the paper does, that the</span>
+<span class="sd">    magnetic field is invariant with respect to phi.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        The input values of the x direction for the equation.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        The input values of the y direction for the equation. </span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The input values of the z direction for the equation.</span>
+<span class="sd">    h : float</span>
+<span class="sd">        A free parameter as dictated by the paper.</span>
+<span class="sd">    k_array : array_like</span>
+<span class="sd">        The list of k coefficient values for the summation in Eq 45.</span>
+<span class="sd">    disk_radius : float</span>
+<span class="sd">        The radius of the protoplanetary disk. Relevent for the hourglass</span>
+<span class="sd">        magnetic field generated by this paper.</span>
+<span class="sd">    uniform_B0 : float</span>
+<span class="sd">        The magnitude of the background magnetic field.</span>
+<span class="sd">    center : array_like; optional</span>
+<span class="sd">        The center of the hourglass shaped magnetic field function, passed</span>
+<span class="sd">        as an array ``[r0,phi0,z0]``. Defaults to ``[0,0,0]``</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Bfield_x : ndarray</span>
+<span class="sd">        The value of the magnetic field in the x-axial direction.</span>
+<span class="sd">    Bfield_y : ndarray</span>
+<span class="sd">        The value of the magnetic field in the y-axial direction.</span>
+<span class="sd">    Bfield_z : ndarray</span>
+<span class="sd">        The value of the magnetic field in the z-axial direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">k_array</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">k_array</span><span class="p">)</span>
+    <span class="n">disk_radius</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span>
+        <span class="n">disk_radius</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">uniform_B0</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">uniform_B0</span><span class="p">)</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+
+    <span class="c1"># Convert the cartesian cords to cylindrical cords.</span>
+    <span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">cst</span><span class="o">.</span><span class="n">cartesian_to_cylindrical_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+    <span class="c1"># Compute the magnetic fields.</span>
+    <span class="n">Bfield_rho</span><span class="p">,</span> <span class="n">Bfield_phi</span><span class="p">,</span> <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">hourglass_magnetic_field_cyln_3d</span><span class="p">(</span>
+        <span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">k_array</span><span class="p">,</span> <span class="n">disk_radius</span><span class="p">,</span> <span class="n">uniform_B0</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">)</span>
+
+    <span class="c1"># Convert back to the cartesian cords.</span>
+    <span class="n">Bfield_x</span><span class="p">,</span> <span class="n">Bfield_y</span><span class="p">,</span> <span class="n">Bfield_z</span> <span class="o">=</span> \
+        <span class="n">_Backend</span><span class="o">.</span><span class="n">cst</span><span class="o">.</span><span class="n">cylindrical_to_cartesian_3d</span><span class="p">(</span><span class="n">Bfield_rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">Bfield_z</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Bfield_x</span><span class="p">,</span> <span class="n">Bfield_y</span><span class="p">,</span> <span class="n">Bfield_z</span></div>
+
+
+<span class="c1">########################################################################</span>
+<span class="c1">#####            3D Magnetic Field Cylindrical Functions           #####</span>
+<span class="c1">########################################################################</span>
+
+<div class="viewcode-block" id="hourglass_magnetic_field_cyln_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.hourglass_magnetic_field_cyln_3d">[docs]</a><span class="k">def</span> <span class="nf">hourglass_magnetic_field_cyln_3d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
+                                     <span class="n">h</span><span class="p">,</span> <span class="n">k_array</span><span class="p">,</span> <span class="n">disk_radius</span><span class="p">,</span> <span class="n">uniform_B0</span><span class="p">,</span>
+                                     <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Equation for hourglass magnetic fields given by Ewertowshi &amp; Basu 2013.</span>
+
+<span class="sd">    This function is the three dimensional version of the equations given by </span>
+<span class="sd">    Ewertowshi &amp; Basu 2013. This function assumes, as the paper does, that the</span>
+<span class="sd">    magnetic field is invariant with respect to phi.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rho : array_like</span>
+<span class="sd">        The input values of the radial direction for the equation.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The input values of the polar angle for the equation. </span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The input values of the polar direction for the equation.</span>
+<span class="sd">    h : float</span>
+<span class="sd">        A free parameter as dictated by the paper.</span>
+<span class="sd">    k_array : array_like</span>
+<span class="sd">        The list of k coefficient values for the summation in Eq 45.</span>
+<span class="sd">    disk_radius : float</span>
+<span class="sd">        The radius of the protoplanetary disk. Relevent for the hourglass</span>
+<span class="sd">        magnetic field generated by this paper.</span>
+<span class="sd">    uniform_B0 : float</span>
+<span class="sd">        The magnitude of the background magnetic field.</span>
+<span class="sd">    center : array_like</span>
+<span class="sd">        The center of the hourglass shaped magnetic field function, passed</span>
+<span class="sd">        as an array ``[r0,phi0,z0]``. Defaults to ``[0,0,0]``</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Bfield_rho : ndarray</span>
+<span class="sd">        The value of the magnetic field in the rho-axial direction.</span>
+<span class="sd">    Bfield_phi : ndarray</span>
+<span class="sd">        The value of the magnetic field in the phi-axial direction.</span>
+<span class="sd">    Bfield_z : ndarray</span>
+<span class="sd">        The value of the magnetic field in the z-axial direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check the parameters.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">k_array</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">k_array</span><span class="p">)</span>
+    <span class="n">disk_radius</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">disk_radius</span><span class="p">,</span>
+                                                    <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">uniform_B0</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">uniform_B0</span><span class="p">)</span>
+
+    <span class="c1"># Do a translation based off of the center.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Compute the magnetic fields from Ewertowski and Basu 2013 equations.</span>
+    <span class="n">Bfield_rho</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">Ewertowski_Basu_2013</span><span class="o">.</span><span class="n">Ewer_Basu__B_r</span><span class="p">(</span>
+        <span class="n">rho</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">k_array</span><span class="p">,</span> <span class="n">disk_radius</span><span class="p">)</span>
+    <span class="n">Bfield_phi</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">Ewertowski_Basu_2013</span><span class="o">.</span><span class="n">Ewer_Basu__B_z</span><span class="p">(</span>
+        <span class="n">rho</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">k_array</span><span class="p">,</span> <span class="n">disk_radius</span><span class="p">,</span> <span class="n">uniform_B0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Bfield_rho</span><span class="p">,</span> <span class="n">Bfield_phi</span><span class="p">,</span> <span class="n">Bfield_z</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

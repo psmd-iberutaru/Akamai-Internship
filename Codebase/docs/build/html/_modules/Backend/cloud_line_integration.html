@@ -1,0 +1,363 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Backend.cloud_line_integration &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Backend.cloud_line_integration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module outlines the math side of the integration functions used. The</span>
+<span class="sd">cloud line integration computes a line integral along a sightline path, </span>
+<span class="sd">whereas the bounds of the integration is such that a field is integrated</span>
+<span class="sd">within the cloud.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">scipy.integrate</span> <span class="k">as</span> <span class="nn">sp_int</span>
+<span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="k">as</span> <span class="nn">sp_opt</span>
+
+<span class="kn">import</span> <span class="nn">Robustness</span> <span class="k">as</span> <span class="nn">Robust</span>
+
+
+<div class="viewcode-block" id="line_integral_boundaries"><a class="viewcode-back" href="../../Backend.cloud_line_integration.html#Backend.cloud_line_integration.line_integral_boundaries">[docs]</a><span class="k">def</span> <span class="nf">line_integral_boundaries</span><span class="p">(</span><span class="n">view_line_point</span><span class="p">,</span> <span class="n">cloud_equation</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span>
+                             <span class="n">view_line_deltas</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">n_guesses</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find line integral boundaries given the cloud and sightline. </span>
+
+<span class="sd">    This function determines the points that intersect the sphere, starting</span>
+<span class="sd">    with it entering and exit. It returns the ranges of points that would</span>
+<span class="sd">    yield line integral boundaries that integrate within the cloud volume.</span>
+
+<span class="sd">    By default, the cloud equation should be a function such that it returns a</span>
+<span class="sd">    float, f(x,y,z), based on implicit shape making: f(x,y,z) = 0. If not, it</span>
+<span class="sd">    should be at least a string that contains the python syntax expression of</span>
+<span class="sd">    the shape for f(x,y,z) = 0, i.e., left-hand side of the equation only.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    view_line_point : array_like </span>
+<span class="sd">        Expected in three dimensions. It specifies the point that the viewline </span>
+<span class="sd">        is positioned at in cartesian space.</span>
+<span class="sd">    cloud_equation : function</span>
+<span class="sd">        The implicit equation of the cloud. Must be ``f(x)`` where </span>
+<span class="sd">        ``f(x) = 0``.</span>
+<span class="sd">    box_width : float</span>
+<span class="sd">        An overestimated value of the size of the cloud along any given axis.</span>
+<span class="sd">        Used for finding locations of intersections of the cloud and sightline.</span>
+<span class="sd">    view_line_deltas : array_like</span>
+<span class="sd">        Expected in three dimensions. It specifies the linear coefficient that </span>
+<span class="sd">        the sightline travels through space. Defaults to (1,0,0), a line </span>
+<span class="sd">        parallel to the x-axis.</span>
+<span class="sd">    n_guesses : int</span>
+<span class="sd">        An order of magnitude overestimate of the number of intersections </span>
+<span class="sd">        between the cloud and the sightline. Defaults to 100.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lower_bounds : ndarray</span>
+<span class="sd">        An array of the lower bound(s) if each integration needed that is</span>
+<span class="sd">        within the cloud along the sightline.</span>
+<span class="sd">    upper_bounds : ndarray</span>
+<span class="sd">        An array of the upper bound(s) if each integration needed that is</span>
+<span class="sd">        within the cloud along the sightline.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check.</span>
+    <span class="n">view_line_point</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">view_line_point</span><span class="p">,</span>
+                                                        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+    <span class="c1"># Check for both cases.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cloud_function</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">cloud_equation</span><span class="p">,</span>
+                                                             <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># Warn the user that sympy parsing is going to be used.</span>
+        <span class="c1"># Try to use a sympy parsing. Assume a normal cartesian implicit</span>
+        <span class="c1"># surface.</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">)</span>
+        <span class="n">cloud_function</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">inparse</span><span class="o">.</span><span class="n">user_equation_parse</span><span class="p">(</span><span class="n">cloud_equation</span><span class="p">,</span>
+                                                            <span class="n">variables</span><span class="p">)</span>
+    <span class="n">box_width</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">box_width</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Define the sightline parametric equations.</span>
+    <span class="k">def</span> <span class="nf">x_param</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">view_line_deltas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">view_line_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">y_param</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">view_line_deltas</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">view_line_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">z_param</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">view_line_deltas</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">view_line_point</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Assume that the user&#39;s function accepts x,y,z in that order.</span>
+    <span class="k">def</span> <span class="nf">parameterized_cloud_equation</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cloud_function</span><span class="p">(</span><span class="n">x_param</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">y_param</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">z_param</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+    <span class="c1"># Find all of the roots of the parameterized function.</span>
+    <span class="n">initial_guesses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">box_width</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span> <span class="n">n_guesses</span><span class="p">)</span>
+    <span class="n">eq_roots</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">int_err</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> \
+        <span class="n">sp_opt</span><span class="o">.</span><span class="n">fsolve</span><span class="p">(</span><span class="n">parameterized_cloud_equation</span><span class="p">,</span> <span class="n">initial_guesses</span><span class="p">,</span>
+                      <span class="n">xtol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">maxfev</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">),</span><span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sort_eq_roots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">eq_roots</span><span class="p">)</span>
+
+    <span class="c1"># If there were no detected bounds, it is likely that there was no</span>
+    <span class="c1"># intersection to begin with, and thus no bounds. Scipy documentation</span>
+    <span class="c1"># specifies that 1 means it is fine.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">int_err</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">lower_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="n">upper_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="k">return</span> <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span>
+
+    <span class="c1"># Have only unique roots.</span>
+    <span class="n">unique_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sort_eq_roots</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">sort_eq_roots</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mf">1e-5</span>
+    <span class="n">neg_bound_roots</span> <span class="o">=</span> <span class="n">sort_eq_roots</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">unique_index</span><span class="p">]</span>
+    <span class="n">pos_bound_roots</span> <span class="o">=</span> <span class="n">sort_eq_roots</span><span class="p">[</span><span class="mi">1</span><span class="p">:][</span><span class="n">unique_index</span><span class="p">]</span>
+
+    <span class="c1"># There always exists an odd number of regions. The surface is closed and</span>
+    <span class="c1"># has an even number of intersections by the sightline that passes in and</span>
+    <span class="c1"># out of the surface as per topology. By default, the first and last groups</span>
+    <span class="c1"># will not be within the cloud by the closed nature of the cloud. Assume</span>
+    <span class="c1"># that the light goes from +x -&gt; -x such that the yz plane is normal when</span>
+    <span class="c1"># &#39;seen&#39;, thus the observer is near -x axis head.</span>
+    <span class="n">lower_bounds</span> <span class="o">=</span> <span class="n">x_param</span><span class="p">(</span><span class="n">neg_bound_roots</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">upper_bounds</span> <span class="o">=</span> <span class="n">x_param</span><span class="p">(</span><span class="n">pos_bound_roots</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span></div>
+
+
+<div class="viewcode-block" id="cloud_line_integral"><a class="viewcode-back" href="../../Backend.cloud_line_integration.html#Backend.cloud_line_integration.cloud_line_integral">[docs]</a><span class="k">def</span> <span class="nf">cloud_line_integral</span><span class="p">(</span><span class="n">field_function</span><span class="p">,</span> <span class="n">cloud_equation</span><span class="p">,</span> <span class="n">view_line_point</span><span class="p">,</span>
+                        <span class="n">box_width</span><span class="p">,</span>
+                        <span class="n">view_line_deltas</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">n_guesses</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                        <span class="n">integral_method</span><span class="o">=</span><span class="s1">&#39;scipy&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computs the line integral over a field given bounds of a cloud ans path.</span>
+
+<span class="sd">    This function computes the total summation of the line integrals given</span>
+<span class="sd">    a field function that a single sightline passes through, given the </span>
+<span class="sd">    boundary that only the section of the line within a cloud would be </span>
+<span class="sd">    computed as it is the upper and lower bounds for the integral(s).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field_function : function</span>
+<span class="sd">        The function of the field. Must be three dimensional in the form</span>
+<span class="sd">        ``def f(x,y,z): return a``. Does not accept non-numerical returns.</span>
+<span class="sd">    cloud_equation : function</span>
+<span class="sd">        The implicit equation of the cloud. Must be ``f(x)`` where </span>
+<span class="sd">        ``f(x) = 0``.</span>
+<span class="sd">    view_line_point : array_like </span>
+<span class="sd">        Expected in three dimensions. It specifies the point that the viewline </span>
+<span class="sd">        is positioned at in cartesian space.</span>
+<span class="sd">    box_width : float</span>
+<span class="sd">        An overestimated value of the size of the cloud along any given axis.</span>
+<span class="sd">        Used for finding locations of intersections of the cloud and sightline.</span>
+<span class="sd">    view_line_deltas : array_like; optional</span>
+<span class="sd">        Expected in three dimensions. It specifies the linear coefficient that </span>
+<span class="sd">        the sightline travels through space. Defaults to (1,0,0), a line </span>
+<span class="sd">        parallel to the x-axis.</span>
+<span class="sd">    n_guesses : int; optional</span>
+<span class="sd">        An order of magnitude overestimate of the number of intersections </span>
+<span class="sd">        between the cloud and the sightline. Defaults to 100.</span>
+<span class="sd">    integral_method; optional</span>
+<span class="sd">        The method of which the integration will be computed. Defaults to </span>
+<span class="sd">        Scipy&#39;s scipy.integrate.quad().</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    integrated_value : float</span>
+<span class="sd">        The integrated value of the given field bounded by the sightline and</span>
+<span class="sd">        the shape of the cloud.</span>
+<span class="sd">    error : float</span>
+<span class="sd">        The associated error with the integration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Type check</span>
+    <span class="n">field_function</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">field_function</span><span class="p">,</span>
+                                                         <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">cloud_equation</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">cloud_equation</span><span class="p">,</span>
+                                                         <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">view_line_point</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">view_line_point</span><span class="p">,</span>
+                                                        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+    <span class="n">box_width</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">box_width</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">view_line_deltas</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_tuple</span><span class="p">(</span><span class="n">view_line_deltas</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">n_guesses</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_int_value</span><span class="p">(</span><span class="n">n_guesses</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">integral_method</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span><span class="n">integral_method</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># Integrating function. Parameterize the field function to integrate over</span>
+    <span class="c1"># the curve given by the sightline.</span>
+    <span class="c1"># Define the sightline parametric equations.</span>
+
+    <span class="k">def</span> <span class="nf">x_param</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">view_line_deltas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">view_line_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">y_param</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">view_line_deltas</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">view_line_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">z_param</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">view_line_deltas</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">view_line_point</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Assume that the user&#39;s function accepts x,y,z in that order.</span>
+    <span class="k">def</span> <span class="nf">parameterized_field_equation</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">field_function</span><span class="p">(</span><span class="n">x_param</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">y_param</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">z_param</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+    <span class="c1"># Determine the lower and upper bounds of the parameterized functional</span>
+    <span class="c1"># integrations.</span>
+    <span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span> <span class="o">=</span> \
+        <span class="n">line_integral_boundaries</span><span class="p">(</span><span class="n">view_line_point</span><span class="p">,</span> <span class="n">cloud_equation</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span>
+                                 <span class="n">view_line_deltas</span><span class="p">,</span> <span class="n">n_guesses</span><span class="p">)</span>
+
+    <span class="c1"># The total integrated number.</span>
+    <span class="n">integrated_value</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Error array</span>
+
+    <span class="c1"># Begin integration, ensure the integration is logical and possible.</span>
+    <span class="k">if</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">lower_bounds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">upper_bounds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+        <span class="c1"># If there are no detected bounds, then there is nothing to integrate</span>
+        <span class="c1"># over. To integrate would be nonsensical. Returning handleable values.</span>
+        <span class="n">integrated_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">integrated_value</span><span class="p">,</span> <span class="n">error</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># It is assumed that the integration is doable.</span>
+        <span class="k">for</span> <span class="n">lowerdex</span><span class="p">,</span> <span class="n">upperdex</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span><span class="p">):</span>
+            <span class="n">integration</span> <span class="o">=</span> <span class="n">_integration_function</span><span class="p">(</span><span class="n">parameterized_field_equation</span><span class="p">,</span>
+                                                <span class="n">lowerdex</span><span class="p">,</span> <span class="n">upperdex</span><span class="p">,</span> 
+                                                <span class="n">int_method</span><span class="o">=</span><span class="n">integral_method</span><span class="p">)</span>
+            <span class="n">integrated_value</span> <span class="o">+=</span> <span class="n">integration</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">integration</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Errors add in quadrature.</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">integrated_value</span><span class="p">,</span> <span class="n">error</span></div>
+
+
+<span class="k">def</span> <span class="nf">_integration_function</span><span class="p">(</span><span class="n">intergrand</span><span class="p">,</span><span class="n">lower</span><span class="p">,</span><span class="n">upper</span><span class="p">,</span><span class="n">int_method</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Integration methods to be used.</span>
+
+<span class="sd">    This function is a list of the possible integration functions that</span>
+<span class="sd">    would be used.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    intergrand : function</span>
+<span class="sd">        The function to be integrated.</span>
+<span class="sd">    lower : float</span>
+<span class="sd">        The lower bound of the integral.</span>
+<span class="sd">    upper : float</span>
+<span class="sd">        The upper bound of the integral.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    integral : float</span>
+<span class="sd">        The total value of the integral</span>
+<span class="sd">    error : float</span>
+<span class="sd">        The total error value of the integral&#39;s computation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">intergrand</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The integrand function must be callable as &#39;</span>
+                        <span class="s1">&#39;it is impossible to integrate otherwise.&#39;</span>
+                        <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lower</span><span class="p">)</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span>
+
+    <span class="n">n_divisions</span> <span class="o">=</span> <span class="mi">1000</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">int_method</span> <span class="o">==</span> <span class="s1">&#39;scipy&#39;</span><span class="p">):</span>
+        <span class="c1"># Just use Scipy&#39;s integrate functionality.</span>
+        <span class="n">integral</span><span class="p">,</span><span class="n">error</span> <span class="o">=</span> <span class="n">sp_int</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span><span class="n">intergrand</span><span class="p">,</span><span class="n">lower</span><span class="p">,</span><span class="n">upper</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">int_method</span> <span class="o">==</span> <span class="s1">&#39;simpsons&#39;</span><span class="p">):</span>
+        <span class="c1"># Use Scipy&#39;s simpson&#39;s method, it does not seem like it needs to be</span>
+        <span class="c1"># changed to be manually implemented.</span>
+        <span class="n">x_spread</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span><span class="n">upper</span><span class="p">,</span><span class="n">n_divisions</span><span class="p">)</span>
+        <span class="n">y_spread</span> <span class="o">=</span> <span class="n">intergrand</span><span class="p">(</span><span class="n">x_spread</span><span class="p">)</span>
+        <span class="n">integral</span> <span class="o">=</span> <span class="n">sp_int</span><span class="o">.</span><span class="n">simps</span><span class="p">(</span><span class="n">y_spread</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="n">x_spread</span><span class="p">)</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">int_method</span> <span class="o">==</span> <span class="s1">&#39;trapezoidal&#39;</span><span class="p">):</span>
+        <span class="c1"># Assume a uniform grid.</span>
+        <span class="n">delta_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">upper</span> <span class="o">-</span> <span class="n">lower</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_divisions</span>
+        <span class="n">x_spread</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span><span class="n">upper</span><span class="p">,</span><span class="n">n_divisions</span><span class="p">)</span>
+        <span class="n">y_spread</span> <span class="o">=</span> <span class="n">intergrand</span><span class="p">(</span><span class="n">x_spread</span><span class="p">)</span>
+        <span class="n">integral</span> <span class="o">=</span> <span class="p">((</span><span class="n">delta_x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> 
+                    <span class="o">*</span> <span class="p">(</span><span class="n">y_spread</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_spread</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="n">y_spread</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Robust</span><span class="o">.</span><span class="n">InputError</span><span class="p">(</span><span class="s1">&#39;Integral method is not one of the specified &#39;</span>
+                                <span class="s1">&#39;or accepted methods.&#39;</span>
+                                <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">integral</span><span class="p">,</span><span class="n">error</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

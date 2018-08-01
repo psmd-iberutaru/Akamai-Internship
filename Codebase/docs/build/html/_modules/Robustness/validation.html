@@ -1,0 +1,505 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Robustness.validation &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Robustness.validation</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">inspect</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="kn">from</span> <span class="nn">Robustness.exception</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="validate_boolean_value"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_boolean_value">[docs]</a><span class="k">def</span> <span class="nf">validate_boolean_value</span><span class="p">(</span><span class="n">boolean_value_input</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to validate that a boolean value </span>
+<span class="sd">    input is valid. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check. If it is not a boolean value, attempt to change it</span>
+    <span class="c1"># into one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">boolean_value_input</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">boolean_value_input</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">boolean_value_input</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input boolean value is not transformable into a &#39;</span>
+                            <span class="s1">&#39;boolean value.    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">boolean_value_input</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_boolean_array"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_boolean_array">[docs]</a><span class="k">def</span> <span class="nf">validate_boolean_array</span><span class="p">(</span><span class="n">boolean_array_input</span><span class="p">,</span>
+                           <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">deep_validate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to validate that the boolean </span>
+<span class="sd">    array is valid. The shape and size of the array can be optionally </span>
+<span class="sd">    tested.</span>
+
+<span class="sd">    deep_validate instructs the program to loop over every element </span>
+<span class="sd">    array and validate it in turn.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Type check. If it is not an array, attempt to change it to one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">boolean_array_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">boolean_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">boolean_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input boolean array is not transformable into a &#39;</span>
+                            <span class="s1">&#39;boolean array.    --Kyubey&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">boolean_array_input</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">boolean_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">boolean_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input boolean array is not transformable into a &#39;</span>
+                            <span class="s1">&#39;boolean array.    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check the optional conditions of shape and size.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check optional condition inputs.</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">validate_tuple</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">boolean_array_input</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;Input boolean array is not the correct shape. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1"> &#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">boolean_array_input</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check optional condition inputs.</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">validate_int_value</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">boolean_array_input</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">size</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;Input boolean array is not the correct size. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1"> &#39;</span>
+                             <span class="s1">&#39; --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">boolean_array_input</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+    <span class="c1"># Check if the user desired a deep validation check, warn about</span>
+    <span class="c1"># time. First type check.</span>
+    <span class="n">deep_validate</span> <span class="o">=</span> <span class="n">validate_boolean_value</span><span class="p">(</span><span class="n">deep_validate</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">deep_validate</span><span class="p">):</span>
+        <span class="c1"># Warn about time.</span>
+        <span class="n">kyubey_warning</span><span class="p">(</span><span class="n">TimeWarning</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;Deep validate detected for boolean &#39;</span>
+                                     <span class="s1">&#39;array validation. This may take longer.&#39;</span>
+                                     <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Enable value function to loop over all elements of an array.</span>
+        <span class="n">vect_validate_boolean_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">validate_boolean_value</span><span class="p">,)</span>
+        <span class="n">boolean_array_input</span> <span class="o">=</span> <span class="n">vect_validate_boolean_value</span><span class="p">(</span><span class="n">boolean_array_input</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">boolean_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_int_value"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_int_value">[docs]</a><span class="k">def</span> <span class="nf">validate_int_value</span><span class="p">(</span><span class="n">int_value_input</span><span class="p">,</span>
+                       <span class="n">non_zero</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">less_than</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to validate that a int value is valid. </span>
+<span class="sd">    The value, its range (either greater than or less than a number) may </span>
+<span class="sd">    also be tested. This function will bark if the value is greater than </span>
+<span class="sd">    less_than or less than greater_than. It can also be tested if it is </span>
+<span class="sd">    non-zero (true for non-zero, false for zero passes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Type check. If it is not a int value, attempt to change it into one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">int_value_input</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">int_value_input</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">int_value_input</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input int value is not transformable into a &#39;</span>
+                            <span class="s1">&#39;int value.    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Test the optional conditions.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">non_zero</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">non_zero</span> <span class="o">=</span> <span class="n">validate_boolean_value</span><span class="p">(</span><span class="n">non_zero</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">non_zero</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">int_value_input</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input int value is zero, non_zero flag is &#39;</span>
+                                 <span class="s1">&#39;set to true.    --Kyubey&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="p">(</span><span class="n">non_zero</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">int_value_input</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input int value is non-zero, non_zero flag &#39;</span>
+                                 <span class="s1">&#39;is set to false.    --Kyubey&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">greater_than</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check the optional test inputs.</span>
+        <span class="n">greater_than</span> <span class="o">=</span> <span class="n">validate_float_value</span><span class="p">(</span><span class="n">greater_than</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">int_value_input</span> <span class="o">&lt;=</span> <span class="n">greater_than</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input int value is less than the stipulated &#39;</span>
+                             <span class="s1">&#39;value. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">greater_than</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">int_value_input</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">less_than</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check the optional test inputs.</span>
+        <span class="n">less_than</span> <span class="o">=</span> <span class="n">validate_float_value</span><span class="p">(</span><span class="n">less_than</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">int_value_input</span> <span class="o">&gt;=</span> <span class="n">less_than</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input int value is greater than the stipulated &#39;</span>
+                             <span class="s1">&#39;value. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">less_than</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">int_value_input</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">int_value_input</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_int_array"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_int_array">[docs]</a><span class="k">def</span> <span class="nf">validate_int_array</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span>
+                       <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">deep_validate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="c1"># Deep/value validate parameters.</span>
+                       <span class="n">non_zero</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">less_than</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to validate that the integer array is </span>
+<span class="sd">    valid. The shape and size of the array can be optionally tested.</span>
+
+<span class="sd">    deep_validate instructs the program to loop over every element array and</span>
+<span class="sd">    validate it in turn.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Type check. If it is not an array, attempt to change it to one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">int_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input integer array is not transformable into a &#39;</span>
+                            <span class="s1">&#39;integer array.    --Kyubey&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">int_array_input</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">int_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input integer array is not transformable into a &#39;</span>
+                            <span class="s1">&#39;integer array.    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check the optional conditions of shape and size.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check optional condition inputs.</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">validate_tuple</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">int_array_input</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;Input integer array is not the correct shape.&#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">int_array_input</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check optional condition inputs.</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">validate_int_value</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">int_array_input</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">size</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;Input integer array is not the correct size. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39; --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">int_array_input</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+    <span class="c1"># Check if the user desired a deep validation check, warn about time. First</span>
+    <span class="c1"># type check.</span>
+    <span class="n">deep_validate</span> <span class="o">=</span> <span class="n">validate_boolean_value</span><span class="p">(</span><span class="n">deep_validate</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">deep_validate</span><span class="p">):</span>
+        <span class="c1"># Warn about time.</span>
+        <span class="n">kyubey_warning</span><span class="p">(</span><span class="n">TimeWarning</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;Deep validate detected for integer &#39;</span>
+                                     <span class="s1">&#39;array validation. This may take longer.&#39;</span>
+                                     <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Enable value function to loop over all elements of an array.</span>
+        <span class="n">vect_validate_int_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">validate_int_value</span><span class="p">)</span>
+        <span class="n">int_array_input</span> <span class="o">=</span> <span class="n">vect_validate_int_value</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span>
+                                                  <span class="n">non_zero</span><span class="o">=</span><span class="n">non_zero</span><span class="p">,</span>
+                                                  <span class="n">greater_than</span><span class="o">=</span><span class="n">greater_than</span><span class="p">,</span>
+                                                  <span class="n">less_than</span><span class="o">=</span><span class="n">less_than</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_float_value"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_float_value">[docs]</a><span class="k">def</span> <span class="nf">validate_float_value</span><span class="p">(</span><span class="n">float_value_input</span><span class="p">,</span>
+                         <span class="n">greater_than</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">less_than</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to validate that a float value is valid. </span>
+<span class="sd">    The value, its range (either greater than or less than a number) may </span>
+<span class="sd">    also be tested. This function will bark if the value is greater than </span>
+<span class="sd">    less_than or less than greater_than.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Type check. If it is not a float value, attempt to change it into one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">float_value_input</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">float_value_input</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">float_value_input</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input float value is not transformable into a &#39;</span>
+                            <span class="s1">&#39;float value.    -Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Test the optional conditions.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">greater_than</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check the optional test inputs.</span>
+        <span class="n">greater_than</span> <span class="o">=</span> <span class="n">validate_float_value</span><span class="p">(</span><span class="n">greater_than</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">float_value_input</span> <span class="o">&lt;=</span> <span class="n">greater_than</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input float value is less than the stipulated &#39;</span>
+                             <span class="s1">&#39;value. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">greater_than</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">float_value_input</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">less_than</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">less_than</span> <span class="o">=</span> <span class="n">validate_float_value</span><span class="p">(</span><span class="n">less_than</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">float_value_input</span> <span class="o">&gt;=</span> <span class="n">less_than</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input int value is greater than the stipulated &#39;</span>
+                             <span class="s1">&#39;value. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">less_than</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">float_value_input</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">float_value_input</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_float_array"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_float_array">[docs]</a><span class="k">def</span> <span class="nf">validate_float_array</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span>
+                         <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">deep_validate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="c1"># Deep/value validate parameters.</span>
+                         <span class="n">greater_than</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">less_than</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to validate that the float array is </span>
+<span class="sd">    valid. The shape and size of the array can be optionally tested.</span>
+
+<span class="sd">    deep_validate instructs the program to loop over every element array and</span>
+<span class="sd">    validate it in turn.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Type check. If it is not an array, attempt to change it to one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">float_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input float array is not transformable into a &#39;</span>
+                            <span class="s1">&#39;float array.    --Kyubey&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">float_array_input</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">float_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input float array is not transformable into a &#39;</span>
+                            <span class="s1">&#39;float array.    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check the optional conditions of shape and size.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check optional condition inputs.</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">validate_tuple</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">float_array_input</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;Input float array is not the correct shape. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">.&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">float_array_input</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check optional condition inputs.</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">validate_int_value</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">float_array_input</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">size</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;Input float array is not the correct size. &#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">.&#39;</span>
+                             <span class="s1">&#39; --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="n">float_array_input</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+    <span class="c1"># Check if the user desired a deep validation check, warn about time. First</span>
+    <span class="c1"># type check.</span>
+    <span class="n">deep_validate</span> <span class="o">=</span> <span class="n">validate_boolean_value</span><span class="p">(</span><span class="n">deep_validate</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">deep_validate</span><span class="p">):</span>
+        <span class="c1"># Warn about time.</span>
+        <span class="n">kyubey_warning</span><span class="p">(</span><span class="n">TimeWarning</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;Deep validate detected for float &#39;</span>
+                                     <span class="s1">&#39;array validation. This may take longer.&#39;</span>
+                                     <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Enable value function to loop over all elements of an array.</span>
+        <span class="n">vect_validate_float_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">validate_float_value</span><span class="p">)</span>
+        <span class="n">float_array_input</span> <span class="o">=</span> <span class="n">vect_validate_float_value</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span>
+                                                      <span class="n">greater_than</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                      <span class="n">less_than</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_list"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_list">[docs]</a><span class="k">def</span> <span class="nf">validate_list</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span>
+                  <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to validate that a list is valid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check. If it not a list, attempt to change it into one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">input_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input list cannot be turned into a list.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check optional conditions if provided.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check optional input.</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">validate_int_value</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span> <span class="o">!=</span> <span class="n">length</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;The input list is not the correct length.&#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">input_list</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_tuple"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_tuple">[docs]</a><span class="k">def</span> <span class="nf">validate_tuple</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">,</span>
+                   <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to validate that a tuple is valid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check. If it not a tuple, attempt to change it into one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">input_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input tuple cannot be turned into a tuple.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check optional conditions if provided.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check optional input.</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">validate_int_value</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">)</span> <span class="o">!=</span> <span class="n">length</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;The input tuple is not the correct length.&#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_string"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_string">[docs]</a><span class="k">def</span> <span class="nf">validate_string</span><span class="p">(</span><span class="n">input_string</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contain_substr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this function is to determine if a string is valid. The </span>
+<span class="sd">    length of the string can also be tested. If the string contains a substring </span>
+<span class="sd">    can also be tested. Due to oddities of strings, this function may return </span>
+<span class="sd">    back false errors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Type check. If not string, attempt to turn it into one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">input_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input string cannot be turned into a string.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check for optional conditions.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Type check.</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">validate_int_value</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span> <span class="o">!=</span> <span class="n">length</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s1">&#39;Input string is not the correct length.&#39;</span>
+                             <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">  Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;    --Kyubey&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">act</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">input_string</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">contain_substr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">contain_substr</span> <span class="o">=</span> <span class="n">validate_list</span><span class="p">(</span><span class="n">contain_substr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">substr</span> <span class="ow">in</span> <span class="n">input_string</span> <span class="k">for</span> <span class="n">substr</span> <span class="ow">in</span> <span class="n">contain_substr</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input string does not contain given &#39;</span>
+                                 <span class="s1">&#39;substrings.&#39;</span>
+                                 <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">contain_substr</span> <span class="o">=</span> <span class="n">validate_string</span><span class="p">(</span><span class="n">contain_substr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">contain_substr</span> <span class="ow">in</span> <span class="n">input_string</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input string does not contain given &#39;</span>
+                                 <span class="s1">&#39;substring.&#39;</span>
+                                 <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_function_call"><a class="viewcode-back" href="../../Robustness.validation.html#Robustness.validation.validate_function_call">[docs]</a><span class="k">def</span> <span class="nf">validate_function_call</span><span class="p">(</span><span class="n">input_function</span><span class="p">,</span>
+                           <span class="n">n_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the input function is a valid callable function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Type check, test if the input function is callable.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">callable</span><span class="p">(</span><span class="n">input_function</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input function is not callable. This is an &#39;</span>
+                        <span class="s1">&#39;indication that it is not a function.&#39;</span>
+                        <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Type check the optional parameters.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">n_parameters</span> <span class="o">=</span> <span class="n">validate_int_value</span><span class="p">(</span><span class="n">n_parameters</span><span class="p">,</span><span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Inspect the function.</span>
+        <span class="n">input_function_sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">input_function</span><span class="p">)</span>
+        <span class="n">input_function_params</span> <span class="o">=</span> <span class="n">input_function_sig</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_function_params</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_parameters</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Function does not have the correct number of &#39;</span>
+                            <span class="s1">&#39;expected parameters. &#39;</span>
+                            <span class="s1">&#39;Expected: </span><span class="si">{expt}</span><span class="s1">   Actual: </span><span class="si">{act}</span><span class="s1">&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expt</span><span class="o">=</span><span class="n">n_parameters</span><span class="p">,</span>
+                                    <span class="n">act</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">input_function_params</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">input_function</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

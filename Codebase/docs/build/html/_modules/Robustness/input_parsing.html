@@ -1,0 +1,205 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Robustness.input_parsing &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Robustness.input_parsing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The purpose of this function is that inputs are parsed correctly.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="nn">sy</span>
+
+<span class="kn">import</span> <span class="nn">Robustness</span> <span class="k">as</span> <span class="nn">Robust</span>
+
+
+<div class="viewcode-block" id="user_equation_parse"><a class="viewcode-back" href="../../Robustness.input_parsing.html#Robustness.input_parsing.user_equation_parse">[docs]</a><span class="k">def</span> <span class="nf">user_equation_parse</span><span class="p">(</span><span class="n">user_eq_input</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert input implicit equation into a function.</span>
+
+<span class="sd">    This function returns a functional form of a user&#39;s input expression. </span>
+<span class="sd">    Only standard python math functions are to be used, and nothing else. </span>
+<span class="sd">    The functional form will be in return f(x), for the user inputs some string</span>
+<span class="sd">    for f(x). Variables is a string tuple that contains the list of variables </span>
+<span class="sd">    expected in the equation parse.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    user_eq_input : string or function</span>
+<span class="sd">        This is the wanted string or function to be converted. If it is a </span>
+<span class="sd">        function, there is simple verification before passing it back.</span>
+<span class="sd">    variables : tuple of strings</span>
+<span class="sd">        This is the symbols within the equation for parsing as the input (e.g. </span>
+<span class="sd">        the ``x`` and ``y`` in ``f(x,y)``)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    function : function</span>
+<span class="sd">        A callable function that executes the mathematical expression given in</span>
+<span class="sd">        the string. The order of parameters from variables are kept.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    DangerWarning : Warning</span>
+<span class="sd">        This is used because the eval() function is used in this code.</span>
+<span class="sd">    TerminateError : BaseException</span>
+<span class="sd">        This is done if the verification of the continuation of the program</span>
+<span class="sd">        fails.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function does use the eval function and excessive precautions are</span>
+<span class="sd">    used. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Find the number of variables expected, and map to required inputs.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_tuple</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">n_variables</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Double check input variable stipulations:   </span><span class="si">{input}</span><span class="s1">&#39;</span>
+              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">variables</span><span class="p">)))</span>
+        <span class="k">raise</span>
+
+    <span class="c1"># Type check.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user_eq_input</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span><span class="n">user_eq_input</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Test to see if the user input a function instead for whatever</span>
+            <span class="c1"># reason.</span>
+            <span class="n">user_eq_input</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span>
+                <span class="n">user_eq_input</span><span class="p">,</span> <span class="n">n_parameters</span><span class="o">=</span><span class="n">n_variables</span><span class="p">)</span>
+
+            <span class="c1"># If it hits here, the user has input their own function. This</span>
+            <span class="c1"># could be dangerous, warn the user.</span>
+            <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">kyubey_warning</span><span class="p">(</span><span class="n">Robust</span><span class="o">.</span><span class="n">DangerWarning</span><span class="p">,</span>
+                                        <span class="p">(</span><span class="s1">&#39;It has been detected that an input &#39;</span>
+                                         <span class="s1">&#39;string for equation parsing is &#39;</span>
+                                         <span class="s1">&#39;actually a function with the &#39;</span>
+                                         <span class="s1">&#39;following name: &#39;</span>
+                                         <span class="s1">&#39;</span><span class="si">{funt_name}</span><span class="s1">. If this is correct, &#39;</span>
+                                         <span class="s1">&#39;continue with prompt.&#39;</span>
+                                         <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">),</span>
+                                        <span class="n">input_halt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># This is chancy, and should be avoided.</span>
+            <span class="k">return</span> <span class="n">user_eq_input</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># It seems it is not a function either. Raise the user once more.</span>
+            <span class="k">raise</span> <span class="n">Robust</span><span class="o">.</span><span class="n">InputError</span><span class="p">(</span><span class="s1">&#39;The string input cannot be turned into a &#39;</span>
+                                    <span class="s1">&#39;parseable function call.&#39;</span>
+                                    <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Else, try sympy methods or base methods.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># The string should be valid in equation form now. Define some symbols.</span>
+        <span class="n">sy_variables</span> <span class="o">=</span> <span class="n">sy</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">sy_variables</span> <span class="o">=</span> <span class="n">sy</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">sy_variables</span><span class="p">)</span>
+        <span class="c1"># Attempt to convert the string function input into a lambda equation.</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="n">sy</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">lambdify</span><span class="p">(</span><span class="n">sy_variables</span><span class="p">,</span> <span class="nb">eval</span><span class="p">(</span><span class="n">user_eq_input</span><span class="p">))</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># It does not seem like it can be done with Sympy. Try with base</span>
+        <span class="c1"># functionality, but, also be very cautious.</span>
+        <span class="n">variable_string</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">variabledex</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="n">variable_string</span> <span class="o">+=</span> <span class="n">variabledex</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span>
+        <span class="c1"># Knock off the extra &#39;,&#39;</span>
+        <span class="n">variable_string</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">variable_string</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Define the execute function line.</span>
+        <span class="n">eval_string</span> <span class="o">=</span> <span class="s1">&#39;lambda &#39;</span> <span class="o">+</span> <span class="n">variable_string</span> <span class="o">+</span> <span class="s1">&#39; : &#39;</span> <span class="o">+</span> <span class="n">user_eq_input</span>
+
+        <span class="c1"># Warn the user before executing the execution of the string just in</span>
+        <span class="c1"># case.</span>
+        <span class="n">Robust</span><span class="o">.</span><span class="n">kyubey_warning</span><span class="p">(</span><span class="n">Robust</span><span class="o">.</span><span class="n">DangerWarning</span><span class="p">,</span>
+                              <span class="p">(</span><span class="s1">&#39;The following string is going to be passed &#39;</span>
+                               <span class="s1">&#39;through the &quot;eval&quot; function. Is it safe to &#39;</span>
+                               <span class="s1">&#39;pass this string? </span><span class="se">\n</span><span class="s1"> &#39;</span>
+                               <span class="s1">&#39;&lt; </span><span class="si">{eval_str}</span><span class="s1"> &gt; </span><span class="se">\n</span><span class="s1"> &#39;</span>
+                               <span class="s1">&#39;    --Kyubey&#39;</span>
+                               <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eval_str</span><span class="o">=</span><span class="n">eval_string</span><span class="p">)),</span>
+                              <span class="n">input_halt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># If the user is very sure.</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">eval_string</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">function</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

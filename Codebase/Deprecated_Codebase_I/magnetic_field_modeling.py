@@ -56,8 +56,8 @@ def combine_hourglass_circular(percent_hg_to_cr,
         Hourglass and circular function magnetic field function.
 
         Hourglass contribution: {hg_percent_str} 
-            Hourglass function parameters:
-        --------------------------------------
+            Hourglass function Parameters
+        -----------------------------------
             center      =  {hg_center_str}
             h           =  {h_str}
             k_array     =  {k_array_str}
@@ -65,8 +65,8 @@ def combine_hourglass_circular(percent_hg_to_cr,
             uniform_B0  =  {uniform_B0_str}
         
         Circular contribution: {cr_percent_str}
-            Circular function parameters:
-        --------------------------------------
+            Circular function Parameters
+        -----------------------------------
             center      =  {cr_center_str}
             cir_funct   =  {cir_function_str}
         """.format(

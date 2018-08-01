@@ -1,0 +1,913 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>model_observing &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model_observing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Model observing, this module is built to simulate actual observing. The </span>
+<span class="sd">object is known, and given sight parameters, the data is given. In particular,</span>
+<span class="sd">these functions actually give the values of terms derived from the object</span>
+<span class="sd">model also provided.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">astropy</span> <span class="k">as</span> <span class="nn">ap</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">ap_u</span>
+<span class="kn">import</span> <span class="nn">astropy.coordinates</span> <span class="k">as</span> <span class="nn">ap_coord</span>
+
+<span class="kn">import</span> <span class="nn">Robustness</span> <span class="k">as</span> <span class="nn">Robust</span>
+<span class="kn">import</span> <span class="nn">Backend</span> <span class="k">as</span> <span class="nn">_Backend</span>
+
+<span class="kn">import</span> <span class="nn">data_systematization</span> <span class="k">as</span> <span class="nn">d_systize</span>
+
+
+<div class="viewcode-block" id="Sightline"><a class="viewcode-back" href="../model_observing.html#model_observing.Sightline">[docs]</a><span class="k">class</span> <span class="nc">Sightline</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a sightline. It contains the information for a given sightline</span>
+<span class="sd">    through space. The sightline is always given by the RA and DEC values. </span>
+
+<span class="sd">    The notation for the accepted values of RA and DEC is found in the </span>
+<span class="sd">    Astropy module&#39;s SkyCord class.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    self.coordinates : Astropy SkyCord object.</span>
+<span class="sd">        This is the sky coordinates of the sightline.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    sightline_parameters() : function (returns | ndarray,ndarray)</span>
+<span class="sd">        This method returns back both the sightline&#39;s center and slopes for</span>
+<span class="sd">        an actual geometrical representation of the line. Converting from </span>
+<span class="sd">        the equatorial coordinate system to the cartesian coordinate system.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">right_ascension</span><span class="p">,</span> <span class="n">declination</span><span class="p">,</span>
+                 <span class="n">Skycord_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialization of a sightline.</span>
+
+<span class="sd">        The creates the sightline&#39;s main parameters, the defineing elements</span>
+<span class="sd">        of the sightline is the location that it is throughout space. This</span>
+<span class="sd">        is a specific wrapper around SkyCord.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        right_ascension : string</span>
+<span class="sd">            The right ascension value for the sightline. This term must be </span>
+<span class="sd">            formatted in the Astropy SkyCord format: `` &#39;00h00m00.00s&#39; ``.</span>
+<span class="sd">            For the values of the seconds are decimal and may extend to any </span>
+<span class="sd">            precision.</span>
+<span class="sd">        declination : string</span>
+<span class="sd">            The declination value for the sightline. This term must be </span>
+<span class="sd">            formatted in the Astropy SkyCord format: `` &#39;±00d00m00.00s&#39; ``.</span>
+<span class="sd">            For the values of the seconds are decimal and may extend to any </span>
+<span class="sd">            precision.</span>
+<span class="sd">        Skycord_object : SkyCord object; optional</span>
+<span class="sd">            It may be easier to also just pass an Astropy Skycord object in</span>
+<span class="sd">            general. The other strings are ignored if it is successful.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ra_wrap_angle : float; optional</span>
+<span class="sd">            This angle, in radians, specifies where the RA values should wrap.</span>
+<span class="sd">            Wrapping is considered to be very bad and should be avoided. </span>
+<span class="sd">            Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Type check.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">Skycord_object</span><span class="p">,</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">)):</span>
+            <span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">Skycord_object</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Type check for RA and dec before conversion</span>
+            <span class="n">right_ascension</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span><span class="n">right_ascension</span><span class="p">)</span>
+            <span class="n">declination</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span><span class="n">declination</span><span class="p">)</span>
+            <span class="c1"># Convert the strings to sky cords.</span>
+            <span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">(</span><span class="n">right_ascension</span><span class="p">,</span>
+                                                <span class="n">declination</span><span class="p">,</span>
+                                                <span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">)</span>
+        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">ra_wrap_angle</span><span class="p">)</span>
+        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span> <span class="o">*</span> <span class="n">ap_u</span><span class="o">.</span><span class="n">rad</span>
+
+        <span class="c1"># Define the member arguments.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">sky_coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span>
+
+<div class="viewcode-block" id="Sightline.sightline_parameters"><a class="viewcode-back" href="../model_observing.html#model_observing.Sightline.sightline_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">sightline_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; This function returns the sightline linear parameters.</span>
+
+<span class="sd">        The sightline is by definition always parallel to the x-axis </span>
+<span class="sd">        of the object to be observed. The plane of the sky is the yz-plane</span>
+<span class="sd">        of the object. This function returns first the central defining</span>
+<span class="sd">        point, then the deltas for the equation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sightline_center : ndarray</span>
+<span class="sd">            This returns a cartsian point based on the approximation </span>
+<span class="sd">            that, if the x-axis and the r-axis are the same of cartesian </span>
+<span class="sd">            and spherical cordinates, then so too are the yz-plane and the </span>
+<span class="sd">            theta-phi plane. </span>
+<span class="sd">        sightline_slopes : ndarray</span>
+<span class="sd">            This returns the slopes of the cartesian point values given </span>
+<span class="sd">            by the center. Because of the approximation from above, it is </span>
+<span class="sd">            always [1,0,0].</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The coordinates of the sightline in relation to the object are as</span>
+<span class="sd">        follows:</span>
+
+<span class="sd">        - The x-axis of the object is equal to the r-axis of the telescope. Both pointing away from the telescope, deeper into space.</span>
+<span class="sd">        - The y-axis of the object is equal to the RA-axis/phi-axis of the </span>
+<span class="sd">        telescope, westward (as y increases, RA decreases)</span>
+<span class="sd">        - The z-axis of the object is equal to the DEC-axis of the telescope. It is also equal to the negative of the theta-axis </span>
+<span class="sd">        when it is centered on theta = pi/2. Points north-south of the </span>
+<span class="sd">        telescope.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Work in radians.</span>
+        <span class="n">ra_radians</span><span class="p">,</span> <span class="n">dec_radians</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radianize_coordinates</span><span class="p">()</span>
+
+        <span class="n">sightline_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ra_radians</span><span class="p">,</span> <span class="n">dec_radians</span><span class="p">])</span>
+        <span class="n">sightline_slopes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">sightline_center</span><span class="p">,</span> <span class="n">sightline_slopes</span></div>
+
+    <span class="k">def</span> <span class="nf">_radianize_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method returns the RA and DEC in radians.</span>
+
+<span class="sd">        This method converts the RA and DEC coordinate measurements into</span>
+<span class="sd">        radians for better accounting.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ra_radians : float</span>
+<span class="sd">            The RA coordinate in radians.</span>
+<span class="sd">        dec_radians : float</span>
+<span class="sd">            The DEC coordinate in radians.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Change the wrapping location if necessary. Astropy requires a unit.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">wrap_angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span>
+
+        <span class="n">ra_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">12</span><span class="p">))</span>
+        <span class="n">dec_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ra_radians</span><span class="p">,</span> <span class="n">dec_radians</span></div>
+
+
+<div class="viewcode-block" id="ProtostarModel"><a class="viewcode-back" href="../model_observing.html#model_observing.ProtostarModel">[docs]</a><span class="k">class</span> <span class="nc">ProtostarModel</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is an object that represents a model of an object in space. It</span>
+<span class="sd">    contains all the required functions and parameters associated with </span>
+<span class="sd">    one of the objects that would be observed for polarimetry data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    self.coordinates : Astropy SkyCord object</span>
+<span class="sd">        This is the coordinates of the object that this class defines.</span>
+<span class="sd">    self.cloud_model : function</span>
+<span class="sd">        This is an implicit function (or a numerical approximation thereof) of </span>
+<span class="sd">        the shape of the protostar cloud. </span>
+<span class="sd">    self.magnetic_field : function</span>
+<span class="sd">        This is an implicit function (or a numerical approximation thereof) of </span>
+<span class="sd">        the shape of the magnetic field.</span>
+<span class="sd">    self.density_model : function</span>
+<span class="sd">        This is an implicit function (or a numerical approximation thereof) of</span>
+<span class="sd">        the shape of the density model of the cloud.</span>
+<span class="sd">    self.polarization_model : function</span>
+<span class="sd">        This is an implicit function (or a numerical approximation thereof) of </span>
+<span class="sd">        the polarization model of the cloud.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">cloud_model</span><span class="p">,</span> <span class="n">magnetic_field_model</span><span class="p">,</span>
+                 <span class="n">density_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">polarization_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">zeros_guess_count</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Object form of a model object to be observed.</span>
+
+<span class="sd">        This is the object representation of an object in the sky. The </span>
+<span class="sd">        required terms are present.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        coordinates : Astropy SkyCord object</span>
+<span class="sd">            These are the coordinates of the observation object. It is up</span>
+<span class="sd">            to the user to put as complete information as possible.</span>
+<span class="sd">        cloud_model : function or string,</span>
+<span class="sd">            An implicit equation of the cloud. The origin of this equation </span>
+<span class="sd">            must also be the coordinate specified by self.coordinates. Must</span>
+<span class="sd">            be cartesian in the form ``f(x,y,z) = 0``, for the function or</span>
+<span class="sd">            string is ``f(x,y,z)``. The x-axis is always aligned with a </span>
+<span class="sd">            telescope as it is the same as a telescope&#39;s r-axis.</span>
+<span class="sd">        magnetic_field_model : function or InterpolationTable</span>
+<span class="sd">            A function that, given a single point in cartesian space, will </span>
+<span class="sd">            return the value of the magnitude of the magnetic field&#39;s three </span>
+<span class="sd">            orthogonal vectors in xyz-space. If an interpolation table is </span>
+<span class="sd">            given, a numerical approximation function will be used instead.</span>
+<span class="sd">        density_model : function or string, or InterpolationTable; optional</span>
+<span class="sd">            A function that, given a point in cartesian space, will return</span>
+<span class="sd">            a value pertaining to the density of the gas/dust within at that</span>
+<span class="sd">            point. Defaults to uniform. If an interpolation table is </span>
+<span class="sd">            given, a numerical approximation function will be used instead.</span>
+<span class="sd">        polarization_model: function, string, float or InterpolationTable; optional</span>
+<span class="sd">            This is the percent of polarization of the light. Either given as </span>
+<span class="sd">            a function (or string representing a function) ``f(x,y,z)``, or </span>
+<span class="sd">            as a constant float value. Default is uniform value of 1. If an </span>
+<span class="sd">            interpolation table is given, a numerical approximation function </span>
+<span class="sd">            will be used instead.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ra_wrap_angle : float; optional</span>
+<span class="sd">            This angle, in radians, specifies where the RA values should wrap.</span>
+<span class="sd">            Wrapping is considered to be very bad and should be avoided. </span>
+<span class="sd">            Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)</span>
+<span class="sd">        zeros_guess_count : int; optional</span>
+<span class="sd">            This value stipulates how many spread out test points there should </span>
+<span class="sd">            be when finding sightline intersection points. A higher number </span>
+<span class="sd">            should be used for complex shapes. Defaults at 100.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialization of boolean checks.</span>
+        <span class="c1"># Check if the user input a interpolated data table instead of a </span>
+        <span class="c1"># function. The integration method must change if so.</span>
+        <span class="n">input_interpolated_tables</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Type check</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The input for coordinates must be an Astropy &#39;</span>
+                            <span class="s1">&#39;SkyCord object.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">callable</span><span class="p">(</span><span class="n">cloud_model</span><span class="p">)):</span>
+            <span class="n">cloud_model</span> <span class="o">=</span> \
+                <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">cloud_model</span><span class="p">,</span>
+                                                    <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">cloud_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">cloud_model</span> <span class="o">=</span> \
+                <span class="n">Robust</span><span class="o">.</span><span class="n">inparse</span><span class="o">.</span><span class="n">user_equation_parse</span><span class="p">(</span><span class="n">cloud_model</span><span class="p">,</span>
+                                                   <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The input for the cloud equation must either &#39;</span>
+                            <span class="s1">&#39;be a callable function or a string that can &#39;</span>
+                            <span class="s1">&#39;be converted into an implicit callable function.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Test magnetic field model.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">callable</span><span class="p">(</span><span class="n">magnetic_field_model</span><span class="p">)):</span>
+            <span class="n">magnetic_field_model</span> <span class="o">=</span> \
+                <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">magnetic_field_model</span><span class="p">,</span>
+                                                    <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">magnetic_field_model</span><span class="p">,</span> <span class="n">d_systize</span><span class="o">.</span><span class="n">InterpolationTable</span><span class="p">)):</span>
+            <span class="c1"># The user has inputted an interpolation table, record such.</span>
+            <span class="n">input_interpolated_tables</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">magnetic_field_model</span><span class="o">.</span><span class="n">classification</span> <span class="o">==</span> <span class="s1">&#39;vector&#39;</span><span class="p">):</span>
+                <span class="n">magnetic_field_model</span> <span class="o">=</span> \
+                    <span class="n">magnetic_field_model</span><span class="o">.</span><span class="n">numerical_function</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The magnetic field lookup table must be a &#39;</span>
+                                <span class="s1">&#39;vector based table. It is currently a &#39;</span>
+                                <span class="s1">&#39;&lt; </span><span class="si">{tb}</span><span class="s1"> &gt; based table.&#39;</span>
+                                <span class="s1">&#39;    --Kyubey&#39;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tb</span><span class="o">=</span><span class="n">magnetic_field_model</span><span class="o">.</span><span class="n">classification</span><span class="p">))</span>
+
+        <span class="c1"># Test density model.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">callable</span><span class="p">(</span><span class="n">density_model</span><span class="p">)):</span>
+            <span class="n">density_model</span> <span class="o">=</span> \
+                <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">density_model</span><span class="p">,</span>
+                                                    <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">density_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">density_model</span> <span class="o">=</span> \
+                <span class="n">Robust</span><span class="o">.</span><span class="n">inparse</span><span class="o">.</span><span class="n">user_equation_parse</span><span class="p">(</span><span class="n">density_model</span><span class="p">,</span>
+                                                   <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">density_model</span><span class="p">,</span> <span class="n">d_systize</span><span class="o">.</span><span class="n">InterpolationTable</span><span class="p">)):</span>
+            <span class="c1"># The user has inputted an interpolation table, record such.</span>
+            <span class="n">input_interpolated_tables</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">density_model</span><span class="o">.</span><span class="n">classification</span> <span class="o">==</span> <span class="s1">&#39;scalar&#39;</span><span class="p">):</span>
+                <span class="n">density_model</span> <span class="o">=</span> <span class="n">density_model</span><span class="o">.</span><span class="n">numerical_function</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The density model lookup table must be a &#39;</span>
+                                <span class="s1">&#39;scalar based table. It is currently a &#39;</span>
+                                <span class="s1">&#39;&lt; </span><span class="si">{tb}</span><span class="s1"> &gt; based table.&#39;</span>
+                                <span class="s1">&#39;    --Kyubey&#39;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tb</span><span class="o">=</span><span class="n">density_model</span><span class="o">.</span><span class="n">classification</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">density_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># The user likely did not input a density model, the default</span>
+            <span class="c1"># is uniform distribution.</span>
+            <span class="k">def</span> <span class="nf">uniform_density_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">density_model</span> <span class="o">=</span> <span class="n">uniform_density_function</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The input for the density equation must either &#39;</span>
+                            <span class="s1">&#39;be a callable function or a string that can &#39;</span>
+                            <span class="s1">&#39;be converted into an implicit callable function.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+        <span class="c1"># Test polarization model factor</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">callable</span><span class="p">(</span><span class="n">polarization_model</span><span class="p">)):</span>
+            <span class="n">polarization_model</span> <span class="o">=</span> \
+                <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">polarization_model</span><span class="p">,</span>
+                                                    <span class="n">n_parameters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">polarization_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">polarization_model</span> <span class="o">=</span> \
+                <span class="n">Robust</span><span class="o">.</span><span class="n">inparse</span><span class="o">.</span><span class="n">user_equation_parse</span><span class="p">(</span><span class="n">polarization_model</span><span class="p">,</span>
+                                                   <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">polarization_model</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))):</span>
+            <span class="n">percent_polarized</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">polarization_model</span><span class="p">))</span>
+            <span class="c1"># The user desires a constant value for the percent polarization.</span>
+            <span class="k">def</span> <span class="nf">constant_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span> 
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">percent_polarized</span><span class="p">)</span>
+            <span class="n">polarization_model</span> <span class="o">=</span> <span class="n">constant_function</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">polarization_model</span><span class="p">,</span> <span class="n">d_systize</span><span class="o">.</span><span class="n">InterpolationTable</span><span class="p">)):</span>
+            <span class="c1"># The user has inputted an interpolation table, record such.</span>
+            <span class="n">input_interpolated_tables</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">polarization_model</span><span class="o">.</span><span class="n">classification</span> <span class="o">==</span> <span class="s1">&#39;scalar&#39;</span><span class="p">):</span>
+                <span class="n">polarization_model</span> <span class="o">=</span> <span class="n">polarization_model</span><span class="o">.</span><span class="n">numerical_function</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The polarization model lookup table must be &#39;</span>
+                                <span class="s1">&#39;a scalar based table. It is currently a &#39;</span>
+                                <span class="s1">&#39;&lt; </span><span class="si">{tb}</span><span class="s1"> &gt; based table.&#39;</span>
+                                <span class="s1">&#39;    --Kyubey&#39;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tb</span><span class="o">=</span><span class="n">polarization_model</span><span class="o">.</span><span class="n">classification</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">polarization_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># The user likely did not input a density model, the default</span>
+            <span class="c1"># is uniform total distribution.</span>
+            <span class="k">def</span> <span class="nf">uniform_polarization_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">polarization_model</span> <span class="o">=</span> <span class="n">uniform_polarization_function</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The input for the polarization model must either &#39;</span>
+                            <span class="s1">&#39;be a callable function, a string that can &#39;</span>
+                            <span class="s1">&#39;be converted into an implicit callable function,&#39;</span>
+                            <span class="s1">&#39;or a constant float/int value.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">ra_wrap_angle</span><span class="p">)</span>
+        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span> <span class="o">*</span> <span class="n">ap_u</span><span class="o">.</span><span class="n">rad</span>
+
+        <span class="n">zeros_guess_count</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_int_value</span><span class="p">(</span><span class="n">zeros_guess_count</span><span class="p">,</span>
+                                                            <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cloud_model</span> <span class="o">=</span> <span class="n">cloud_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">magnetic_field</span> <span class="o">=</span> <span class="n">magnetic_field_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">density_model</span> <span class="o">=</span> <span class="n">density_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polarization_model</span> <span class="o">=</span> <span class="n">polarization_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interpolated_tables</span> <span class="o">=</span> <span class="n">input_interpolated_tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zeros_guess_count</span> <span class="o">=</span> <span class="n">zeros_guess_count</span>
+
+    <span class="k">def</span> <span class="nf">_radianize_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This method returns the RA and DEC in radians.</span>
+
+<span class="sd">        This method converts the RA and DEC coordinate measurements into</span>
+<span class="sd">        radians for better accounting.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        ra_radians : float</span>
+<span class="sd">            The RA coordinate in radians.</span>
+<span class="sd">        dec_radians : float</span>
+<span class="sd">            The DEC coordinate in radians.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Change the wrapping location if necessary. Astropy requires a unit.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">wrap_angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span>
+
+        <span class="n">ra_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">12</span><span class="p">))</span>
+        <span class="n">dec_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ra_radians</span><span class="p">,</span> <span class="n">dec_radians</span></div>
+
+
+<div class="viewcode-block" id="ObservingRun"><a class="viewcode-back" href="../model_observing.html#model_observing.ObservingRun">[docs]</a><span class="k">class</span> <span class="nc">ObservingRun</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Execute a mock observing run of an object. </span>
+
+<span class="sd">    This class is the main model observations of an object. Taking a </span>
+<span class="sd">    central sightline and the field of view, it then gives back a set of </span>
+<span class="sd">    plots, similar to those that an observer would see after data reduction.</span>
+
+<span class="sd">    The class itself does the computation in its methods, returning back </span>
+<span class="sd">    a heatmap/contour object plot from the observing depending on the method.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    self.observe_target : ProtostarModel object</span>
+<span class="sd">        The model target for simulated observing. Conceptually, the object</span>
+<span class="sd">        that the telescope observes.</span>
+<span class="sd">    self.sightline : Sightline object</span>
+<span class="sd">        The primary sightline that is used for the model observing, </span>
+<span class="sd">        conceptually where the telescope is aimed at.</span>
+<span class="sd">    self.field_of_view : float</span>
+<span class="sd">        The field of view value of the observation, given as the length</span>
+<span class="sd">        of the observing chart.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    Stokes_parameter_contours() : function {returns | ndarray,ndarray}</span>
+<span class="sd">        Compute the value of Stoke parameters at random sightlines from the</span>
+<span class="sd">        primary sightline and plot them. Returns the values that was used </span>
+<span class="sd">        to plot.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observe_target</span><span class="p">,</span> <span class="n">sightline</span><span class="p">,</span> <span class="n">field_of_view</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Doing an observing run.</span>
+
+<span class="sd">        Create an observing run object, compiling the primary sightline and</span>
+<span class="sd">        the field of view. </span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        observe_target : ProtostarModel object</span>
+<span class="sd">            This is the object to be observed. </span>
+<span class="sd">        sightline : Sightline object</span>
+<span class="sd">            This is the primary sightline, in essence, where the telescope</span>
+<span class="sd">            is pointing in this simulation.</span>
+<span class="sd">        field_of_view : float</span>
+<span class="sd">            The width of the sky segment that is being observed. Must be in</span>
+<span class="sd">            radians. Applies to both RA and DEC evenly for a square image. </span>
+<span class="sd">            Seen range is `` (RA,DEC) ± field_of_view/2 ``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Basic type checking</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">observe_target</span><span class="p">,</span> <span class="n">ProtostarModel</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The observed target must be a ProtostarModel &#39;</span>
+                            <span class="s1">&#39;class object.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sightline</span><span class="p">,</span> <span class="n">Sightline</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The sightline must be a Sightline class object.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+        <span class="n">field_of_view</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">field_of_view</span><span class="p">,</span>
+                                                          <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Check if both objects have the same RA wraping angle. If not, then</span>
+        <span class="c1"># it is highly likely that the mapping will be incorrect.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">observe_target</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> <span class="o">!=</span> <span class="n">sightline</span><span class="o">.</span><span class="n">_ra_wrap_angle</span><span class="p">):</span>
+            <span class="n">Robust</span><span class="o">.</span><span class="n">kyubey_warning</span><span class="p">(</span><span class="n">Robust</span><span class="o">.</span><span class="n">AstronomyWarning</span><span class="p">,</span>
+                                  <span class="p">(</span><span class="s1">&#39;The RA wrapping angle for both objects &#39;</span>
+                                   <span class="s1">&#39;are different. This may result in &#39;</span>
+                                   <span class="s1">&#39;improper mapping during computations.&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Check if the object is actually within the field of view.</span>
+        <span class="n">obs_target_ra_radians</span><span class="p">,</span> <span class="n">obs_target_dec_radians</span> <span class="o">=</span> \
+            <span class="n">observe_target</span><span class="o">.</span><span class="n">_radianize_coordinates</span><span class="p">()</span>
+
+        <span class="n">sightline_ra_radians</span><span class="p">,</span> <span class="n">sightline_dec_radians</span> <span class="o">=</span> \
+            <span class="n">sightline</span><span class="o">.</span><span class="n">_radianize_coordinates</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="p">(((</span><span class="n">sightline_ra_radians</span> <span class="o">-</span> <span class="n">field_of_view</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+             <span class="o">&lt;=</span> <span class="n">obs_target_ra_radians</span> <span class="o">&lt;=</span>
+             <span class="p">(</span><span class="n">sightline_ra_radians</span> <span class="o">+</span> <span class="n">field_of_view</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span> <span class="ow">and</span>
+            <span class="p">((</span><span class="n">sightline_dec_radians</span> <span class="o">-</span> <span class="n">field_of_view</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+             <span class="o">&lt;=</span> <span class="n">obs_target_dec_radians</span> <span class="o">&lt;=</span>
+             <span class="p">(</span><span class="n">sightline_dec_radians</span> <span class="o">+</span> <span class="n">field_of_view</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)):</span>
+            <span class="c1"># If at this stage, it should be fine.</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Robust</span><span class="o">.</span><span class="n">AstronomyError</span><span class="p">(</span><span class="s1">&#39;Object is not within the sightline &#39;</span>
+                                        <span class="s1">&#39;and field of view. Please revise. &#39;</span>
+                                        <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Assign and create.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">observe_target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sightline</span> <span class="o">=</span> <span class="n">sightline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">field_of_view</span><span class="o">/</span><span class="mi">2</span>
+
+<div class="viewcode-block" id="ObservingRun.Stokes_parameter_contours"><a class="viewcode-back" href="../model_observing.html#model_observing.ObservingRun.Stokes_parameter_contours">[docs]</a>    <span class="k">def</span> <span class="nf">Stokes_parameter_contours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                  <span class="n">n_axial_samples</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This function produces a contour plot of the stoke values.</span>
+
+<span class="sd">        This function generates a large number of random sightlines to </span>
+<span class="sd">        traceout contour information of the of the fields. From </span>
+<span class="sd">        there, is creates and returns a contour plot.</span>
+
+<span class="sd">        The values of the intensity, I, the two polarization values, Q,U, and</span>
+<span class="sd">        the polarization intensity, hypt(Q,U) is plotted.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_axial_samples : int; optional</span>
+<span class="sd">            The number of points along one RA or DEC axis to be sampled. The</span>
+<span class="sd">            resulting sample is a mesh n**2 between the bounds. Default is 25.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple(ndarray) : ra_dec_array</span>
+<span class="sd">            This is a tuple of the values of the RA and DEC of the random</span>
+<span class="sd">            sightlines (arranged in parallel arrays).</span>
+<span class="sd">        tuple(ndarray) : stokes_parameters</span>
+<span class="sd">            This is a tuple of ndarrays of the stoke parameters calculated by </span>
+<span class="sd">            the random sightlines.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Type check</span>
+        <span class="n">n_axial_samples</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_int_value</span><span class="p">(</span><span class="n">n_axial_samples</span><span class="p">,</span>
+                                                          <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Make a plotting background.</span>
+        <span class="n">fig1</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">,</span> <span class="n">ax4</span><span class="p">,</span> <span class="n">ax5</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span>
+                                                       <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                                       <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Extract Stokes parameter data.</span>
+        <span class="n">stokes_parameters</span><span class="p">,</span> <span class="n">ra_dec_array</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Stoke_parameters</span><span class="p">(</span><span class="n">n_axial_samples</span><span class="p">)</span>
+
+        <span class="c1"># Decompose the stokes parameters into I,Q,U,V along with the angle</span>
+        <span class="c1"># of polarization.</span>
+        <span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">stokes_parameters</span>
+        <span class="n">polar_I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">U</span><span class="p">)</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">efp</span><span class="o">.</span><span class="n">angle_from_Stokes_parameters</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">U</span><span class="p">)</span>
+
+        <span class="c1"># Arrange the values into plottable values. The x-axis is RA, and the</span>
+        <span class="c1"># y-axis is DEC.</span>
+        <span class="n">plotting_x_axis</span> <span class="o">=</span> <span class="n">ra_dec_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">plotting_y_axis</span> <span class="o">=</span> <span class="n">ra_dec_array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Extrapolate and plot a contour based on irregularly spaced data.</span>
+        <span class="n">ax1_o</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">plotting_x_axis</span><span class="p">,</span> <span class="n">plotting_y_axis</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">ax2_o</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">plotting_x_axis</span><span class="p">,</span> <span class="n">plotting_y_axis</span><span class="p">,</span> <span class="n">polar_I</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">ax3_o</span> <span class="o">=</span> <span class="n">ax3</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">plotting_x_axis</span><span class="p">,</span> <span class="n">plotting_y_axis</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">ax4_o</span> <span class="o">=</span> <span class="n">ax4</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">plotting_x_axis</span><span class="p">,</span> <span class="n">plotting_y_axis</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">ax5_o</span> <span class="o">=</span> <span class="n">ax5</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">plotting_x_axis</span><span class="p">,</span> <span class="n">plotting_y_axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="c1"># Assign titles.</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Total Intensity&#39;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Polar Intensity&#39;</span><span class="p">)</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Q Values&#39;</span><span class="p">)</span>
+        <span class="n">ax4</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;U Values&#39;</span><span class="p">)</span>
+        <span class="n">ax5</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Angle&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Assign a color bar legends</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ax1_o</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ax2_o</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ax3_o</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax3</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ax4_o</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax4</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ax5_o</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax5</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="c1"># Just in case they want to play with the data.</span>
+        <span class="k">return</span> <span class="n">ra_dec_array</span><span class="p">,</span> <span class="n">stokes_parameters</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_integrated_intensity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sightline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the total strength of the light/E-field.</span>
+
+<span class="sd">        Given a sightline independent of the primary one, this function </span>
+<span class="sd">        computes the integrated value of the magnitude of the E-field. It</span>
+<span class="sd">        is assumed that the magnitude of the E-field is directly related to </span>
+<span class="sd">        energy given by the Poynting vector.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sightline : Sightline object</span>
+<span class="sd">            The sightline through which the intensity will be calculated </span>
+<span class="sd">            through, using the density function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        integrated_intensity : float</span>
+<span class="sd">            The total integrated intensity.</span>
+<span class="sd">        polarized_integrated_intensity : float</span>
+<span class="sd">            The total integrated intensity from polarization contribution,</span>
+<span class="sd">            given by the polarization model function.</span>
+<span class="sd">        error : float</span>
+<span class="sd">            The error of the integrated intensity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Basic type checking.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sightline</span><span class="p">,</span> <span class="n">Sightline</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The sightline must be a sightline object.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Extract information about the target. The coefficient is rather</span>
+        <span class="c1"># arbitrary.</span>
+        <span class="n">box_width</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span>
+
+        <span class="c1"># Extract sightline information</span>
+        <span class="n">sightline_center</span><span class="p">,</span> <span class="n">sightline_slopes</span> <span class="o">=</span> <span class="n">sightline</span><span class="o">.</span><span class="n">sightline_parameters</span><span class="p">()</span>
+
+        <span class="c1"># If the Protostar model contains an interpolation table instead of</span>
+        <span class="c1"># a normal function. Assume the usage of a Simpson&#39;s integration.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_interpolated_tables</span><span class="p">):</span>
+            <span class="n">integral_method</span> <span class="o">=</span> <span class="s1">&#39;simpsons&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">integral_method</span> <span class="o">=</span> <span class="s1">&#39;scipy&#39;</span>
+
+        <span class="c1"># Integration function with a polarization dependence, as the amount of</span>
+        <span class="c1"># polarization influences. The polarization model must be sqrt(f(x))</span>
+        <span class="c1"># because the user expects a I_p = I_t * p, while the most efficient</span>
+        <span class="c1"># method of implementation (modifying the E-fields), produces a</span>
+        <span class="c1"># relationship of I_p = I_t * p**2.</span>
+        <span class="k">def</span> <span class="nf">polarization_intensity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">density_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                     <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">polarization_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))))</span>
+            <span class="k">return</span> <span class="n">total</span>
+
+        <span class="c1"># Integrate over the density function.</span>
+        <span class="n">integrated_intensity</span><span class="p">,</span> <span class="n">int_error</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">cloud_line_integral</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">density_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">cloud_model</span><span class="p">,</span>
+            <span class="n">sightline_center</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span> 
+            <span class="n">view_line_deltas</span><span class="o">=</span><span class="n">sightline_slopes</span><span class="p">,</span>
+            <span class="n">n_guesses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_zeros_guess_count</span><span class="p">,</span>
+            <span class="n">integral_method</span><span class="o">=</span><span class="n">integral_method</span><span class="p">)</span>
+
+        <span class="c1"># Also find out the total polarized intensity.</span>
+        <span class="n">polarized_integrated_intensity</span><span class="p">,</span> <span class="n">pol_error</span> <span class="o">=</span> \
+            <span class="n">_Backend</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">cloud_line_integral</span><span class="p">(</span>
+                <span class="n">polarization_intensity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">cloud_model</span><span class="p">,</span>
+                <span class="n">sightline_center</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span> 
+                <span class="n">view_line_deltas</span><span class="o">=</span><span class="n">sightline_slopes</span><span class="p">,</span>
+                <span class="n">n_guesses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_zeros_guess_count</span><span class="p">,</span>
+                <span class="n">integral_method</span><span class="o">=</span><span class="n">integral_method</span><span class="p">)</span>
+
+        <span class="c1"># Error propagates in q.uadrature</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">int_error</span><span class="p">,</span> <span class="n">pol_error</span><span class="p">)</span>
+
+        <span class="c1"># Return</span>
+        <span class="k">return</span> <span class="n">integrated_intensity</span><span class="p">,</span> <span class="n">polarized_integrated_intensity</span><span class="p">,</span> <span class="n">error</span>
+
+    <span class="k">def</span> <span class="nf">_compute_integrated_magnetic_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sightline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes total magnetic field vectors over a sightline.</span>
+
+<span class="sd">        Given a sightline independent of the primary one, compute the</span>
+<span class="sd">        integrated values of the magnetic field vectors. The values given</span>
+<span class="sd">        is of little importance because of their computation of an improper summation, but the angles are most important. Nonetheless, magnitude</span>
+<span class="sd">        is preserved.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sightline : Sightline object</span>
+<span class="sd">            The sightline through which the magnetic fields will be calculated</span>
+<span class="sd">            through.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Bfield_x_integrated : float</span>
+<span class="sd">            The total value of all x-axial magnetic field vectors added </span>
+<span class="sd">            together through the sightline and object cloud.</span>
+<span class="sd">        Bfield_y_integrated : float</span>
+<span class="sd">            The total value of all y-axial magnetic field vectors added </span>
+<span class="sd">            together through the sightline and object cloud.</span>
+<span class="sd">        Bfield_z_integrated : float</span>
+<span class="sd">            The total value of all z-axial magnetic field vectors added </span>
+<span class="sd">            together through the sightline and object cloud.</span>
+<span class="sd">        errors : ndarray</span>
+<span class="sd">            A collection of error values, parallel to the float value </span>
+<span class="sd">            collection above.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Basic type checking.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sightline</span><span class="p">,</span> <span class="n">Sightline</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The sightline must be a sightline object.&#39;</span>
+                            <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Extract information about the target. The coefficient is rather</span>
+        <span class="c1"># arbitrary.</span>
+        <span class="n">box_width</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span>
+
+        <span class="c1"># If the Protostar model contains an interpolation table instead of</span>
+        <span class="c1"># a normal function. Assume the usage of a Simpson&#39;s integration.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_interpolated_tables</span><span class="p">):</span>
+            <span class="n">integral_method</span> <span class="o">=</span> <span class="s1">&#39;simpsons&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">integral_method</span> <span class="o">=</span> <span class="s1">&#39;scipy&#39;</span>
+
+        <span class="c1"># Define custom functions such that integrating over a vector function</span>
+        <span class="c1"># is instead an integration over the three independent dimensions.</span>
+        <span class="k">def</span> <span class="nf">target_cloud_Bfield_x</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">magnetic_field</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">target_cloud_Bfield_y</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">magnetic_field</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">target_cloud_Bfield_z</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">magnetic_field</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Extract sightline information</span>
+        <span class="n">sightline_center</span><span class="p">,</span> <span class="n">sightline_slopes</span> <span class="o">=</span> <span class="n">sightline</span><span class="o">.</span><span class="n">sightline_parameters</span><span class="p">()</span>
+
+        <span class="c1"># Begin computation.</span>
+        <span class="n">Bfield_x_integrated</span><span class="p">,</span> <span class="n">error_x</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">cloud_line_integral</span><span class="p">(</span>
+            <span class="n">target_cloud_Bfield_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">cloud_model</span><span class="p">,</span>
+            <span class="n">sightline_center</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span> 
+            <span class="n">view_line_deltas</span><span class="o">=</span><span class="n">sightline_slopes</span><span class="p">,</span>
+            <span class="n">n_guesses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_zeros_guess_count</span><span class="p">,</span>
+            <span class="n">integral_method</span><span class="o">=</span><span class="n">integral_method</span><span class="p">)</span>
+        <span class="n">Bfield_y_integrated</span><span class="p">,</span> <span class="n">error_y</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">cloud_line_integral</span><span class="p">(</span>
+            <span class="n">target_cloud_Bfield_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">cloud_model</span><span class="p">,</span>
+            <span class="n">sightline_center</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span> 
+            <span class="n">view_line_deltas</span><span class="o">=</span><span class="n">sightline_slopes</span><span class="p">,</span>
+            <span class="n">n_guesses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_zeros_guess_count</span><span class="p">,</span>
+            <span class="n">integral_method</span><span class="o">=</span><span class="n">integral_method</span><span class="p">)</span>
+        <span class="n">Bfield_z_integrated</span><span class="p">,</span> <span class="n">error_z</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">cloud_line_integral</span><span class="p">(</span>
+            <span class="n">target_cloud_Bfield_z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">cloud_model</span><span class="p">,</span>
+            <span class="n">sightline_center</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span> 
+            <span class="n">view_line_deltas</span><span class="o">=</span><span class="n">sightline_slopes</span><span class="p">,</span>
+            <span class="n">n_guesses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_zeros_guess_count</span><span class="p">,</span>
+            <span class="n">integral_method</span><span class="o">=</span><span class="n">integral_method</span><span class="p">)</span>
+
+        <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">error_x</span><span class="p">,</span> <span class="n">error_y</span><span class="p">,</span> <span class="n">error_z</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">Bfield_x_integrated</span><span class="p">,</span>
+                <span class="n">Bfield_y_integrated</span><span class="p">,</span>
+                <span class="n">Bfield_z_integrated</span><span class="p">,</span>
+                <span class="n">error</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_Stoke_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_axial_samples</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the stoke parameters for a large range of random sightlines.</span>
+
+<span class="sd">        This function computes an entire slew of Stokes parameters by </span>
+<span class="sd">        generating random sightlines within the field of view of the primary</span>
+<span class="sd">        sightline. This function is the precursor for all of the contour plots.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_axial_samples : int</span>
+<span class="sd">            The number of points along one RA or DEC axis to be sampled. The</span>
+<span class="sd">            resulting sample is a mesh n**2 between the bounds.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        stokes_parameters : ndarray</span>
+<span class="sd">            This is the array of all four Stoke parameters over all of the </span>
+<span class="sd">            random sightlines.</span>
+<span class="sd">        ra_dec_array : ndarray</span>
+<span class="sd">            This is the array of all of the random sightline&#39;s RA and DEC </span>
+<span class="sd">            values.</span>
+<span class="sd">        sightline_list : ndarray</span>
+<span class="sd">            This is an array containing all of the sightline&#39;s SkyCord objects,</span>
+<span class="sd">            just in case for whatever need.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Type checking.</span>
+        <span class="n">n_axial_samples</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_int_value</span><span class="p">(</span><span class="n">n_axial_samples</span><span class="p">,</span>
+                                                          <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Work in radians for the target&#39;s center.</span>
+        <span class="n">target_ra</span><span class="p">,</span> <span class="n">target_dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_radianize_coordinates</span><span class="p">()</span>
+
+        <span class="c1"># Use the primary sightline&#39;s wrap angle as it is the most likely to</span>
+        <span class="c1"># accurate.</span>
+        <span class="n">ra_wrap_angle_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sightline</span><span class="o">.</span><span class="n">_ra_wrap_angle</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># Create a large list of sightlines.</span>
+        <span class="n">ra_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">target_ra</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+                               <span class="n">target_ra</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+                               <span class="n">n_axial_samples</span><span class="p">)</span>
+        <span class="n">dec_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">target_dec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+                                <span class="n">target_dec</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
+                                <span class="n">n_axial_samples</span><span class="p">)</span>
+
+        <span class="c1"># Establish a mesh grid, the flatten to 1D arrays of points.</span>
+        <span class="n">ra_mesh</span><span class="p">,</span> <span class="n">dec_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ra_range</span><span class="p">,</span> <span class="n">dec_range</span><span class="p">)</span>
+        <span class="n">ra_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">ra_mesh</span><span class="p">)</span>
+        <span class="n">dec_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">dec_mesh</span><span class="p">)</span>
+
+        <span class="c1"># Compile the sightlines in a list.</span>
+        <span class="n">sightline_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">radex</span><span class="p">,</span> <span class="n">decdex</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ra_array</span><span class="p">,</span> <span class="n">dec_array</span><span class="p">):</span>
+            <span class="n">temp_skycoord</span> <span class="o">=</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">(</span><span class="n">radex</span><span class="p">,</span> <span class="n">decdex</span><span class="p">,</span>
+                                              <span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;rad&#39;</span><span class="p">)</span>
+            <span class="n">sightline_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Sightline</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">temp_skycoord</span><span class="p">,</span>
+                                            <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="n">ra_wrap_angle_value</span><span class="p">))</span>
+
+        <span class="c1"># It is best if it is not vectored like other numpy operations.</span>
+        <span class="c1"># Because it deals with specific classes and whatnot.</span>
+        <span class="n">intensity_array</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">polarized_intensity</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">Bfield_x_array</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">Bfield_y_array</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">Bfield_z_array</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">error_array</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sightlinedex</span> <span class="ow">in</span> <span class="n">sightline_list</span><span class="p">:</span>
+            <span class="n">temp_intensity</span><span class="p">,</span> <span class="n">temp_polarized_intensity</span><span class="p">,</span> <span class="n">intensity_error</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_compute_integrated_intensity</span><span class="p">(</span><span class="n">sightlinedex</span><span class="p">)</span>
+            <span class="n">Bfield_x</span><span class="p">,</span> <span class="n">Bfield_y</span><span class="p">,</span> <span class="n">Bfield_z</span><span class="p">,</span> <span class="n">Bfield_error</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_compute_integrated_magnetic_field</span><span class="p">(</span><span class="n">sightlinedex</span><span class="p">)</span>
+            <span class="c1"># Append</span>
+            <span class="n">intensity_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_intensity</span><span class="p">)</span>
+            <span class="n">polarized_intensity</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_polarized_intensity</span><span class="p">)</span>
+            <span class="n">Bfield_x_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bfield_x</span><span class="p">)</span>
+            <span class="n">Bfield_y_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bfield_y</span><span class="p">)</span>
+            <span class="n">Bfield_z_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bfield_z</span><span class="p">)</span>
+            <span class="c1"># Combine errors in quadrature.</span>
+            <span class="n">error_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">intensity_error</span><span class="p">,</span> <span class="n">Bfield_error</span><span class="p">))</span>
+
+        <span class="c1"># Vectorize.</span>
+        <span class="n">intensity_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">intensity_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">polarized_intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">polarized_intensity</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">Bfield_x_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_x_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">Bfield_y_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_y_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">Bfield_z_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_z_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">error_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="c1"># The value of Bfeild_x_array is of non-issue because of the desire</span>
+        <span class="c1"># for the Stokes parameters and the orientation of the coordinate</span>
+        <span class="c1"># system.</span>
+        <span class="k">del</span> <span class="n">Bfield_x_array</span><span class="p">,</span> <span class="n">Bfield_x</span>
+
+        <span class="c1"># Convert the magnetic fields to electric fields. Because the strength</span>
+        <span class="c1"># of the magnetic field is independent of the strength of the E field</span>
+        <span class="c1"># through the virtue of the reflecting dust grains, scale by intensity.</span>
+        <span class="n">Efield_y_array_norm</span><span class="p">,</span> <span class="n">Efield_z_array_norm</span> <span class="o">=</span> \
+            <span class="n">_Backend</span><span class="o">.</span><span class="n">efp</span><span class="o">.</span><span class="n">magnetic_to_electric</span><span class="p">(</span><span class="n">Bfield_y_array</span><span class="p">,</span> <span class="n">Bfield_z_array</span><span class="p">,</span>
+                                              <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Efield_y_array</span> <span class="o">=</span> <span class="n">Efield_y_array_norm</span> <span class="o">*</span> <span class="n">intensity_array</span>
+        <span class="n">Efield_z_array</span> <span class="o">=</span> <span class="n">Efield_z_array_norm</span> <span class="o">*</span> <span class="n">intensity_array</span>
+
+        <span class="c1"># Polarized light.</span>
+        <span class="n">Efield_y_array_polar</span> <span class="o">=</span> <span class="n">Efield_y_array_norm</span> <span class="o">*</span> <span class="n">polarized_intensity</span>
+        <span class="n">Efield_z_array_polar</span> <span class="o">=</span> <span class="n">Efield_z_array_norm</span> <span class="o">*</span> <span class="n">polarized_intensity</span>
+
+        <span class="c1"># Get all of the Stokes parameters.</span>
+        <span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> \
+            <span class="n">_Backend</span><span class="o">.</span><span class="n">efp</span><span class="o">.</span><span class="n">Stokes_parameters_from_field</span><span class="p">(</span>
+                <span class="n">Efield_y_array_polar</span><span class="p">,</span> <span class="n">Efield_z_array_polar</span><span class="p">)</span>
+
+        <span class="c1"># Total intensity is actually from the Efield of the total light, not</span>
+        <span class="c1"># just polarized light.</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">Efield_y_array</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">Efield_z_array</span><span class="o">**</span><span class="mi">2</span>
+
+        <span class="c1"># Return all of the parameters as this is a hidden function. The front</span>
+        <span class="c1"># end contour functions take care of producing only the one the user</span>
+        <span class="c1"># wants. Also, return back the sightline locations.</span>
+        <span class="n">stokes_parameters</span> <span class="o">=</span> <span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+        <span class="n">ra_dec_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">ra_array</span><span class="p">,</span> <span class="n">dec_array</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">stokes_parameters</span><span class="p">,</span> <span class="n">ra_dec_array</span><span class="p">,</span> <span class="n">sightline_list</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

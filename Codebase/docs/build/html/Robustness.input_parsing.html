@@ -1,0 +1,155 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Robustness.input_parsing module &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Robustness.validation module" href="Robustness.validation.html" />
+    <link rel="prev" title="Robustness.exception module" href="Robustness.exception.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Robustness.validation.html" title="Robustness.validation module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Robustness.exception.html" title="Robustness.exception module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Robustness.html" accesskey="U">Robustness package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Robustness.input_parsing">
+<span id="robustness-input-parsing-module"></span><h1>Robustness.input_parsing module<a class="headerlink" href="#module-Robustness.input_parsing" title="Permalink to this headline">¶</a></h1>
+<p>The purpose of this function is that inputs are parsed correctly.</p>
+<dl class="function">
+<dt id="Robustness.input_parsing.user_equation_parse">
+<code class="descclassname">Robustness.input_parsing.</code><code class="descname">user_equation_parse</code><span class="sig-paren">(</span><em>user_eq_input</em>, <em>variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Robustness/input_parsing.html#user_equation_parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Robustness.input_parsing.user_equation_parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert input implicit equation into a function.</p>
+<p>This function returns a functional form of a user’s input expression.
+Only standard python math functions are to be used, and nothing else.
+The functional form will be in return f(x), for the user inputs some string
+for f(x). Variables is a string tuple that contains the list of variables
+expected in the equation parse.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>user_eq_input</strong> (<em>string</em><em> or </em><em>function</em>) – This is the wanted string or function to be converted. If it is a
+function, there is simple verification before passing it back.</li>
+<li><strong>variables</strong> (<em>tuple of strings</em>) – This is the symbols within the equation for parsing as the input (e.g.
+the <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> in <code class="docutils literal notranslate"><span class="pre">f(x,y)</span></code>)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>function</strong> – A callable function that executes the mathematical expression given in
+the string. The order of parameters from variables are kept.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">function</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><em>DangerWarning : Warning</em> – This is used because the eval() function is used in this code.</li>
+<li><em>TerminateError : BaseException</em> – This is done if the verification of the continuation of the program
+fails.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This function does use the eval function and excessive precautions are
+used.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Robustness.exception.html"
+                        title="previous chapter">Robustness.exception module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Robustness.validation.html"
+                        title="next chapter">Robustness.validation module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Robustness.input_parsing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Robustness.validation.html" title="Robustness.validation module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Robustness.exception.html" title="Robustness.exception module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Robustness.html" >Robustness package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

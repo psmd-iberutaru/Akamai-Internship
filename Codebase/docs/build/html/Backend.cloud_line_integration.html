@@ -1,0 +1,202 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Backend.cloud_line_integration module &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Backend.coordinate_system_transformation module" href="Backend.coordinate_system_transformation.html" />
+    <link rel="prev" title="Backend.Ewertowski_Basu_2013 module" href="Backend.Ewertowski_Basu_2013.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Backend.coordinate_system_transformation.html" title="Backend.coordinate_system_transformation module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Backend.Ewertowski_Basu_2013.html" title="Backend.Ewertowski_Basu_2013 module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Backend.html" accesskey="U">Backend package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Backend.cloud_line_integration">
+<span id="backend-cloud-line-integration-module"></span><h1>Backend.cloud_line_integration module<a class="headerlink" href="#module-Backend.cloud_line_integration" title="Permalink to this headline">¶</a></h1>
+<p>This module outlines the math side of the integration functions used. The
+cloud line integration computes a line integral along a sightline path,
+whereas the bounds of the integration is such that a field is integrated
+within the cloud.</p>
+<dl class="function">
+<dt id="Backend.cloud_line_integration.cloud_line_integral">
+<code class="descclassname">Backend.cloud_line_integration.</code><code class="descname">cloud_line_integral</code><span class="sig-paren">(</span><em>field_function</em>, <em>cloud_equation</em>, <em>view_line_point</em>, <em>box_width</em>, <em>view_line_deltas=(1</em>, <em>0</em>, <em>0)</em>, <em>n_guesses=100</em>, <em>integral_method='scipy'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/cloud_line_integration.html#cloud_line_integral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.cloud_line_integration.cloud_line_integral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computs the line integral over a field given bounds of a cloud ans path.</p>
+<p>This function computes the total summation of the line integrals given
+a field function that a single sightline passes through, given the
+boundary that only the section of the line within a cloud would be
+computed as it is the upper and lower bounds for the integral(s).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>field_function</strong> (<em>function</em>) – The function of the field. Must be three dimensional in the form
+<code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">f(x,y,z):</span> <span class="pre">return</span> <span class="pre">a</span></code>. Does not accept non-numerical returns.</li>
+<li><strong>cloud_equation</strong> (<em>function</em>) – The implicit equation of the cloud. Must be <code class="docutils literal notranslate"><span class="pre">f(x)</span></code> where
+<code class="docutils literal notranslate"><span class="pre">f(x)</span> <span class="pre">=</span> <span class="pre">0</span></code>.</li>
+<li><strong>view_line_point</strong> (<em>array_like</em>) – Expected in three dimensions. It specifies the point that the viewline
+is positioned at in cartesian space.</li>
+<li><strong>box_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – An overestimated value of the size of the cloud along any given axis.
+Used for finding locations of intersections of the cloud and sightline.</li>
+<li><strong>view_line_deltas</strong> (<em>array_like; optional</em>) – Expected in three dimensions. It specifies the linear coefficient that
+the sightline travels through space. Defaults to (1,0,0), a line
+parallel to the x-axis.</li>
+<li><strong>n_guesses</strong> (<em>int; optional</em>) – An order of magnitude overestimate of the number of intersections
+between the cloud and the sightline. Defaults to 100.</li>
+<li><strong>optional</strong> (<em>integral_method;</em>) – The method of which the integration will be computed. Defaults to
+Scipy’s scipy.integrate.quad().</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>integrated_value</strong> (<em>float</em>) – The integrated value of the given field bounded by the sightline and
+the shape of the cloud.</li>
+<li><strong>error</strong> (<em>float</em>) – The associated error with the integration.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Backend.cloud_line_integration.line_integral_boundaries">
+<code class="descclassname">Backend.cloud_line_integration.</code><code class="descname">line_integral_boundaries</code><span class="sig-paren">(</span><em>view_line_point</em>, <em>cloud_equation</em>, <em>box_width</em>, <em>view_line_deltas=(1</em>, <em>0</em>, <em>0)</em>, <em>n_guesses=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/cloud_line_integration.html#line_integral_boundaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.cloud_line_integration.line_integral_boundaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find line integral boundaries given the cloud and sightline.</p>
+<p>This function determines the points that intersect the sphere, starting
+with it entering and exit. It returns the ranges of points that would
+yield line integral boundaries that integrate within the cloud volume.</p>
+<p>By default, the cloud equation should be a function such that it returns a
+float, f(x,y,z), based on implicit shape making: f(x,y,z) = 0. If not, it
+should be at least a string that contains the python syntax expression of
+the shape for f(x,y,z) = 0, i.e., left-hand side of the equation only.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>view_line_point</strong> (<em>array_like</em>) – Expected in three dimensions. It specifies the point that the viewline
+is positioned at in cartesian space.</li>
+<li><strong>cloud_equation</strong> (<em>function</em>) – The implicit equation of the cloud. Must be <code class="docutils literal notranslate"><span class="pre">f(x)</span></code> where
+<code class="docutils literal notranslate"><span class="pre">f(x)</span> <span class="pre">=</span> <span class="pre">0</span></code>.</li>
+<li><strong>box_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – An overestimated value of the size of the cloud along any given axis.
+Used for finding locations of intersections of the cloud and sightline.</li>
+<li><strong>view_line_deltas</strong> (<em>array_like</em>) – Expected in three dimensions. It specifies the linear coefficient that
+the sightline travels through space. Defaults to (1,0,0), a line
+parallel to the x-axis.</li>
+<li><strong>n_guesses</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – An order of magnitude overestimate of the number of intersections
+between the cloud and the sightline. Defaults to 100.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>lower_bounds</strong> (<em>ndarray</em>) – An array of the lower bound(s) if each integration needed that is
+within the cloud along the sightline.</li>
+<li><strong>upper_bounds</strong> (<em>ndarray</em>) – An array of the upper bound(s) if each integration needed that is
+within the cloud along the sightline.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Backend.Ewertowski_Basu_2013.html"
+                        title="previous chapter">Backend.Ewertowski_Basu_2013 module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Backend.coordinate_system_transformation.html"
+                        title="next chapter">Backend.coordinate_system_transformation module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Backend.cloud_line_integration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Backend.coordinate_system_transformation.html" title="Backend.coordinate_system_transformation module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Backend.Ewertowski_Basu_2013.html" title="Backend.Ewertowski_Basu_2013 module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Active_Codebase</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="Backend.html" >Backend package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

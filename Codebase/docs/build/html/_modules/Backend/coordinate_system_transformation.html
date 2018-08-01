@@ -1,0 +1,405 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Backend.coordinate_system_transformation &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Backend.coordinate_system_transformation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file is some side functions that allows for the conversion of cordinate</span>
+<span class="sd">systems.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1">########################################################################</span>
+<span class="c1">##########                From Cartesian to ***               ##########</span>
+<span class="c1">########################################################################</span>
+
+
+<div class="viewcode-block" id="cartesian_to_polar_2d"><a class="viewcode-back" href="../../Backend.coordinate_system_transformation.html#Backend.coordinate_system_transformation.cartesian_to_polar_2d">[docs]</a><span class="k">def</span> <span class="nf">cartesian_to_polar_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert cartesian points to polar points.</span>
+
+<span class="sd">    Convert cartesian coordinate points in 2D to polar coordinate points in 2D.</span>
+<span class="sd">    This function uses the notation convention of ISO 80000-2:2009 and its </span>
+<span class="sd">    related successors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        The x values of the points to be transformed.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        The y values of the points to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : array_like</span>
+<span class="sd">        The rho (radial) values of the points after transformation.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi (angular) values of the points after transformation.    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic validation</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert to polar coordinates.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rho</span><span class="p">,</span> <span class="n">phi</span></div>
+
+
+<div class="viewcode-block" id="cartesian_to_cylindrical_3d"><a class="viewcode-back" href="../../Backend.coordinate_system_transformation.html#Backend.coordinate_system_transformation.cartesian_to_cylindrical_3d">[docs]</a><span class="k">def</span> <span class="nf">cartesian_to_cylindrical_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert cartesian points to cylindrical points.</span>
+
+<span class="sd">    Convert cartesian coordinate points in 3D to cylindrical coordinate points </span>
+<span class="sd">    in 3D. This function uses the notation convention of ISO 80000-2:2009 and </span>
+<span class="sd">    its related successors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        The x values of the points to be transformed.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        The y values of the points to be transformed.</span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z values of the points to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : array_like</span>
+<span class="sd">        The rho (radial) values of the points after transformation.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi (angular) values of the points after transformation.    </span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z (height) values of the points after transformation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic validation.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert to cylindrical coordinates.</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span>
+
+    <span class="k">return</span> <span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span></div>
+
+
+<div class="viewcode-block" id="cartesian_to_spherical_3d"><a class="viewcode-back" href="../../Backend.coordinate_system_transformation.html#Backend.coordinate_system_transformation.cartesian_to_spherical_3d">[docs]</a><span class="k">def</span> <span class="nf">cartesian_to_spherical_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert cartesian points to cylindrical points.</span>
+
+<span class="sd">    Convert cartesian coordinate points in 3D to cylindrical coordinate points </span>
+<span class="sd">    in 3D. This function uses the notation convention of ISO 80000-2:2009 and </span>
+<span class="sd">    its related successors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        The x values of the points to be transformed.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        The y values of the points to be transformed.</span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z values of the points to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    r : array_like</span>
+<span class="sd">        The rho (radial) values of the points after transformation.</span>
+<span class="sd">    theta : array_like</span>
+<span class="sd">        The theta (azimuthal angle) values of the points after the </span>
+<span class="sd">        transformation.    </span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi (polar angle) values of the points after the transformation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic validation.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert to spherical coordinates.</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="n">r</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span></div>
+
+
+<span class="c1">########################################################################</span>
+<span class="c1">##########                  From Polar to ***                 ##########</span>
+<span class="c1">########################################################################</span>
+
+<div class="viewcode-block" id="polar_to_cartesian_2d"><a class="viewcode-back" href="../../Backend.coordinate_system_transformation.html#Backend.coordinate_system_transformation.polar_to_cartesian_2d">[docs]</a><span class="k">def</span> <span class="nf">polar_to_cartesian_2d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert polar points to cartesian points.</span>
+
+<span class="sd">    Convert polar coordinate points in 2D to cartesian coordinate points in 2D.</span>
+<span class="sd">    This function uses the notation convention of ISO 80000-2:2009 and its </span>
+<span class="sd">    related successors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rho : array_like</span>
+<span class="sd">        The rho values of the points to be transformed.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi values of the points to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        The x values of the points after transformation.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        The y values of the points after transformation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic type checking</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+<span class="c1">########################################################################</span>
+<span class="c1">##########               From Cylindrical to ***              ##########</span>
+<span class="c1">########################################################################</span>
+
+<div class="viewcode-block" id="cylindrical_to_cartesian_3d"><a class="viewcode-back" href="../../Backend.coordinate_system_transformation.html#Backend.coordinate_system_transformation.cylindrical_to_cartesian_3d">[docs]</a><span class="k">def</span> <span class="nf">cylindrical_to_cartesian_3d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert cylindrical points to cartesian points.</span>
+
+<span class="sd">    Convert cylindrical coordinate points in 3D to cartesian coordinate points </span>
+<span class="sd">    in 3D. This function uses the notation convention of ISO 80000-2:2009 and  </span>
+<span class="sd">    its related successors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rho : array_like</span>
+<span class="sd">        The rho values of the points to be transformed.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi values of the points to be transformed.</span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z values of the points to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        The x values of the points after transformation.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        The y values of the points after transformation.</span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z values of the points after transformation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic type checking</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span>
+
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span></div>
+
+
+<div class="viewcode-block" id="cylindrical_to_spherical_3d"><a class="viewcode-back" href="../../Backend.coordinate_system_transformation.html#Backend.coordinate_system_transformation.cylindrical_to_spherical_3d">[docs]</a><span class="k">def</span> <span class="nf">cylindrical_to_spherical_3d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert cylindrical points to spherical points.</span>
+
+<span class="sd">    Convert cylindrical coordinate points in 3D to spherical coordinate points </span>
+<span class="sd">    in 3D. This function uses the notation convention of ISO 80000-2:2009 and  </span>
+<span class="sd">    its related successors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rho : array_like</span>
+<span class="sd">        The rho values of the points to be transformed.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi values of the points to be transformed.</span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z values of the points to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    r : array_like</span>
+<span class="sd">        The rho (radial) values of the points after transformation.</span>
+<span class="sd">    theta : array_like</span>
+<span class="sd">        The theta (azimuthal angle) values of the points after the </span>
+<span class="sd">        transformation.    </span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi (polar angle) values of the points after the transformation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic type checking</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">z</span><span class="o">/</span><span class="n">r</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span>
+
+    <span class="k">return</span> <span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span></div>
+
+
+<span class="c1">########################################################################</span>
+<span class="c1">##########                From Spherical to ***               ##########</span>
+<span class="c1">########################################################################</span>
+
+<div class="viewcode-block" id="spherical_to_cartesian_3d"><a class="viewcode-back" href="../../Backend.coordinate_system_transformation.html#Backend.coordinate_system_transformation.spherical_to_cartesian_3d">[docs]</a><span class="k">def</span> <span class="nf">spherical_to_cartesian_3d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert spherical points to cartesian points.</span>
+
+<span class="sd">    Convert spherical coordinate points in 3D to cartesian coordinate points </span>
+<span class="sd">    in 3D. This function uses the notation convention of ISO 80000-2:2009 and  </span>
+<span class="sd">    its related successors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    r : array_like</span>
+<span class="sd">        The r values of the points to be transformed.</span>
+<span class="sd">    theta : array_like</span>
+<span class="sd">        The theta values of the points to be transformed.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi values of the points to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        The x values of the points after transformation.</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        The y values of the points after transformation.</span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z values of the points after transformation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic type checking</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span></div>
+
+
+<div class="viewcode-block" id="spherical_to_cylindrical_3d"><a class="viewcode-back" href="../../Backend.coordinate_system_transformation.html#Backend.coordinate_system_transformation.spherical_to_cylindrical_3d">[docs]</a><span class="k">def</span> <span class="nf">spherical_to_cylindrical_3d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert cylindrical points to cartesian points.</span>
+
+<span class="sd">    Convert cylindrical coordinate points in 3D to cartesian coordinate points </span>
+<span class="sd">    in 3D. This function uses the notation convention of ISO 80000-2:2009 and  </span>
+<span class="sd">    its related successors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    r : array_like</span>
+<span class="sd">        The r values of the points to be transformed.</span>
+<span class="sd">    theta : array_like</span>
+<span class="sd">        The theta values of the points to be transformed.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi values of the points to be transformed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rho : array_like</span>
+<span class="sd">        The rho values of the points after transformation.</span>
+<span class="sd">    phi : array_like</span>
+<span class="sd">        The phi (angular) values of the points after transformation.</span>
+<span class="sd">    z : array_like</span>
+<span class="sd">        The z values of the points after transformation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic type checking</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>
