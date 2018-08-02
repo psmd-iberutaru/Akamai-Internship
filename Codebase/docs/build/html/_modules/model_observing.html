@@ -114,8 +114,8 @@
 <span class="sd">            Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Type check.</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">Skycoord_object</span><span class="p">,</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">)):</span>
-            <span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">Skycoord_object</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">SkyCoord_object</span><span class="p">,</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">)):</span>
+            <span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">SkyCoord_object</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Type check for RA and dec before conversion</span>
             <span class="n">right_ascension</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span><span class="n">right_ascension</span><span class="p">)</span>

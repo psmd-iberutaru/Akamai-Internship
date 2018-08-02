@@ -177,8 +177,8 @@ class InterpolationTable():
             following strings:
 
                 - 'nearest'
-                - 'linear'
-                - 'cubic', default
+                - 'linear', default
+                - 'cubic'
         
         Returns
         -------
