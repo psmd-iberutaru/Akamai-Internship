@@ -61,9 +61,10 @@
 <span class="sd">    yield line integral boundaries that integrate within the cloud volume.</span>
 
 <span class="sd">    By default, the cloud equation should be a function such that it returns a</span>
-<span class="sd">    float, f(x,y,z), based on implicit shape making: f(x,y,z) = 0. If not, it</span>
-<span class="sd">    should be at least a string that contains the python syntax expression of</span>
-<span class="sd">    the shape for f(x,y,z) = 0, i.e., left-hand side of the equation only.</span>
+<span class="sd">    float, ``f(x,y,z)``, based on implicit shape making: ``f(x,y,z) = 0``. If</span>
+<span class="sd">    not, it should be at least a string that contains the python syntax </span>
+<span class="sd">    expression of the shape for ``f(x,y,z) = 0``, i.e., left-hand side of the </span>
+<span class="sd">    equation only.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -78,11 +79,11 @@
 <span class="sd">        Used for finding locations of intersections of the cloud and sightline.</span>
 <span class="sd">    view_line_deltas : array_like</span>
 <span class="sd">        Expected in three dimensions. It specifies the linear coefficient that </span>
-<span class="sd">        the sightline travels through space. Defaults to (1,0,0), a line </span>
+<span class="sd">        the sightline travels through space. Defaults to ``(1,0,0)``, a line </span>
 <span class="sd">        parallel to the x-axis.</span>
 <span class="sd">    n_guesses : int</span>
 <span class="sd">        An order of magnitude overestimate of the number of intersections </span>
-<span class="sd">        between the cloud and the sightline. Defaults to 100.</span>
+<span class="sd">        between the cloud and the sightline. Defaults to ``100``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -161,7 +162,7 @@
                         <span class="n">box_width</span><span class="p">,</span>
                         <span class="n">view_line_deltas</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">n_guesses</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                         <span class="n">integral_method</span><span class="o">=</span><span class="s1">&#39;scipy&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Computs the line integral over a field given bounds of a cloud ans path.</span>
+    <span class="sd">&quot;&quot;&quot;Computs the line integral over a field given bounds of a cloud and path.</span>
 
 <span class="sd">    This function computes the total summation of the line integrals given</span>
 <span class="sd">    a field function that a single sightline passes through, given the </span>
@@ -184,14 +185,14 @@
 <span class="sd">        Used for finding locations of intersections of the cloud and sightline.</span>
 <span class="sd">    view_line_deltas : array_like; optional</span>
 <span class="sd">        Expected in three dimensions. It specifies the linear coefficient that </span>
-<span class="sd">        the sightline travels through space. Defaults to (1,0,0), a line </span>
+<span class="sd">        the sightline travels through space. Defaults to ``(1,0,0)``, a line </span>
 <span class="sd">        parallel to the x-axis.</span>
 <span class="sd">    n_guesses : int; optional</span>
 <span class="sd">        An order of magnitude overestimate of the number of intersections </span>
-<span class="sd">        between the cloud and the sightline. Defaults to 100.</span>
+<span class="sd">        between the cloud and the sightline. Defaults to ``100``.</span>
 <span class="sd">    integral_method: string; optional</span>
 <span class="sd">        The method of which the integration will be computed. Defaults to </span>
-<span class="sd">        Scipy&#39;s scipy.integrate.quad().</span>
+<span class="sd">        Scipy&#39;s :py:func:`.scipy.integrate.quad`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

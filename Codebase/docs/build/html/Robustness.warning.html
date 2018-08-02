@@ -109,6 +109,24 @@ to compute.</p>
 <dd><p>General warning for the Robustness module/function package. If the warning
 is serious enough (like a DangerWarning), then force the user to ensure
 the continuation of the program.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>warn_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">warning</span></code> object) – The warning which to submit.</li>
+<li><strong>message</strong> (<em>string</em>) – The warning message.</li>
+<li><strong>stacklevel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The stack level call that the warning goes back to.</li>
+<li><strong>input_halt</strong> (<em>bool; optional</em>) – If the warning requires user input to continue, this is true. Defaults
+to false.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="Robustness.exception.html#Robustness.exception.TerminateError" title="Robustness.exception.TerminateError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TerminateError</span></code></a> in the event of the input halt failing.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

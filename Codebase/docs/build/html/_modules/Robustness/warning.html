@@ -119,6 +119,23 @@
 <span class="sd">    General warning for the Robustness module/function package. If the warning</span>
 <span class="sd">    is serious enough (like a DangerWarning), then force the user to ensure</span>
 <span class="sd">    the continuation of the program.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    warn_class : :py:class:`warning` object</span>
+<span class="sd">        The warning which to submit.</span>
+<span class="sd">    message : string</span>
+<span class="sd">        The warning message.</span>
+<span class="sd">    stacklevel : int</span>
+<span class="sd">        The stack level call that the warning goes back to.</span>
+<span class="sd">    input_halt : bool; optional</span>
+<span class="sd">        If the warning requires user input to continue, this is true. Defaults</span>
+<span class="sd">        to false.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    :py:exc:`~.TerminateError` in the event of the input halt failing.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Warn user.</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">warn_class</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">stacklevel</span><span class="p">)</span>

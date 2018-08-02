@@ -22,9 +22,10 @@ def line_integral_boundaries(view_line_point, cloud_equation, box_width,
     yield line integral boundaries that integrate within the cloud volume.
 
     By default, the cloud equation should be a function such that it returns a
-    float, f(x,y,z), based on implicit shape making: f(x,y,z) = 0. If not, it
-    should be at least a string that contains the python syntax expression of
-    the shape for f(x,y,z) = 0, i.e., left-hand side of the equation only.
+    float, ``f(x,y,z)``, based on implicit shape making: ``f(x,y,z) = 0``. If
+    not, it should be at least a string that contains the python syntax 
+    expression of the shape for ``f(x,y,z) = 0``, i.e., left-hand side of the 
+    equation only.
 
     Parameters
     ----------
@@ -39,11 +40,11 @@ def line_integral_boundaries(view_line_point, cloud_equation, box_width,
         Used for finding locations of intersections of the cloud and sightline.
     view_line_deltas : array_like
         Expected in three dimensions. It specifies the linear coefficient that 
-        the sightline travels through space. Defaults to (1,0,0), a line 
+        the sightline travels through space. Defaults to ``(1,0,0)``, a line 
         parallel to the x-axis.
     n_guesses : int
         An order of magnitude overestimate of the number of intersections 
-        between the cloud and the sightline. Defaults to 100.
+        between the cloud and the sightline. Defaults to ``100``.
 
     Returns
     -------
@@ -122,7 +123,7 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
                         box_width,
                         view_line_deltas=(1, 0, 0), n_guesses=100,
                         integral_method='scipy'):
-    """Computs the line integral over a field given bounds of a cloud ans path.
+    """Computs the line integral over a field given bounds of a cloud and path.
 
     This function computes the total summation of the line integrals given
     a field function that a single sightline passes through, given the 
@@ -145,14 +146,14 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
         Used for finding locations of intersections of the cloud and sightline.
     view_line_deltas : array_like; optional
         Expected in three dimensions. It specifies the linear coefficient that 
-        the sightline travels through space. Defaults to (1,0,0), a line 
+        the sightline travels through space. Defaults to ``(1,0,0)``, a line 
         parallel to the x-axis.
     n_guesses : int; optional
         An order of magnitude overestimate of the number of intersections 
-        between the cloud and the sightline. Defaults to 100.
+        between the cloud and the sightline. Defaults to ``100``.
     integral_method: string; optional
         The method of which the integration will be computed. Defaults to 
-        Scipy's scipy.integrate.quad().
+        Scipy's :py:func:`.scipy.integrate.quad`.
 
     Returns
     -------

@@ -167,7 +167,7 @@ texinfo_documents = [
 # -- Extension configuration ---------------------------------------------
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
+napoleon_include_init_with_doc = True
 napoleon_include_private_with_doc = False
 napoleon_include_special_with_doc = True
 
@@ -175,7 +175,11 @@ napoleon_include_special_with_doc = True
 # -- Options for intersphinx extension ------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/', None),
+                       'numpy': ('http://docs.scipy.org/doc/numpy/', None),
+                       'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
+                       'matplotlib': ('http://matplotlib.sourceforge.net/', None),
+                       'astropy' : ('http://docs.astropy.org/en/stable/',None)}
 
 # -- Options for todo extension ------------------------------------------
 

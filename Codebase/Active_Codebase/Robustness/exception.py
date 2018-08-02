@@ -8,7 +8,7 @@ import random
 
 class TerminateError(BaseException):
     """
-    A very serious error that should override the try, except functions
+    A very serious error that should override the try-except blocks
     that are written.
     """
 

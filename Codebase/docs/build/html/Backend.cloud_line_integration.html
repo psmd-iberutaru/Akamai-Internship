@@ -54,7 +54,7 @@ within the cloud.</p>
 <dl class="function">
 <dt id="Backend.cloud_line_integration.cloud_line_integral">
 <code class="descclassname">Backend.cloud_line_integration.</code><code class="descname">cloud_line_integral</code><span class="sig-paren">(</span><em>field_function</em>, <em>cloud_equation</em>, <em>view_line_point</em>, <em>box_width</em>, <em>view_line_deltas=(1</em>, <em>0</em>, <em>0)</em>, <em>n_guesses=100</em>, <em>integral_method='scipy'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/cloud_line_integration.html#cloud_line_integral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.cloud_line_integration.cloud_line_integral" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computs the line integral over a field given bounds of a cloud ans path.</p>
+<dd><p>Computs the line integral over a field given bounds of a cloud and path.</p>
 <p>This function computes the total summation of the line integrals given
 a field function that a single sightline passes through, given the
 boundary that only the section of the line within a cloud would be
@@ -73,12 +73,12 @@ is positioned at in cartesian space.</li>
 <li><strong>box_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – An overestimated value of the size of the cloud along any given axis.
 Used for finding locations of intersections of the cloud and sightline.</li>
 <li><strong>view_line_deltas</strong> (<em>array_like; optional</em>) – Expected in three dimensions. It specifies the linear coefficient that
-the sightline travels through space. Defaults to (1,0,0), a line
+the sightline travels through space. Defaults to <code class="docutils literal notranslate"><span class="pre">(1,0,0)</span></code>, a line
 parallel to the x-axis.</li>
 <li><strong>n_guesses</strong> (<em>int; optional</em>) – An order of magnitude overestimate of the number of intersections
-between the cloud and the sightline. Defaults to 100.</li>
+between the cloud and the sightline. Defaults to <code class="docutils literal notranslate"><span class="pre">100</span></code>.</li>
 <li><strong>integral_method</strong> (<em>string; optional</em>) – The method of which the integration will be computed. Defaults to
-Scipy’s scipy.integrate.quad().</li>
+Scipy’s <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quad.html#scipy.integrate.quad" title="(in SciPy v1.1.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.integrate.quad()</span></code></a>.</li>
 </ul>
 </td>
 </tr>
@@ -102,9 +102,10 @@ the shape of the cloud.</li>
 with it entering and exit. It returns the ranges of points that would
 yield line integral boundaries that integrate within the cloud volume.</p>
 <p>By default, the cloud equation should be a function such that it returns a
-float, f(x,y,z), based on implicit shape making: f(x,y,z) = 0. If not, it
-should be at least a string that contains the python syntax expression of
-the shape for f(x,y,z) = 0, i.e., left-hand side of the equation only.</p>
+float, <code class="docutils literal notranslate"><span class="pre">f(x,y,z)</span></code>, based on implicit shape making: <code class="docutils literal notranslate"><span class="pre">f(x,y,z)</span> <span class="pre">=</span> <span class="pre">0</span></code>. If
+not, it should be at least a string that contains the python syntax
+expression of the shape for <code class="docutils literal notranslate"><span class="pre">f(x,y,z)</span> <span class="pre">=</span> <span class="pre">0</span></code>, i.e., left-hand side of the
+equation only.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -117,10 +118,10 @@ is positioned at in cartesian space.</li>
 <li><strong>box_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – An overestimated value of the size of the cloud along any given axis.
 Used for finding locations of intersections of the cloud and sightline.</li>
 <li><strong>view_line_deltas</strong> (<em>array_like</em>) – Expected in three dimensions. It specifies the linear coefficient that
-the sightline travels through space. Defaults to (1,0,0), a line
+the sightline travels through space. Defaults to <code class="docutils literal notranslate"><span class="pre">(1,0,0)</span></code>, a line
 parallel to the x-axis.</li>
 <li><strong>n_guesses</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – An order of magnitude overestimate of the number of intersections
-between the cloud and the sightline. Defaults to 100.</li>
+between the cloud and the sightline. Defaults to <code class="docutils literal notranslate"><span class="pre">100</span></code>.</li>
 </ul>
 </td>
 </tr>

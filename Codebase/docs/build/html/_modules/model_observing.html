@@ -65,11 +65,11 @@
 <span class="sd">    through space. The sightline is always given by the RA and DEC values. </span>
 
 <span class="sd">    The notation for the accepted values of RA and DEC is found in the </span>
-<span class="sd">    Astropy module&#39;s SkyCord class.</span>
+<span class="sd">    Astropy module&#39;s :py:class:`~.astropy.coordinates.SkyCoord` class.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    self.coordinates : Astropy SkyCord object.</span>
+<span class="sd">    self.coordinates : Astropy :py:class:`~.astropy.coordinates.SkyCoord` object.</span>
 <span class="sd">        This is the sky coordinates of the sightline.</span>
 
 <span class="sd">    Methods</span>
@@ -81,28 +81,29 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">right_ascension</span><span class="p">,</span> <span class="n">declination</span><span class="p">,</span>
-                 <span class="n">Skycord_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">):</span>
+<div class="viewcode-block" id="Sightline.__init__"><a class="viewcode-back" href="../model_observing.html#model_observing.Sightline.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">right_ascension</span><span class="p">,</span> <span class="n">declination</span><span class="p">,</span>
+                 <span class="n">SkyCoord_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialization of a sightline.</span>
 
 <span class="sd">        The creates the sightline&#39;s main parameters, the defineing elements</span>
 <span class="sd">        of the sightline is the location that it is throughout space. This</span>
-<span class="sd">        is a specific wrapper around SkyCord.</span>
+<span class="sd">        is a specific wrapper around :py:class:`~.astropy.coordinates.SkyCoord`.</span>
 
 <span class="sd">        Arguments</span>
 <span class="sd">        ---------</span>
 <span class="sd">        right_ascension : string</span>
 <span class="sd">            The right ascension value for the sightline. This term must be </span>
-<span class="sd">            formatted in the Astropy SkyCord format: `` &#39;00h00m00.00s&#39; ``.</span>
+<span class="sd">            formatted in the Astropy :py:class:`~.astropy.coordinates.SkyCoord` format: ``00h00m00.00s``.</span>
 <span class="sd">            For the values of the seconds are decimal and may extend to any </span>
 <span class="sd">            precision.</span>
 <span class="sd">        declination : string</span>
 <span class="sd">            The declination value for the sightline. This term must be </span>
-<span class="sd">            formatted in the Astropy SkyCord format: `` &#39;±00d00m00.00s&#39; ``.</span>
+<span class="sd">            formatted in the Astropy :py:class:`~.astropy.coordinates.SkyCoord` format: ``±00d00m00.00s``.</span>
 <span class="sd">            For the values of the seconds are decimal and may extend to any </span>
 <span class="sd">            precision.</span>
-<span class="sd">        Skycord_object : SkyCord object; optional</span>
-<span class="sd">            It may be easier to also just pass an Astropy Skycord object in</span>
+<span class="sd">        Skycord_object : :py:class:`~.astropy.coordinates.SkyCoord` object; optional</span>
+<span class="sd">            It may be easier to also just pass an Astropy </span>
+<span class="sd">            :py:class:`~.astropy.coordinates.SkyCoord` object in</span>
 <span class="sd">            general. The other strings are ignored if it is successful.</span>
 
 <span class="sd">        Parameters</span>
@@ -113,8 +114,8 @@
 <span class="sd">            Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Type check.</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">Skycord_object</span><span class="p">,</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">)):</span>
-            <span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">Skycord_object</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">Skycoord_object</span><span class="p">,</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">)):</span>
+            <span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">Skycoord_object</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Type check for RA and dec before conversion</span>
             <span class="n">right_ascension</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_string</span><span class="p">(</span><span class="n">right_ascension</span><span class="p">)</span>
@@ -128,7 +129,7 @@
 
         <span class="c1"># Define the member arguments.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">sky_coordinates</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span></div>
 
 <div class="viewcode-block" id="Sightline.sightline_parameters"><a class="viewcode-back" href="../model_observing.html#model_observing.Sightline.sightline_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">sightline_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; This function returns the sightline linear parameters.</span>
@@ -161,6 +162,7 @@
 <span class="sd">        - The z-axis of the object is equal to the DEC-axis of the telescope. It is also equal to the negative of the theta-axis </span>
 <span class="sd">        when it is centered on theta = pi/2. Points north-south of the </span>
 <span class="sd">        telescope.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Work in radians.</span>
@@ -202,7 +204,7 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    self.coordinates : Astropy SkyCord object</span>
+<span class="sd">    self.coordinates : Astropy :py:class:`~.astropy.coordinates.SkyCoord` object</span>
 <span class="sd">        This is the coordinates of the object that this class defines.</span>
 <span class="sd">    self.cloud_model : function</span>
 <span class="sd">        This is an implicit function (or a numerical approximation thereof) of </span>
@@ -218,7 +220,7 @@
 <span class="sd">        the polarization model of the cloud.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">cloud_model</span><span class="p">,</span> <span class="n">magnetic_field_model</span><span class="p">,</span>
+<div class="viewcode-block" id="ProtostarModel.__init__"><a class="viewcode-back" href="../model_observing.html#model_observing.ProtostarModel.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">cloud_model</span><span class="p">,</span> <span class="n">magnetic_field_model</span><span class="p">,</span>
                  <span class="n">density_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">polarization_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">zeros_guess_count</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Object form of a model object to be observed.</span>
@@ -228,7 +230,7 @@
 
 <span class="sd">        Arguments</span>
 <span class="sd">        ---------</span>
-<span class="sd">        coordinates : Astropy SkyCord object</span>
+<span class="sd">        coordinates : Astropy :py:class:`~.astropy.coordinates.SkyCoord` object</span>
 <span class="sd">            These are the coordinates of the observation object. It is up</span>
 <span class="sd">            to the user to put as complete information as possible.</span>
 <span class="sd">        cloud_model : function or string,</span>
@@ -237,17 +239,17 @@
 <span class="sd">            be cartesian in the form ``f(x,y,z) = 0``, for the function or</span>
 <span class="sd">            string is ``f(x,y,z)``. The x-axis is always aligned with a </span>
 <span class="sd">            telescope as it is the same as a telescope&#39;s r-axis.</span>
-<span class="sd">        magnetic_field_model : function or InterpolationTable</span>
+<span class="sd">        magnetic_field_model : function or :py:class:`~.InterpolationTable`</span>
 <span class="sd">            A function that, given a single point in cartesian space, will </span>
 <span class="sd">            return the value of the magnitude of the magnetic field&#39;s three </span>
 <span class="sd">            orthogonal vectors in xyz-space. If an interpolation table is </span>
 <span class="sd">            given, a numerical approximation function will be used instead.</span>
-<span class="sd">        density_model : function or string, or InterpolationTable; optional</span>
+<span class="sd">        density_model : function or string, or :py:class:`~.InterpolationTable`; optional</span>
 <span class="sd">            A function that, given a point in cartesian space, will return</span>
 <span class="sd">            a value pertaining to the density of the gas/dust within at that</span>
 <span class="sd">            point. Defaults to uniform. If an interpolation table is </span>
 <span class="sd">            given, a numerical approximation function will be used instead.</span>
-<span class="sd">        polarization_model: function, string, float or InterpolationTable; optional</span>
+<span class="sd">        polarization_model: function, string, float or :py:class:`~.InterpolationTable`; optional</span>
 <span class="sd">            This is the percent of polarization of the light. Either given as </span>
 <span class="sd">            a function (or string representing a function) ``f(x,y,z)``, or </span>
 <span class="sd">            as a constant float value. Default is uniform value of 1. If an </span>
@@ -389,7 +391,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">polarization_model</span> <span class="o">=</span> <span class="n">polarization_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_interpolated_tables</span> <span class="o">=</span> <span class="n">input_interpolated_tables</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_zeros_guess_count</span> <span class="o">=</span> <span class="n">zeros_guess_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zeros_guess_count</span> <span class="o">=</span> <span class="n">zeros_guess_count</span></div>
 
     <span class="k">def</span> <span class="nf">_radianize_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This method returns the RA and DEC in radians.</span>
@@ -426,10 +428,10 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    self.observe_target : ProtostarModel object</span>
+<span class="sd">    self.observe_target : :py:class:`ProtostarModel` object</span>
 <span class="sd">        The model target for simulated observing. Conceptually, the object</span>
 <span class="sd">        that the telescope observes.</span>
-<span class="sd">    self.sightline : Sightline object</span>
+<span class="sd">    self.sightline : :py:class:`Sightline` object</span>
 <span class="sd">        The primary sightline that is used for the model observing, </span>
 <span class="sd">        conceptually where the telescope is aimed at.</span>
 <span class="sd">    self.field_of_view : float</span>
@@ -446,7 +448,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observe_target</span><span class="p">,</span> <span class="n">sightline</span><span class="p">,</span> <span class="n">field_of_view</span><span class="p">):</span>
+<div class="viewcode-block" id="ObservingRun.__init__"><a class="viewcode-back" href="../model_observing.html#model_observing.ObservingRun.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observe_target</span><span class="p">,</span> <span class="n">sightline</span><span class="p">,</span> <span class="n">field_of_view</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Doing an observing run.</span>
 
 <span class="sd">        Create an observing run object, compiling the primary sightline and</span>
@@ -454,7 +456,7 @@
 
 <span class="sd">        Arguments</span>
 <span class="sd">        ---------</span>
-<span class="sd">        observe_target : ProtostarModel object</span>
+<span class="sd">        observe_target : :py:class:`ProtostarModel` object</span>
 <span class="sd">            This is the object to be observed. </span>
 <span class="sd">        sightline : Sightline object</span>
 <span class="sd">            This is the primary sightline, in essence, where the telescope</span>
@@ -507,7 +509,7 @@
         <span class="c1"># Assign and create.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">observe_target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sightline</span> <span class="o">=</span> <span class="n">sightline</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">field_of_view</span><span class="o">/</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">field_of_view</span><span class="o">/</span><span class="mi">2</span></div>
 
 <div class="viewcode-block" id="ObservingRun.Stokes_parameter_contours"><a class="viewcode-back" href="../model_observing.html#model_observing.ObservingRun.Stokes_parameter_contours">[docs]</a>    <span class="k">def</span> <span class="nf">Stokes_parameter_contours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                   <span class="n">n_axial_samples</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
@@ -595,7 +597,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        sightline : Sightline object</span>
+<span class="sd">        sightline : :py:class:`Sightline` object</span>
 <span class="sd">            The sightline through which the intensity will be calculated </span>
 <span class="sd">            through, using the density function.</span>
 
@@ -672,7 +674,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        sightline : Sightline object</span>
+<span class="sd">        sightline : :py:class:`Sightline` object</span>
 <span class="sd">            The sightline through which the magnetic fields will be calculated</span>
 <span class="sd">            through.</span>
 

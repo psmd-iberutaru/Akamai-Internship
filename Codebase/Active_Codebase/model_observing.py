@@ -26,11 +26,11 @@ class Sightline():
     through space. The sightline is always given by the RA and DEC values. 
 
     The notation for the accepted values of RA and DEC is found in the 
-    Astropy module's SkyCord class.
+    Astropy module's :py:class:`~.astropy.coordinates.SkyCoord` class.
 
     Attributes
     ----------
-    self.coordinates : Astropy SkyCord object.
+    self.coordinates : Astropy :py:class:`~.astropy.coordinates.SkyCoord` object.
         This is the sky coordinates of the sightline.
 
     Methods
@@ -43,27 +43,28 @@ class Sightline():
     """
 
     def __init__(self, right_ascension, declination,
-                 Skycord_object=None, ra_wrap_angle=2*np.pi):
+                 SkyCoord_object=None, ra_wrap_angle=2*np.pi):
         """Initialization of a sightline.
 
         The creates the sightline's main parameters, the defineing elements
         of the sightline is the location that it is throughout space. This
-        is a specific wrapper around SkyCord.
+        is a specific wrapper around :py:class:`~.astropy.coordinates.SkyCoord`.
 
         Arguments
         ---------
         right_ascension : string
             The right ascension value for the sightline. This term must be 
-            formatted in the Astropy SkyCord format: `` '00h00m00.00s' ``.
+            formatted in the Astropy :py:class:`~.astropy.coordinates.SkyCoord` format: ``00h00m00.00s``.
             For the values of the seconds are decimal and may extend to any 
             precision.
         declination : string
             The declination value for the sightline. This term must be 
-            formatted in the Astropy SkyCord format: `` '±00d00m00.00s' ``.
+            formatted in the Astropy :py:class:`~.astropy.coordinates.SkyCoord` format: ``±00d00m00.00s``.
             For the values of the seconds are decimal and may extend to any 
             precision.
-        Skycord_object : SkyCord object; optional
-            It may be easier to also just pass an Astropy Skycord object in
+        Skycord_object : :py:class:`~.astropy.coordinates.SkyCoord` object; optional
+            It may be easier to also just pass an Astropy 
+            :py:class:`~.astropy.coordinates.SkyCoord` object in
             general. The other strings are ignored if it is successful.
 
         Parameters
@@ -74,8 +75,8 @@ class Sightline():
             Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)
         """
         # Type check.
-        if (isinstance(Skycord_object, ap_coord.SkyCoord)):
-            sky_coordinates = Skycord_object
+        if (isinstance(SkyCoord_object, ap_coord.SkyCoord)):
+            sky_coordinates = SkyCoord_object
         else:
             # Type check for RA and dec before conversion
             right_ascension = Robust.valid.validate_string(right_ascension)
@@ -122,6 +123,7 @@ class Sightline():
         - The z-axis of the object is equal to the DEC-axis of the telescope. It is also equal to the negative of the theta-axis 
         when it is centered on theta = pi/2. Points north-south of the 
         telescope.
+
         """
 
         # Work in radians.
@@ -163,7 +165,7 @@ class ProtostarModel():
 
     Attributes
     ----------
-    self.coordinates : Astropy SkyCord object
+    self.coordinates : Astropy :py:class:`~.astropy.coordinates.SkyCoord` object
         This is the coordinates of the object that this class defines.
     self.cloud_model : function
         This is an implicit function (or a numerical approximation thereof) of 
@@ -189,7 +191,7 @@ class ProtostarModel():
 
         Arguments
         ---------
-        coordinates : Astropy SkyCord object
+        coordinates : Astropy :py:class:`~.astropy.coordinates.SkyCoord` object
             These are the coordinates of the observation object. It is up
             to the user to put as complete information as possible.
         cloud_model : function or string,
@@ -198,17 +200,17 @@ class ProtostarModel():
             be cartesian in the form ``f(x,y,z) = 0``, for the function or
             string is ``f(x,y,z)``. The x-axis is always aligned with a 
             telescope as it is the same as a telescope's r-axis.
-        magnetic_field_model : function or InterpolationTable
+        magnetic_field_model : function or :py:class:`~.InterpolationTable`
             A function that, given a single point in cartesian space, will 
             return the value of the magnitude of the magnetic field's three 
             orthogonal vectors in xyz-space. If an interpolation table is 
             given, a numerical approximation function will be used instead.
-        density_model : function or string, or InterpolationTable; optional
+        density_model : function or string, or :py:class:`~.InterpolationTable`; optional
             A function that, given a point in cartesian space, will return
             a value pertaining to the density of the gas/dust within at that
             point. Defaults to uniform. If an interpolation table is 
             given, a numerical approximation function will be used instead.
-        polarization_model: function, string, float or InterpolationTable; optional
+        polarization_model: function, string, float or :py:class:`~.InterpolationTable`; optional
             This is the percent of polarization of the light. Either given as 
             a function (or string representing a function) ``f(x,y,z)``, or 
             as a constant float value. Default is uniform value of 1. If an 
@@ -387,10 +389,10 @@ class ObservingRun():
 
     Attributes
     ----------
-    self.observe_target : ProtostarModel object
+    self.observe_target : :py:class:`ProtostarModel` object
         The model target for simulated observing. Conceptually, the object
         that the telescope observes.
-    self.sightline : Sightline object
+    self.sightline : :py:class:`Sightline` object
         The primary sightline that is used for the model observing, 
         conceptually where the telescope is aimed at.
     self.field_of_view : float
@@ -415,7 +417,7 @@ class ObservingRun():
 
         Arguments
         ---------
-        observe_target : ProtostarModel object
+        observe_target : :py:class:`ProtostarModel` object
             This is the object to be observed. 
         sightline : Sightline object
             This is the primary sightline, in essence, where the telescope
@@ -556,7 +558,7 @@ class ObservingRun():
 
         Parameters
         ----------
-        sightline : Sightline object
+        sightline : :py:class:`Sightline` object
             The sightline through which the intensity will be calculated 
             through, using the density function.
 
@@ -633,7 +635,7 @@ class ObservingRun():
 
         Parameters
         ----------
-        sightline : Sightline object
+        sightline : :py:class:`Sightline` object
             The sightline through which the magnetic fields will be calculated
             through.
 

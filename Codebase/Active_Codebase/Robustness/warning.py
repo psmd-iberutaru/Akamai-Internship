@@ -80,6 +80,23 @@ def kyubey_warning(warn_class, message,
     General warning for the Robustness module/function package. If the warning
     is serious enough (like a DangerWarning), then force the user to ensure
     the continuation of the program.
+
+    Parameters
+    ----------
+    warn_class : :py:class:`warning` object
+        The warning which to submit.
+    message : string
+        The warning message.
+    stacklevel : int
+        The stack level call that the warning goes back to.
+    input_halt : bool; optional
+        If the warning requires user input to continue, this is true. Defaults
+        to false.
+
+    Raises
+    ------
+    :py:exc:`~.TerminateError` in the event of the input halt failing.
+
     """
     # Warn user.
     warnings.warn(message, category=warn_class, stacklevel=stacklevel)

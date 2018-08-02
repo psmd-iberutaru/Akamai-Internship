@@ -2,7 +2,7 @@ Active\_Codebase namespace
 ==========================
 
 Subpackages
-----------
+-----------
 
 .. toctree::
 
@@ -12,36 +12,11 @@ Subpackages
 Submodules
 ----------
 
-Active\_Codebase.data\_systematization module
------------------------------------------
+.. toctree::
 
-.. automodule:: Active_Codebase.data_systematization
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Active\_Codebase.magnetic\_field\_functions\_2d module
---------------------------------------------------
-
-.. automodule:: Active_Codebase.magnetic_field_functions_2d
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Active\_Codebase.magnetic\_field\_functions\_3d module
---------------------------------------------------
-
-.. automodule:: Active_Codebase.magnetic_field_functions_3d
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Active\_Codebase.model\_observing module
--------------------------------------
-
-.. automodule:: Active_Codebase.model_observing
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   Active_Codebase.data_systematization
+   Active_Codebase.density_field_functions
+   Active_Codebase.magnetic_field_functions_2d
+   Active_Codebase.magnetic_field_functions_3d
+   Active_Codebase.model_observing
 
