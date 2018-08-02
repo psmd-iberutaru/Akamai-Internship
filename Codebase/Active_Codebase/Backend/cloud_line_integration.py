@@ -150,7 +150,7 @@ def cloud_line_integral(field_function, cloud_equation, view_line_point,
     n_guesses : int; optional
         An order of magnitude overestimate of the number of intersections 
         between the cloud and the sightline. Defaults to 100.
-    integral_method; optional
+    integral_method: string; optional
         The method of which the integration will be computed. Defaults to 
         Scipy's scipy.integrate.quad().
 

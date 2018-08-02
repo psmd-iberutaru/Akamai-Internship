@@ -173,12 +173,89 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
 
     # Convert back to the cartesian cords.
     Bfield_x, Bfield_y, Bfield_z = \
-        _Backend.cst.cylindrical_to_cartesian_3d(Bfield_rho, 
-                                                 phi + Bfield_phi, 
+        _Backend.cst.cylindrical_to_cartesian_3d(Bfield_rho,
+                                                 phi + Bfield_phi,
                                                  Bfield_z)
 
     return Bfield_x, Bfield_y, Bfield_z
 
+
+def monopole_magnetic_field_cart_3d(x, y, z,
+                                    center = [0,0,0],
+                                    mag_function=lambda r: r**2):
+    """This is a monopole magnetic field, extending radially with zero curl.
+
+    This function gives a description of a magnetic field extending radially
+    according to some magnitude function (as a function of radius). The 
+    point of radiance (the center of the field) can be adjusted as needed.
+
+    Note that this is currently an impossible shape for a magnetic field as
+    determined by Maxwell's equations. 
+    
+    Parameters
+    ----------
+    x : array_like
+        The x values of the input points.
+    y : array_like
+        The y values of the input points.
+    z : array_like
+        The z values of the input points.
+    center : array_like
+        The center of the magnetic field.
+    mag_function : function
+        The magnitude of the magnetic fields as a function of radius.
+
+    Returns
+    -------
+    Bfield_x : ndarray
+        The x component of the magnetic field.
+    Bfield_y : ndarray
+        The y component of the magnetic field.
+    Bfield_z : ndarray
+        The z component of the magnetic field.
+    """
+
+    # Warn about the implications of using this field. Although it is assumed
+    # that the warning will be done by the spherical function.
+    # Robust.kyubey_warning(Robust.PhysicsWarning,
+    #                       ('Magnetic monopole fields are considered as '
+    #                        'non-physical by Maxwell\'s equations.'
+    #                        '    --Kyubey'))
+
+    # Type check
+    x = Robust.valid.validate_float_array(x)
+    y = Robust.valid.validate_float_array(y)
+    z = Robust.valid.validate_float_array(z)
+    center = Robust.valid.validate_float_array(center,shape=(3,))
+    mag_function = Robust.valid.validate_function_call(mag_function,
+                                                       n_parameters=1)
+
+    # Shift based on the center
+    x = x - center[0]
+    y = y - center[1]
+    z = z - center[2]
+
+    # Convert the points into spherical cords.
+    r, theta, phi = _Backend.cst.cartesian_to_spherical_3d(x,y,z)
+
+    # Compute field.
+    Bfield_r,Bfield_theta,Bfield_phi = \
+        monopole_magnetic_field_sphr_3d(r,theta,phi,
+                                        center=[0,0,0],
+                                        mag_function=mag_function)
+
+    # Convert back to cartesian
+    Bfield_x,Bfield_y,Bfield_z = \
+        _Backend.cst.spherical_to_cartesian_3d(Bfield_r,
+                                               theta + Bfield_theta,
+                                               phi + Bfield_phi)
+    
+    # Vectorize
+    Bfield_x = np.array(Bfield_x,dtype=float)
+    Bfield_y = np.array(Bfield_y,dtype=float)
+    Bfield_z = np.array(Bfield_z,dtype=float)
+
+    return Bfield_x,Bfield_y,Bfield_z
 
 ########################################################################
 #####            3D Magnetic Field Cylindrical Functions           #####
@@ -248,3 +325,74 @@ def hourglass_magnetic_field_cyln_3d(rho, phi, z,
         rho, z, h, k_array, disk_radius, uniform_B0)
 
     return Bfield_rho, Bfield_phi, Bfield_z
+
+
+########################################################################
+#####             3D Magnetic Field Spherical Functions            #####
+########################################################################
+
+def monopole_magnetic_field_sphr_3d(r, theta, phi,
+                                    center = [0,0,0],
+                                    mag_function=lambda r: r**2):
+    """This is a monopole magnetic field, extending radially with zero curl.
+
+    This function gives a description of a magnetic field extending radially
+    according to some magnitude function (as a function of radius). The 
+    point of radiance (the center of the field) can be adjusted as needed.
+
+    Note that this is currently an impossible shape for a magnetic field as
+    determined by Maxwell's equations. 
+
+    Parameters
+    ----------
+    r : array_like
+        The radial component of the input points.
+    theta : array_like
+        The polar angle component of the input points.
+    phi : array_like
+        The azimuthal angle component of the input points.
+    center : array_like
+        The center point of the magnetic field.
+    mag_function : function
+        The measured magnitude of the magnetic field as a function of ``r``.
+
+    Returns
+    -------
+    Bfield_r : ndarray
+        The radial component of the magnetic field at the given points.
+    Bfield_theta : ndarray
+        The polar angle component of the magnetic field at the given points.
+    Bfeild_phi : ndarray
+        The azimuthal angle component of the magnetic field at the given points.
+    """
+
+    # Warn about the implications of using this field.
+    Robust.kyubey_warning(Robust.PhysicsWarning,
+                          ('Magnetic monopole fields are considered as '
+                           'non-physical by Maxwell\'s equations.'
+                           '    --Kyubey'))
+
+    # Type check.
+    r = Robust.valid.validate_float_array(r)
+    theta = Robust.valid.validate_float_array(theta)
+    phi = Robust.valid.validate_float_array(phi)
+    center = Robust.valid.validate_float_array(center,shape=(3,))
+    mag_function = Robust.valid.validate_function_call(mag_function,
+                                                       n_parameters=1)
+
+    # Shift based on the center cord.
+    r = r - center[0]
+    theta = theta - center[1]
+    phi = phi - center[2]
+
+    # The magnetic field really does not depend on the theta or phi parameters.
+    Bfield_r = mag_function(r)
+    Bfield_theta = np.zeros_like(theta)
+    Bfield_phi = np.zeros_like(phi)
+
+    # Vectorize
+    Bfield_r = np.array(Bfield_r,dtype=float)
+    Bfield_theta = np.array(Bfield_theta,dtype=float)
+    Bfield_phi = np.array(Bfield_phi,dtype=float)
+
+    return Bfield_r,Bfield_theta,Bfield_phi

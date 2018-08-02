@@ -163,6 +163,74 @@ as an array <code class="docutils literal notranslate"><span class="pre">[r0,phi
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="magnetic_field_functions_3d.monopole_magnetic_field_cart_3d">
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">monopole_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#monopole_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.monopole_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a monopole magnetic field, extending radially with zero curl.</p>
+<p>This function gives a description of a magnetic field extending radially
+according to some magnitude function (as a function of radius). The
+point of radiance (the center of the field) can be adjusted as needed.</p>
+<p>Note that this is currently an impossible shape for a magnetic field as
+determined by Maxwell’s equations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>array_like</em>) – The x values of the input points.</li>
+<li><strong>y</strong> (<em>array_like</em>) – The y values of the input points.</li>
+<li><strong>z</strong> (<em>array_like</em>) – The z values of the input points.</li>
+<li><strong>center</strong> (<em>array_like</em>) – The center of the magnetic field.</li>
+<li><strong>mag_function</strong> (<em>function</em>) – The magnitude of the magnetic fields as a function of radius.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>Bfield_x</strong> (<em>ndarray</em>) – The x component of the magnetic field.</li>
+<li><strong>Bfield_y</strong> (<em>ndarray</em>) – The y component of the magnetic field.</li>
+<li><strong>Bfield_z</strong> (<em>ndarray</em>) – The z component of the magnetic field.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="magnetic_field_functions_3d.monopole_magnetic_field_sphr_3d">
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">monopole_magnetic_field_sphr_3d</code><span class="sig-paren">(</span><em>r, theta, phi, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#monopole_magnetic_field_sphr_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.monopole_magnetic_field_sphr_3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a monopole magnetic field, extending radially with zero curl.</p>
+<p>This function gives a description of a magnetic field extending radially
+according to some magnitude function (as a function of radius). The
+point of radiance (the center of the field) can be adjusted as needed.</p>
+<p>Note that this is currently an impossible shape for a magnetic field as
+determined by Maxwell’s equations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r</strong> (<em>array_like</em>) – The radial component of the input points.</li>
+<li><strong>theta</strong> (<em>array_like</em>) – The polar angle component of the input points.</li>
+<li><strong>phi</strong> (<em>array_like</em>) – The azimuthal angle component of the input points.</li>
+<li><strong>center</strong> (<em>array_like</em>) – The center point of the magnetic field.</li>
+<li><strong>mag_function</strong> (<em>function</em>) – The measured magnitude of the magnetic field as a function of <code class="docutils literal notranslate"><span class="pre">r</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>Bfield_r</strong> (<em>ndarray</em>) – The radial component of the magnetic field at the given points.</li>
+<li><strong>Bfield_theta</strong> (<em>ndarray</em>) – The polar angle component of the magnetic field at the given points.</li>
+<li><strong>Bfeild_phi</strong> (<em>ndarray</em>) – The azimuthal angle component of the magnetic field at the given points.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 
 

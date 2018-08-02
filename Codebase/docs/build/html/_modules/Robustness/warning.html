@@ -1,0 +1,187 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Robustness.warning &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Robustness.warning</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">Robustness.exception</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="TimeWarning"><a class="viewcode-back" href="../../Robustness.warning.html#Robustness.warning.TimeWarning">[docs]</a><span class="k">class</span> <span class="nc">TimeWarning</span><span class="p">(</span><span class="ne">ResourceWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A warning to be used when some computation or flag might take a long time</span>
+<span class="sd">    to compute. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="DangerWarning"><a class="viewcode-back" href="../../Robustness.warning.html#Robustness.warning.DangerWarning">[docs]</a><span class="k">class</span> <span class="nc">DangerWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A warning to be used when some input or output is dangerous for the </span>
+<span class="sd">    system or program itself and may be disastrous with unexpected inputs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="InputWarning"><a class="viewcode-back" href="../../Robustness.warning.html#Robustness.warning.InputWarning">[docs]</a><span class="k">class</span> <span class="nc">InputWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A warning to be used when the values of some item is incorrect, but is </span>
+<span class="sd">    fixed within the program.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="OutputWarning"><a class="viewcode-back" href="../../Robustness.warning.html#Robustness.warning.OutputWarning">[docs]</a><span class="k">class</span> <span class="nc">OutputWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A warning to be used when the values of an output may not use all of the </span>
+<span class="sd">    inputs given, or that it might become unexpected because of bugs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="PhysicalityWarning"><a class="viewcode-back" href="../../Robustness.warning.html#Robustness.warning.PhysicalityWarning">[docs]</a><span class="k">class</span> <span class="nc">PhysicalityWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A warning to be used when the current program is doing something that does</span>
+<span class="sd">    not make sense in real life.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="PhysicsWarning"><a class="viewcode-back" href="../../Robustness.warning.html#Robustness.warning.PhysicsWarning">[docs]</a><span class="k">class</span> <span class="nc">PhysicsWarning</span><span class="p">(</span><span class="n">PhysicalityWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A warning to be used when the current program is doing something a bit</span>
+<span class="sd">    risky or something that would not make normal sense in physics terms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="AstronomyWarning"><a class="viewcode-back" href="../../Robustness.warning.html#Robustness.warning.AstronomyWarning">[docs]</a><span class="k">class</span> <span class="nc">AstronomyWarning</span><span class="p">(</span><span class="n">PhysicalityWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A warning to be used when the current program is doing something a bit</span>
+<span class="sd">    risky or something that would not make normal sense in astronomical terms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<span class="c1"># Begin the main warning function.</span>
+<div class="viewcode-block" id="kyubey_warning"><a class="viewcode-back" href="../../Robustness.warning.html#Robustness.warning.kyubey_warning">[docs]</a><span class="k">def</span> <span class="nf">kyubey_warning</span><span class="p">(</span><span class="n">warn_class</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span>
+                   <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">input_halt</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    General warning for the Robustness module/function package. If the warning</span>
+<span class="sd">    is serious enough (like a DangerWarning), then force the user to ensure</span>
+<span class="sd">    the continuation of the program.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Warn user.</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">warn_class</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">stacklevel</span><span class="p">)</span>
+    <span class="c1"># If a halt is desired.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">input_halt</span><span class="p">):</span>
+        <span class="c1"># Employ random interger returning value to verification.</span>
+        <span class="n">validation_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9999</span><span class="p">))</span>
+        <span class="c1"># Print message.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;A halt input has been issued by the program. Your input is &#39;</span>
+              <span class="s1">&#39;required for the program to continue. Please enter in the &#39;</span>
+              <span class="s1">&#39;following interger value:  &lt; </span><span class="si">{valid_int}</span><span class="s1"> &gt;&#39;</span>
+              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">valid_int</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">validation_number</span><span class="p">)))</span>
+        <span class="c1"># Check for the correct validation number.</span>
+        <span class="n">user_answer</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Input above integer number:  &#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Validate for correct answer.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">validation_number</span> <span class="o">==</span> <span class="n">user_answer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TerminateError</span><span class="p">(</span><span class="s1">&#39;The warning verification process has failed. &#39;</span>
+                                 <span class="s1">&#39;The incorrect value has been inputted. &#39;</span>
+                                 <span class="s1">&#39;Terminating program to prevent damage. &#39;</span>
+                                 <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

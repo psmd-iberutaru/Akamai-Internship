@@ -9,6 +9,7 @@ Submodules
    Robustness.exception
    Robustness.input_parsing
    Robustness.validation
+   Robustness.warning
 
 Module contents
 ---------------
