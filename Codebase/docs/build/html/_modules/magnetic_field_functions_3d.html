@@ -63,7 +63,8 @@
 <div class="viewcode-block" id="circular_magnetic_field_cart_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.circular_magnetic_field_cart_3d">[docs]</a><span class="k">def</span> <span class="nf">circular_magnetic_field_cart_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
                                     <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                     <span class="n">mag_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
-                                    <span class="n">curl_axis</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">):</span>
+                                    <span class="n">curl_axis</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the cartesian magnetic field vectors of a circular field.</span>
 
 <span class="sd">    The circular magnetic field is radially symmetric. This function  </span>
@@ -154,7 +155,8 @@
 
 <div class="viewcode-block" id="hourglass_magnetic_field_cart_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.hourglass_magnetic_field_cart_3d">[docs]</a><span class="k">def</span> <span class="nf">hourglass_magnetic_field_cart_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
                                      <span class="n">h</span><span class="p">,</span> <span class="n">k_array</span><span class="p">,</span> <span class="n">disk_radius</span><span class="p">,</span> <span class="n">uniform_B0</span><span class="p">,</span>
-                                     <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+                                     <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Equation for hourglass magnetic fields given by Ewertowshi &amp; Basu 2013.</span>
 
 <span class="sd">    This function is the three dimensional version of the equations given by </span>
@@ -220,8 +222,9 @@
 
 
 <div class="viewcode-block" id="monopole_magnetic_field_cart_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.monopole_magnetic_field_cart_3d">[docs]</a><span class="k">def</span> <span class="nf">monopole_magnetic_field_cart_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
-                                    <span class="n">center</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
-                                    <span class="n">mag_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">):</span>
+                                    <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">mag_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This is a monopole magnetic field, extending radially with zero curl.</span>
 
 <span class="sd">    This function gives a description of a magnetic field extending radially</span>
@@ -230,7 +233,7 @@
 
 <span class="sd">    Note that this is currently an impossible shape for a magnetic field as</span>
 <span class="sd">    determined by Maxwell&#39;s equations. </span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    x : array_like</span>
@@ -265,7 +268,7 @@
     <span class="n">x</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-    <span class="n">center</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">center</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
     <span class="n">mag_function</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">mag_function</span><span class="p">,</span>
                                                        <span class="n">n_parameters</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -275,34 +278,36 @@
     <span class="n">z</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
     <span class="c1"># Convert the points into spherical cords.</span>
-    <span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">cst</span><span class="o">.</span><span class="n">cartesian_to_spherical_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">cst</span><span class="o">.</span><span class="n">cartesian_to_spherical_3d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
 
     <span class="c1"># Compute field.</span>
-    <span class="n">Bfield_r</span><span class="p">,</span><span class="n">Bfield_theta</span><span class="p">,</span><span class="n">Bfield_phi</span> <span class="o">=</span> \
-        <span class="n">monopole_magnetic_field_sphr_3d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span><span class="n">phi</span><span class="p">,</span>
-                                        <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">Bfield_r</span><span class="p">,</span> <span class="n">Bfield_theta</span><span class="p">,</span> <span class="n">Bfield_phi</span> <span class="o">=</span> \
+        <span class="n">monopole_magnetic_field_sphr_3d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span>
+                                        <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                         <span class="n">mag_function</span><span class="o">=</span><span class="n">mag_function</span><span class="p">)</span>
 
     <span class="c1"># Convert back to cartesian</span>
-    <span class="n">Bfield_x</span><span class="p">,</span><span class="n">Bfield_y</span><span class="p">,</span><span class="n">Bfield_z</span> <span class="o">=</span> \
+    <span class="n">Bfield_x</span><span class="p">,</span> <span class="n">Bfield_y</span><span class="p">,</span> <span class="n">Bfield_z</span> <span class="o">=</span> \
         <span class="n">_Backend</span><span class="o">.</span><span class="n">cst</span><span class="o">.</span><span class="n">spherical_to_cartesian_3d</span><span class="p">(</span><span class="n">Bfield_r</span><span class="p">,</span>
                                                <span class="n">theta</span> <span class="o">+</span> <span class="n">Bfield_theta</span><span class="p">,</span>
                                                <span class="n">phi</span> <span class="o">+</span> <span class="n">Bfield_phi</span><span class="p">)</span>
-    
-    <span class="c1"># Vectorize</span>
-    <span class="n">Bfield_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_x</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">Bfield_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_y</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_z</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Bfield_x</span><span class="p">,</span><span class="n">Bfield_y</span><span class="p">,</span><span class="n">Bfield_z</span></div>
+    <span class="c1"># Vectorize</span>
+    <span class="n">Bfield_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">Bfield_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Bfield_x</span><span class="p">,</span> <span class="n">Bfield_y</span><span class="p">,</span> <span class="n">Bfield_z</span></div>
 
 <span class="c1">########################################################################</span>
 <span class="c1">#####            3D Magnetic Field Cylindrical Functions           #####</span>
 <span class="c1">########################################################################</span>
 
+
 <div class="viewcode-block" id="hourglass_magnetic_field_cyln_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.hourglass_magnetic_field_cyln_3d">[docs]</a><span class="k">def</span> <span class="nf">hourglass_magnetic_field_cyln_3d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
                                      <span class="n">h</span><span class="p">,</span> <span class="n">k_array</span><span class="p">,</span> <span class="n">disk_radius</span><span class="p">,</span> <span class="n">uniform_B0</span><span class="p">,</span>
-                                     <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+                                     <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Equation for hourglass magnetic fields given by Ewertowshi &amp; Basu 2013.</span>
 
 <span class="sd">    This function is the three dimensional version of the equations given by </span>
@@ -371,8 +376,9 @@
 <span class="c1">########################################################################</span>
 
 <div class="viewcode-block" id="monopole_magnetic_field_sphr_3d"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.monopole_magnetic_field_sphr_3d">[docs]</a><span class="k">def</span> <span class="nf">monopole_magnetic_field_sphr_3d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span>
-                                    <span class="n">center</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
-                                    <span class="n">mag_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">):</span>
+                                    <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">mag_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This is a monopole magnetic field, extending radially with zero curl.</span>
 
 <span class="sd">    This function gives a description of a magnetic field extending radially</span>
@@ -415,7 +421,7 @@
     <span class="n">r</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
     <span class="n">phi</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
-    <span class="n">center</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">center</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
     <span class="n">mag_function</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_function_call</span><span class="p">(</span><span class="n">mag_function</span><span class="p">,</span>
                                                        <span class="n">n_parameters</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -430,11 +436,118 @@
     <span class="n">Bfield_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
 
     <span class="c1"># Vectorize</span>
-    <span class="n">Bfield_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_r</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">Bfield_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_theta</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">Bfield_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_phi</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">Bfield_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_r</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">Bfield_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_theta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">Bfield_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bfield_phi</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Bfield_r</span><span class="p">,</span><span class="n">Bfield_theta</span><span class="p">,</span><span class="n">Bfield_phi</span></div>
+    <span class="k">return</span> <span class="n">Bfield_r</span><span class="p">,</span> <span class="n">Bfield_theta</span><span class="p">,</span> <span class="n">Bfield_phi</span></div>
+
+
+<span class="c1">########################################################################</span>
+<span class="c1">#####               Combinations of Magnetic Fields                #####</span>
+<span class="c1">########################################################################</span>
+
+<div class="viewcode-block" id="linear_combination_magnetic_field"><a class="viewcode-back" href="../magnetic_field_functions_3d.html#magnetic_field_functions_3d.linear_combination_magnetic_field">[docs]</a><span class="k">def</span> <span class="nf">linear_combination_magnetic_field</span><span class="p">(</span><span class="n">field_functions</span><span class="p">,</span> <span class="n">contributions</span><span class="p">,</span>
+                                      <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function handles the linear combination of functions.</span>
+
+<span class="sd">    This function, when given a list of magnetic field functions, their contributions, and the required arguments, will return another function which is based on the linear combination (as determined by contribution) of the given functions. The linear combination of the magnetic fields relies on the superposition principle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    field_functions : array_like </span>
+<span class="sd">        The array of magnetic field functions that are to be used. Must be an</span>
+<span class="sd">        array_like of callable functions.</span>
+<span class="sd">    contributions : array_like</span>
+<span class="sd">        The float value array of the contribution of each magnetic fields. May</span>
+<span class="sd">        either be based on percentage, or a multiplicative factor.</span>
+<span class="sd">    **kwargs : arguments</span>
+<span class="sd">        A dictionary (or explicitly typed out list) of parameters that are required for the other field functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Do what little type checking is possible.</span>
+    <span class="n">contributions</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">contributions</span><span class="p">,</span>
+                                                      <span class="n">deep_validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># If there are not enough contributions, or not enough functions.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">field_functions</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">contributions</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">Robust</span><span class="o">.</span><span class="n">InputError</span><span class="p">(</span><span class="s1">&#39;The number of field functions and the &#39;</span>
+                                <span class="s1">&#39;number of values of the contribution &#39;</span>
+                                <span class="s1">&#39;must be the same.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Normalize the values of the contributions.</span>
+    <span class="n">norm_contri</span> <span class="o">=</span> <span class="n">contributions</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">contributions</span><span class="p">)</span>
+
+    <span class="c1"># Begin to make and compile the function.</span>
+    <span class="k">def</span> <span class="nf">linear_composite_field</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="c1"># Type check.</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+        <span class="n">composite_field_array</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">functiondex</span><span class="p">,</span> <span class="n">contributiondex</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">field_functions</span><span class="p">,</span> <span class="n">norm_contri</span><span class="p">):</span>
+            <span class="n">composite_field_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">contributiondex</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">functiondex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)))</span>
+
+        <span class="n">composite_field_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">composite_field_array</span><span class="p">)</span>
+        <span class="n">composite_field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">composite_field_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">Bfield_x_composite</span> <span class="o">=</span> <span class="n">composite_field</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Bfield_y_composite</span> <span class="o">=</span> <span class="n">composite_field</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">Bfield_z_composite</span> <span class="o">=</span> <span class="n">composite_field</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">Bfield_x_composite</span><span class="p">,</span> <span class="n">Bfield_y_composite</span><span class="p">,</span> <span class="n">Bfield_z_composite</span>
+
+    <span class="c1"># Create the docstring for the function.</span>
+    <span class="n">function_list_and_contri</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">functiondex</span><span class="p">,</span> <span class="n">contributiondex</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">field_functions</span><span class="p">,</span> <span class="n">norm_contri</span><span class="p">):</span>
+        <span class="n">function_list_and_contri</span> <span class="o">+=</span> \
+            <span class="nb">str</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">contributiondex</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;  ||  &#39;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">functiondex</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">kwargs_string_list</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">kwargsdex</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs_string_list</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">kwargsdex</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; = &#39;</span>
+                                  <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">kwargsdex</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">linear_composite_field</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> \
+        <span class="sd">&quot;&quot;&quot;A linear combination of magnetic field functions.</span>
+
+<span class="sd">        This function is a function that combines many different functions</span>
+<span class="sd">        in a linear combination according to a list of functions and </span>
+<span class="sd">        contributions given by the user. It returns a magnetic field function</span>
+<span class="sd">        that acts as the linear combination of such.</span>
+
+<span class="sd">        This particular function is made of the following functions:</span>
+<span class="sd">        Percent Contribution  ||  Function Name</span>
+<span class="sd">        {function_list}</span>
+
+<span class="sd">        Of which the following keyword parameters were fed into it:</span>
+<span class="sd">        {kwargs_list}</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : array_like</span>
+<span class="sd">            The values of x of the input points for the computation of the magnetic field.</span>
+<span class="sd">        y : array_like</span>
+<span class="sd">            The values of y of the input points for the computation of the magnetic field.</span>
+<span class="sd">        z : array_like</span>
+<span class="sd">            The values of z of the input points for the computation of the magnetic field.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Bfield_x_composite : ndarray</span>
+<span class="sd">            The x component of the composite magnetic field.</span>
+<span class="sd">        Bfield_y_composite : ndarray</span>
+<span class="sd">            The y component of the composite magnetic field.</span>
+<span class="sd">        Bfield_z_composite : ndarray</span>
+<span class="sd">            The z component of the composite magnetic field.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">function_list</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">function_list_and_contri</span><span class="p">),</span>
+            <span class="n">kwargs_list</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">kwargs_string_list</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">linear_composite_field</span></div>
 </pre></div>
 
           </div>

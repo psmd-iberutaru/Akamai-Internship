@@ -51,7 +51,7 @@ functions take in 2 parameters, the x,y values or rho,phi values, and return
 the u,v vector components of the given magnetic field</p>
 <dl class="function">
 <dt id="magnetic_field_functions_3d.circular_magnetic_field_cart_3d">
-<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">circular_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;, curl_axis='z'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#circular_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.circular_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">circular_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;, curl_axis='z', **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#circular_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.circular_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the cartesian magnetic field vectors of a circular field.</p>
 <p>The circular magnetic field is radially symmetric. This function
 returns the values of the components of a magnetic field given some
@@ -91,7 +91,7 @@ is perserved.</li>
 
 <dl class="function">
 <dt id="magnetic_field_functions_3d.hourglass_magnetic_field_cart_3d">
-<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">hourglass_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, h, k_array, disk_radius, uniform_B0, center=[0, 0, 0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#hourglass_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.hourglass_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">hourglass_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, h, k_array, disk_radius, uniform_B0, center=[0, 0, 0], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#hourglass_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.hourglass_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Equation for hourglass magnetic fields given by Ewertowshi &amp; Basu 2013.</p>
 <p>This function is the three dimensional version of the equations given by
 Ewertowshi &amp; Basu 2013. This function assumes, as the paper does, that the
@@ -128,7 +128,7 @@ as an array <code class="docutils literal notranslate"><span class="pre">[r0,phi
 
 <dl class="function">
 <dt id="magnetic_field_functions_3d.hourglass_magnetic_field_cyln_3d">
-<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">hourglass_magnetic_field_cyln_3d</code><span class="sig-paren">(</span><em>rho, phi, z, h, k_array, disk_radius, uniform_B0, center=[0, 0, 0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#hourglass_magnetic_field_cyln_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.hourglass_magnetic_field_cyln_3d" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">hourglass_magnetic_field_cyln_3d</code><span class="sig-paren">(</span><em>rho, phi, z, h, k_array, disk_radius, uniform_B0, center=[0, 0, 0], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#hourglass_magnetic_field_cyln_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.hourglass_magnetic_field_cyln_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Equation for hourglass magnetic fields given by Ewertowshi &amp; Basu 2013.</p>
 <p>This function is the three dimensional version of the equations given by
 Ewertowshi &amp; Basu 2013. This function assumes, as the paper does, that the
@@ -164,8 +164,30 @@ as an array <code class="docutils literal notranslate"><span class="pre">[r0,phi
 </dd></dl>
 
 <dl class="function">
+<dt id="magnetic_field_functions_3d.linear_combination_magnetic_field">
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">linear_combination_magnetic_field</code><span class="sig-paren">(</span><em>field_functions</em>, <em>contributions</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#linear_combination_magnetic_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.linear_combination_magnetic_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function handles the linear combination of functions.</p>
+<p>This function, when given a list of magnetic field functions, their contributions, and the required arguments, will return another function which is based on the linear combination (as determined by contribution) of the given functions. The linear combination of the magnetic fields relies on the superposition principle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>field_functions</strong> (<em>array_like</em>) – The array of magnetic field functions that are to be used. Must be an
+array_like of callable functions.</li>
+<li><strong>contributions</strong> (<em>array_like</em>) – The float value array of the contribution of each magnetic fields. May
+either be based on percentage, or a multiplicative factor.</li>
+<li><strong>**kwargs</strong> (<em>arguments</em>) – A dictionary (or explicitly typed out list) of parameters that are required for the other field functions.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="magnetic_field_functions_3d.monopole_magnetic_field_cart_3d">
-<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">monopole_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#monopole_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.monopole_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">monopole_magnetic_field_cart_3d</code><span class="sig-paren">(</span><em>x, y, z, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#monopole_magnetic_field_cart_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.monopole_magnetic_field_cart_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a monopole magnetic field, extending radially with zero curl.</p>
 <p>This function gives a description of a magnetic field extending radially
 according to some magnitude function (as a function of radius). The
@@ -199,7 +221,7 @@ determined by Maxwell’s equations.</p>
 
 <dl class="function">
 <dt id="magnetic_field_functions_3d.monopole_magnetic_field_sphr_3d">
-<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">monopole_magnetic_field_sphr_3d</code><span class="sig-paren">(</span><em>r, theta, phi, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#monopole_magnetic_field_sphr_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.monopole_magnetic_field_sphr_3d" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">magnetic_field_functions_3d.</code><code class="descname">monopole_magnetic_field_sphr_3d</code><span class="sig-paren">(</span><em>r, theta, phi, center=[0, 0, 0], mag_function=&lt;function &lt;lambda&gt;&gt;, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magnetic_field_functions_3d.html#monopole_magnetic_field_sphr_3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#magnetic_field_functions_3d.monopole_magnetic_field_sphr_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a monopole magnetic field, extending radially with zero curl.</p>
 <p>This function gives a description of a magnetic field extending radially
 according to some magnitude function (as a function of radius). The

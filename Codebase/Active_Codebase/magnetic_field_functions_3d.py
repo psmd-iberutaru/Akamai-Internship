@@ -24,7 +24,8 @@ import magnetic_field_functions_2d as mff2d
 def circular_magnetic_field_cart_3d(x, y, z,
                                     center=[0, 0, 0],
                                     mag_function=lambda r: 1/r**2,
-                                    curl_axis='z'):
+                                    curl_axis='z',
+                                    **kwargs):
     """Compute the cartesian magnetic field vectors of a circular field.
 
     The circular magnetic field is radially symmetric. This function  
@@ -115,7 +116,8 @@ def circular_magnetic_field_cart_3d(x, y, z,
 
 def hourglass_magnetic_field_cart_3d(x, y, z,
                                      h, k_array, disk_radius, uniform_B0,
-                                     center=[0, 0, 0]):
+                                     center=[0, 0, 0],
+                                     **kwargs):
     """Equation for hourglass magnetic fields given by Ewertowshi & Basu 2013.
 
     This function is the three dimensional version of the equations given by 
@@ -181,8 +183,9 @@ def hourglass_magnetic_field_cart_3d(x, y, z,
 
 
 def monopole_magnetic_field_cart_3d(x, y, z,
-                                    center = [0,0,0],
-                                    mag_function=lambda r: r**2):
+                                    center=[0, 0, 0],
+                                    mag_function=lambda r: r**2,
+                                    **kwargs):
     """This is a monopole magnetic field, extending radially with zero curl.
 
     This function gives a description of a magnetic field extending radially
@@ -191,7 +194,7 @@ def monopole_magnetic_field_cart_3d(x, y, z,
 
     Note that this is currently an impossible shape for a magnetic field as
     determined by Maxwell's equations. 
-    
+
     Parameters
     ----------
     x : array_like
@@ -226,7 +229,7 @@ def monopole_magnetic_field_cart_3d(x, y, z,
     x = Robust.valid.validate_float_array(x)
     y = Robust.valid.validate_float_array(y)
     z = Robust.valid.validate_float_array(z)
-    center = Robust.valid.validate_float_array(center,shape=(3,))
+    center = Robust.valid.validate_float_array(center, shape=(3,))
     mag_function = Robust.valid.validate_function_call(mag_function,
                                                        n_parameters=1)
 
@@ -236,34 +239,36 @@ def monopole_magnetic_field_cart_3d(x, y, z,
     z = z - center[2]
 
     # Convert the points into spherical cords.
-    r, theta, phi = _Backend.cst.cartesian_to_spherical_3d(x,y,z)
+    r, theta, phi = _Backend.cst.cartesian_to_spherical_3d(x, y, z)
 
     # Compute field.
-    Bfield_r,Bfield_theta,Bfield_phi = \
-        monopole_magnetic_field_sphr_3d(r,theta,phi,
-                                        center=[0,0,0],
+    Bfield_r, Bfield_theta, Bfield_phi = \
+        monopole_magnetic_field_sphr_3d(r, theta, phi,
+                                        center=[0, 0, 0],
                                         mag_function=mag_function)
 
     # Convert back to cartesian
-    Bfield_x,Bfield_y,Bfield_z = \
+    Bfield_x, Bfield_y, Bfield_z = \
         _Backend.cst.spherical_to_cartesian_3d(Bfield_r,
                                                theta + Bfield_theta,
                                                phi + Bfield_phi)
-    
-    # Vectorize
-    Bfield_x = np.array(Bfield_x,dtype=float)
-    Bfield_y = np.array(Bfield_y,dtype=float)
-    Bfield_z = np.array(Bfield_z,dtype=float)
 
-    return Bfield_x,Bfield_y,Bfield_z
+    # Vectorize
+    Bfield_x = np.array(Bfield_x, dtype=float)
+    Bfield_y = np.array(Bfield_y, dtype=float)
+    Bfield_z = np.array(Bfield_z, dtype=float)
+
+    return Bfield_x, Bfield_y, Bfield_z
 
 ########################################################################
 #####            3D Magnetic Field Cylindrical Functions           #####
 ########################################################################
 
+
 def hourglass_magnetic_field_cyln_3d(rho, phi, z,
                                      h, k_array, disk_radius, uniform_B0,
-                                     center=[0, 0, 0]):
+                                     center=[0, 0, 0],
+                                     **kwargs):
     """Equation for hourglass magnetic fields given by Ewertowshi & Basu 2013.
 
     This function is the three dimensional version of the equations given by 
@@ -332,8 +337,9 @@ def hourglass_magnetic_field_cyln_3d(rho, phi, z,
 ########################################################################
 
 def monopole_magnetic_field_sphr_3d(r, theta, phi,
-                                    center = [0,0,0],
-                                    mag_function=lambda r: r**2):
+                                    center=[0, 0, 0],
+                                    mag_function=lambda r: 1/r**2,
+                                    **kwargs):
     """This is a monopole magnetic field, extending radially with zero curl.
 
     This function gives a description of a magnetic field extending radially
@@ -376,7 +382,7 @@ def monopole_magnetic_field_sphr_3d(r, theta, phi,
     r = Robust.valid.validate_float_array(r)
     theta = Robust.valid.validate_float_array(theta)
     phi = Robust.valid.validate_float_array(phi)
-    center = Robust.valid.validate_float_array(center,shape=(3,))
+    center = Robust.valid.validate_float_array(center, shape=(3,))
     mag_function = Robust.valid.validate_function_call(mag_function,
                                                        n_parameters=1)
 
@@ -391,8 +397,115 @@ def monopole_magnetic_field_sphr_3d(r, theta, phi,
     Bfield_phi = np.zeros_like(phi)
 
     # Vectorize
-    Bfield_r = np.array(Bfield_r,dtype=float)
-    Bfield_theta = np.array(Bfield_theta,dtype=float)
-    Bfield_phi = np.array(Bfield_phi,dtype=float)
+    Bfield_r = np.array(Bfield_r, dtype=float)
+    Bfield_theta = np.array(Bfield_theta, dtype=float)
+    Bfield_phi = np.array(Bfield_phi, dtype=float)
 
-    return Bfield_r,Bfield_theta,Bfield_phi
+    return Bfield_r, Bfield_theta, Bfield_phi
+
+
+########################################################################
+#####               Combinations of Magnetic Fields                #####
+########################################################################
+
+def linear_combination_magnetic_field(field_functions, contributions,
+                                      **kwargs):
+    """This function handles the linear combination of functions.
+
+    This function, when given a list of magnetic field functions, their contributions, and the required arguments, will return another function which is based on the linear combination (as determined by contribution) of the given functions. The linear combination of the magnetic fields relies on the superposition principle.
+
+    Parameters
+    ----------
+    field_functions : array_like 
+        The array of magnetic field functions that are to be used. Must be an
+        array_like of callable functions.
+    contributions : array_like
+        The float value array of the contribution of each magnetic fields. May
+        either be based on percentage, or a multiplicative factor.
+    **kwargs : arguments
+        A dictionary (or explicitly typed out list) of parameters that are required for the other field functions.
+    """
+
+    # Do what little type checking is possible.
+    contributions = Robust.valid.validate_float_array(contributions,
+                                                      deep_validate=True)
+
+    # If there are not enough contributions, or not enough functions.
+    if (len(field_functions) != len(contributions)):
+        raise Robust.InputError('The number of field functions and the '
+                                'number of values of the contribution '
+                                'must be the same.')
+
+    # Normalize the values of the contributions.
+    norm_contri = contributions / np.sum(contributions)
+
+    # Begin to make and compile the function.
+    def linear_composite_field(x, y, z):
+        # Type check.
+        x = Robust.valid.validate_float_array(x)
+        y = Robust.valid.validate_float_array(y)
+        z = Robust.valid.validate_float_array(z)
+
+        composite_field_array = []
+        for functiondex, contributiondex in zip(field_functions, norm_contri):
+            composite_field_array.append(
+                contributiondex * np.array(functiondex(x, y, z, **kwargs)))
+
+        composite_field_array = np.array(composite_field_array)
+        composite_field = np.sum(composite_field_array, axis=0)
+
+        Bfield_x_composite = composite_field[0]
+        Bfield_y_composite = composite_field[1]
+        Bfield_z_composite = composite_field[2]
+
+        return Bfield_x_composite, Bfield_y_composite, Bfield_z_composite
+
+    # Create the docstring for the function.
+    function_list_and_contri = ''
+    for functiondex, contributiondex in zip(field_functions, norm_contri):
+        function_list_and_contri += \
+            str(str(contributiondex) + '  ||  '
+                + str(functiondex.__name__) + '\n')
+
+    kwargs_string_list = ''
+    for kwargsdex in kwargs:
+        kwargs_string_list += str(str(kwargsdex) + ' = '
+                                  + str(kwargs[kwargsdex]) + '\n')
+
+    linear_composite_field.__doc__ = \
+        """A linear combination of magnetic field functions.
+
+        This function is a function that combines many different functions
+        in a linear combination according to a list of functions and 
+        contributions given by the user. It returns a magnetic field function
+        that acts as the linear combination of such.
+
+        This particular function is made of the following functions:
+        Percent Contribution  ||  Function Name
+        {function_list}
+
+        Of which the following keyword parameters were fed into it:
+        {kwargs_list}
+
+        Parameters
+        ----------
+        x : array_like
+            The values of x of the input points for the computation of the magnetic field.
+        y : array_like
+            The values of y of the input points for the computation of the magnetic field.
+        z : array_like
+            The values of z of the input points for the computation of the magnetic field.
+
+        Returns
+        -------
+        Bfield_x_composite : ndarray
+            The x component of the composite magnetic field.
+        Bfield_y_composite : ndarray
+            The y component of the composite magnetic field.
+        Bfield_z_composite : ndarray
+            The z component of the composite magnetic field.
+        """.format(
+            function_list=str(function_list_and_contri),
+            kwargs_list=str(kwargs_string_list))
+
+    return linear_composite_field

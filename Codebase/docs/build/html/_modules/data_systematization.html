@@ -43,6 +43,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">sp_inter</span>
+<span class="kn">import</span> <span class="nn">scipy.spatial</span> <span class="k">as</span> <span class="nn">sp_spt</span>
 
 <span class="kn">import</span> <span class="nn">Robustness</span> <span class="k">as</span> <span class="nn">Robust</span>
 <span class="kn">import</span> <span class="nn">Backend</span> <span class="k">as</span> <span class="nn">_Backend</span>
@@ -191,6 +194,53 @@
                                     <span class="s1">&#39;    --Kyubey&#39;</span>
                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_cls</span><span class="o">=</span><span class="n">classification</span><span class="p">))</span>
 
+        <span class="c1"># Precompute the Delaunay triangulation, this is done under the </span>
+        <span class="c1"># assumption that the table should not be changed after data is</span>
+        <span class="c1"># put into it.</span>
+        <span class="c1"># pylint: disable=maybe-no-member</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Delanuay_tri</span> <span class="o">=</span> <span class="n">sp_spt</span><span class="o">.</span><span class="n">Delaunay</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x_values</span><span class="p">,</span><span class="n">y_values</span><span class="p">,</span><span class="n">z_values</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># If there is a Qhull error, we don&#39;t want to deal with it. Does</span>
+            <span class="c1"># not currently know how to specify the QHull error on its own.</span>
+            <span class="n">Delanuay_tri</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># pylint: enable=maybe-no-member</span>
+
+        <span class="c1"># Attempt to make the linear interpolators.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Delanuay_tri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">classification</span> <span class="o">==</span> <span class="s1">&#39;scalar&#39;</span><span class="p">):</span>
+                <span class="n">linear_interp_scalar</span> <span class="o">=</span> \
+                    <span class="n">sp_inter</span><span class="o">.</span><span class="n">LinearNDInterpolator</span><span class="p">(</span><span class="n">Delanuay_tri</span><span class="p">,</span>
+                                                  <span class="n">scalar_ans</span><span class="p">,</span><span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># Just for safety reasons.</span>
+                <span class="n">linear_interp_x_axis</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">linear_interp_y_axis</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">linear_interp_z_axis</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">classification</span> <span class="o">==</span> <span class="s1">&#39;vector&#39;</span><span class="p">):</span>
+                <span class="n">linear_interp_x_axis</span> <span class="o">=</span> \
+                    <span class="n">sp_inter</span><span class="o">.</span><span class="n">LinearNDInterpolator</span><span class="p">(</span><span class="n">Delanuay_tri</span><span class="p">,</span>
+                                                  <span class="n">x_vector_ans</span><span class="p">,</span>
+                                                  <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">linear_interp_y_axis</span> <span class="o">=</span> \
+                    <span class="n">sp_inter</span><span class="o">.</span><span class="n">LinearNDInterpolator</span><span class="p">(</span><span class="n">Delanuay_tri</span><span class="p">,</span>
+                                                  <span class="n">y_vector_ans</span><span class="p">,</span>
+                                                  <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">linear_interp_z_axis</span> <span class="o">=</span> \
+                    <span class="n">sp_inter</span><span class="o">.</span><span class="n">LinearNDInterpolator</span><span class="p">(</span><span class="n">Delanuay_tri</span><span class="p">,</span>
+                                                  <span class="n">z_vector_ans</span><span class="p">,</span>
+                                                  <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># For safety reasons.</span>
+                <span class="n">linear_interp_scalar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">linear_interp_scalar</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">linear_interp_x_axis</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">linear_interp_y_axis</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">linear_interp_z_axis</span> <span class="o">=</span> <span class="kc">None</span>
+
+
         <span class="c1"># Assign variables. Depending on the actual </span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span> <span class="o">=</span> <span class="n">x_values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_values</span> <span class="o">=</span> <span class="n">y_values</span>
@@ -199,7 +249,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scalar_ans</span> <span class="o">=</span> <span class="n">scalar_ans</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_vector_ans</span> <span class="o">=</span> <span class="n">x_vector_ans</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_vector_ans</span> <span class="o">=</span> <span class="n">y_vector_ans</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z_vector_ans</span> <span class="o">=</span> <span class="n">z_vector_ans</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_vector_ans</span> <span class="o">=</span> <span class="n">z_vector_ans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Delanuay_triangulation</span> <span class="o">=</span> <span class="n">Delanuay_tri</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_scalar</span> <span class="o">=</span> <span class="n">linear_interp_scalar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_x_axis</span> <span class="o">=</span> <span class="n">linear_interp_x_axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_y_axis</span> <span class="o">=</span> <span class="n">linear_interp_y_axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_z_axis</span> <span class="o">=</span> <span class="n">linear_interp_z_axis</span></div>
+
 
     
 <div class="viewcode-block" id="InterpolationTable.numerical_function"><a class="viewcode-back" href="../data_systematization.html#data_systematization.InterpolationTable.numerical_function">[docs]</a>    <span class="k">def</span> <span class="nf">numerical_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">interp_method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">):</span>
@@ -225,21 +281,44 @@
 <span class="sd">            The numerical interpolation function that attempts to best</span>
 <span class="sd">            replicate the table.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Detect if the table provided is a scalar or vector based lookup</span>
-        <span class="c1"># table. Return a numerical function implementation based on such.</span>
+        <span class="c1"># Check if a precomputed linear interpolation method(s) are already</span>
+        <span class="c1"># avaliable. If not, detect and return the correct bruteforce method</span>
+        <span class="c1"># of numerical interpolation.</span>
         <span class="n">numeric_function</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classification</span> <span class="o">==</span> <span class="s1">&#39;scalar&#39;</span><span class="p">):</span>
-            <span class="n">numeric_function</span> <span class="o">=</span> \
-                <span class="n">_Backend</span><span class="o">.</span><span class="n">tbint</span><span class="o">.</span><span class="n">funt_interpolate_scalar_table</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y_values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_values</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">scalar_ans</span><span class="p">,</span>
-                    <span class="n">interp_method</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_Delanuay_triangulation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_scalar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
+                <span class="c1"># Return the precomputed linear scalar interpolation.</span>
+                <span class="k">def</span> <span class="nf">linear_interp_scalar_funt</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_scalar</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">linear_interp_scalar_funt</span> <span class="o">=</span> \
+                    <span class="n">_Backend</span><span class="o">.</span><span class="n">tbint</span><span class="o">.</span><span class="n">funt_interpolate_scalar_table</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y_values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_values</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">scalar_ans</span><span class="p">,</span>
+                        <span class="n">interp_method</span><span class="p">)</span>
+            <span class="c1"># Assign the numeric function.</span>
+            <span class="n">numeric_function</span> <span class="o">=</span> <span class="n">linear_interp_scalar_funt</span>
         <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classification</span> <span class="o">==</span> <span class="s1">&#39;vector&#39;</span><span class="p">):</span>
-            <span class="n">numeric_function</span> <span class="o">=</span> \
-                <span class="n">_Backend</span><span class="o">.</span><span class="n">tbint</span><span class="o">.</span><span class="n">funt_interpolate_vector_table</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y_values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_values</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">x_vector_ans</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y_vector_ans</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_vector_ans</span><span class="p">,</span>
-                    <span class="n">interp_method</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_Delanuay_triangulation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_x_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_y_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> 
+                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_z_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>
+                <span class="c1"># Return the precomputed linear vector interpolation.</span>
+                <span class="k">def</span> <span class="nf">linear_interp_vector_funt</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+                    <span class="n">interp_vector</span> <span class="o">=</span> \
+                        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_x_axis</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)),</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_y_axis</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)),</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">_linear_interp_z_axis</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">))])</span>
+                    <span class="k">return</span> <span class="n">interp_vector</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">linear_interp_vector_funt</span> <span class="o">=</span> \
+                    <span class="n">_Backend</span><span class="o">.</span><span class="n">tbint</span><span class="o">.</span><span class="n">funt_interpolate_vector_table</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y_values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_values</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">x_vector_ans</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y_vector_ans</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z_vector_ans</span><span class="p">,</span>
+                        <span class="n">interp_method</span><span class="p">)</span>
+            <span class="c1"># Assign the numeric function</span>
+            <span class="n">numeric_function</span> <span class="o">=</span> <span class="n">linear_interp_vector_funt</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">Robust</span><span class="o">.</span><span class="n">InputError</span><span class="p">(</span><span class="s1">&#39;Table classification must be one of the &#39;</span>
                                     <span class="s1">&#39;following: </span><span class="se">\n</span><span class="s1">&#39;</span>

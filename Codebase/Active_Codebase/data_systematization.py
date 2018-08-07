@@ -4,6 +4,9 @@ accepted data type into a more usable datatype by this module.
 """
 
 import numpy as np
+import scipy as sp
+import scipy.interpolate as sp_inter
+import scipy.spatial as sp_spt
 
 import Robustness as Robust
 import Backend as _Backend
@@ -152,6 +155,53 @@ class InterpolationTable():
                                     '    --Kyubey'
                                     .format(table_cls=classification))
 
+        # Precompute the Delaunay triangulation, this is done under the 
+        # assumption that the table should not be changed after data is
+        # put into it.
+        # pylint: disable=maybe-no-member
+        try:
+            Delanuay_tri = sp_spt.Delaunay(
+                np.array([x_values,y_values,z_values]).T)
+        except (TypeError,ValueError):
+            raise
+        except Exception:
+            # If there is a Qhull error, we don't want to deal with it. Does
+            # not currently know how to specify the QHull error on its own.
+            Delanuay_tri = None
+        # pylint: enable=maybe-no-member
+
+        # Attempt to make the linear interpolators.
+        if (Delanuay_tri is not None):
+            if (classification == 'scalar'):
+                linear_interp_scalar = \
+                    sp_inter.LinearNDInterpolator(Delanuay_tri,
+                                                  scalar_ans,fill_value=0)
+                # Just for safety reasons.
+                linear_interp_x_axis = None
+                linear_interp_y_axis = None
+                linear_interp_z_axis = None
+            elif (classification == 'vector'):
+                linear_interp_x_axis = \
+                    sp_inter.LinearNDInterpolator(Delanuay_tri,
+                                                  x_vector_ans,
+                                                  fill_value=0)
+                linear_interp_y_axis = \
+                    sp_inter.LinearNDInterpolator(Delanuay_tri,
+                                                  y_vector_ans,
+                                                  fill_value=0)
+                linear_interp_z_axis = \
+                    sp_inter.LinearNDInterpolator(Delanuay_tri,
+                                                  z_vector_ans,
+                                                  fill_value=0)
+                # For safety reasons.
+                linear_interp_scalar = None
+        else:
+            linear_interp_scalar = None
+            linear_interp_x_axis = None
+            linear_interp_y_axis = None
+            linear_interp_z_axis = None
+
+
         # Assign variables. Depending on the actual 
         self.x_values = x_values
         self.y_values = y_values
@@ -161,6 +211,12 @@ class InterpolationTable():
         self.x_vector_ans = x_vector_ans
         self.y_vector_ans = y_vector_ans
         self.z_vector_ans = z_vector_ans
+        self._Delanuay_triangulation = Delanuay_tri
+        self._linear_interp_scalar = linear_interp_scalar
+        self._linear_interp_x_axis = linear_interp_x_axis
+        self._linear_interp_y_axis = linear_interp_y_axis
+        self._linear_interp_z_axis = linear_interp_z_axis
+
 
     
     def numerical_function(self,interp_method='linear'):
@@ -186,21 +242,44 @@ class InterpolationTable():
             The numerical interpolation function that attempts to best
             replicate the table.
         """
-        # Detect if the table provided is a scalar or vector based lookup
-        # table. Return a numerical function implementation based on such.
+        # Check if a precomputed linear interpolation method(s) are already
+        # avaliable. If not, detect and return the correct bruteforce method
+        # of numerical interpolation.
         numeric_function = None
         if (self.classification == 'scalar'):
-            numeric_function = \
-                _Backend.tbint.funt_interpolate_scalar_table(
-                    self.x_values,self.y_values,self.z_values,
-                    self.scalar_ans,
-                    interp_method)
+            if ((self._Delanuay_triangulation is not None) and
+                (self._linear_interp_scalar is not None)):
+                # Return the precomputed linear scalar interpolation.
+                def linear_interp_scalar_funt(x,y,z):
+                    return self._linear_interp_scalar((x,y,z))
+            else:
+                linear_interp_scalar_funt = \
+                    _Backend.tbint.funt_interpolate_scalar_table(
+                        self.x_values,self.y_values,self.z_values,
+                        self.scalar_ans,
+                        interp_method)
+            # Assign the numeric function.
+            numeric_function = linear_interp_scalar_funt
         elif (self.classification == 'vector'):
-            numeric_function = \
-                _Backend.tbint.funt_interpolate_vector_table(
-                    self.x_values,self.y_values,self.z_values,
-                    self.x_vector_ans,self.y_vector_ans,self.z_vector_ans,
-                    interp_method)
+            if ((self._Delanuay_triangulation is not None) and
+                ((self._linear_interp_x_axis is not None) and
+                 (self._linear_interp_y_axis is not None) and 
+                 (self._linear_interp_z_axis is not None))):
+                # Return the precomputed linear vector interpolation.
+                def linear_interp_vector_funt(x,y,z):
+                    interp_vector = \
+                        np.array([self._linear_interp_x_axis((x,y,z)),
+                                  self._linear_interp_y_axis((x,y,z)),
+                                  self._linear_interp_z_axis((x,y,z))])
+                    return interp_vector
+            else:
+                linear_interp_vector_funt = \
+                    _Backend.tbint.funt_interpolate_vector_table(
+                        self.x_values,self.y_values,self.z_values,
+                        self.x_vector_ans,self.y_vector_ans,self.z_vector_ans,
+                        interp_method)
+            # Assign the numeric function
+            numeric_function = linear_interp_vector_funt
         else:
             raise Robust.InputError('Table classification must be one of the '
                                     'following: \n'

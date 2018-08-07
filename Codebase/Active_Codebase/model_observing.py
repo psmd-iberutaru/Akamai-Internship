@@ -229,7 +229,7 @@ class ProtostarModel():
             should be used for complex shapes. Defaults at 100.
         """
         # Initialization of boolean checks.
-        # Check if the user input a interpolated data table instead of a 
+        # Check if the user input a interpolated data table instead of a
         # function. The integration method must change if so.
         input_interpolated_tables = False
 
@@ -313,8 +313,9 @@ class ProtostarModel():
         elif (isinstance(polarization_model, (float, int))):
             percent_polarized = float(copy.deepcopy(polarization_model))
             # The user desires a constant value for the percent polarization.
-            def constant_function(x, y, z): 
-                return np.full_like(x,percent_polarized)
+
+            def constant_function(x, y, z):
+                return np.full_like(x, percent_polarized)
             polarization_model = constant_function
         elif (isinstance(polarization_model, d_systize.InterpolationTable)):
             # The user has inputted an interpolation table, record such.
@@ -345,11 +346,30 @@ class ProtostarModel():
         zeros_guess_count = Robust.valid.validate_int_value(zeros_guess_count,
                                                             greater_than=0)
 
+        # All models equations must be offset by the coordinates. This
+        # transformation assumes the flat approximation of the astronomical
+        # sky.
+        coordinates.ra.wrap_angle = ra_wrap_angle
+        ra_radians = float(coordinates.ra.hour * (np.pi / 12))
+        dec_radians = float(coordinates.dec.radian)
+        # Translate the cloud model function.
+        def translate_cloud_model(x, y, z):
+            return cloud_model(x, y - ra_radians, z-dec_radians)
+        # Translate the magnetic field function.
+        def translate_magnetic_field(x, y, z):
+            return magnetic_field_model(x, y - ra_radians, z-dec_radians)
+        # Translate the density model function.
+        def translate_density_model(x, y, z):
+            return density_model(x, y - ra_radians, z-dec_radians)
+        # Translate the polarization model function.
+        def translate_polarization_model(x, y, z):
+            return polarization_model(x, y - ra_radians, z-dec_radians)
+
         self.coordinates = coordinates
-        self.cloud_model = cloud_model
-        self.magnetic_field = magnetic_field_model
-        self.density_model = density_model
-        self.polarization_model = polarization_model
+        self.cloud_model = translate_cloud_model
+        self.magnetic_field = translate_magnetic_field
+        self.density_model = translate_density_model
+        self.polarization_model = translate_polarization_model
         self._ra_wrap_angle = ra_wrap_angle
         self._interpolated_tables = input_interpolated_tables
         self._zeros_guess_count = zeros_guess_count
@@ -459,7 +479,7 @@ class ObservingRun():
              (sightline_ra_radians + field_of_view/2)) and
             ((sightline_dec_radians - field_of_view/2)
              <= obs_target_dec_radians <=
-             (sightline_dec_radians + field_of_view)/2)):
+             (sightline_dec_radians + field_of_view/2))):
             # If at this stage, it should be fine.
             pass
         else:
@@ -473,7 +493,7 @@ class ObservingRun():
         self.offset = field_of_view/2
 
     def Stokes_parameter_contours(self,
-                                  n_axial_samples=25):
+                                  plot_parameters=True, n_axial_samples=25):
         """This function produces a contour plot of the stoke values.
 
         This function generates a large number of random sightlines to 
@@ -485,6 +505,9 @@ class ObservingRun():
 
         Parameters
         ----------
+        plot_parameters : bool; optional
+            A boolean value to specify if the user wanted the parameters to be
+            plotted.
         n_axial_samples : int; optional
             The number of points along one RA or DEC axis to be sampled. The
             resulting sample is a mesh n**2 between the bounds. Default is 25.
@@ -517,33 +540,53 @@ class ObservingRun():
         polar_I = np.hypot(Q, U)
         angle = _Backend.efp.angle_from_Stokes_parameters(Q, U)
 
-        # Arrange the values into plottable values. The x-axis is RA, and the
-        # y-axis is DEC.
-        plotting_x_axis = ra_dec_array[0]
-        plotting_y_axis = ra_dec_array[1]
+        # Double check if the user actually wanted them plotted.
+        if (plot_parameters):
+            # Arrange the values into plottable values. The x-axis is RA, and
+            # the y-axis is DEC.
+            x_axis_plot = ra_dec_array[0]
+            y_axis_plot = ra_dec_array[1]
 
-        # Extrapolate and plot a contour based on irregularly spaced data.
-        ax1_o = ax1.tricontourf(plotting_x_axis, plotting_y_axis, I, 50)
-        ax2_o = ax2.tricontourf(plotting_x_axis, plotting_y_axis, polar_I, 50)
-        ax3_o = ax3.tricontourf(plotting_x_axis, plotting_y_axis, Q, 50)
-        ax4_o = ax4.tricontourf(plotting_x_axis, plotting_y_axis, U, 50)
-        ax5_o = ax5.tricontourf(plotting_x_axis, plotting_y_axis, angle, 50)
+            # Color maps, each gets their own special-ish kind of color map
+            # depending on the plot.
+            intensity_maps = mpl.cm.get_cmap('inferno')
+            seismic_map = mpl.cm.get_cmap('seismic')
+            Q_polarization_map = \
+                _Backend.pltcust.zeroedColorMap(seismic_map, Q.min(), Q.max())
+            U_polarization_map = \
+                _Backend.pltcust.zeroedColorMap(seismic_map, U.min(), U.max())
+            PuOr_map = mpl.cm.get_cmap('PuOr')
+            angle_map = \
+                _Backend.pltcust.zeroedColorMap(PuOr_map,
+                                                angle.min(), angle.max())
 
-        # Assign titles.
-        ax1.set_title('Total Intensity')
-        ax2.set_title('Polar Intensity')
-        ax3.set_title('Q Values')
-        ax4.set_title('U Values')
-        ax5.set_title('Angle')
+            # Extrapolate and plot a contour based on irregularly spaced data.
+            ax1_o = ax1.tricontourf(x_axis_plot, y_axis_plot, I, 50,
+                                    cmap=intensity_maps)
+            ax2_o = ax2.tricontourf(x_axis_plot, y_axis_plot, polar_I, 50,
+                                    cmap=intensity_maps)
+            ax3_o = ax3.tricontourf(x_axis_plot, y_axis_plot, Q, 50,
+                                    cmap=Q_polarization_map)
+            ax4_o = ax4.tricontourf(x_axis_plot, y_axis_plot, U, 50,
+                                    cmap=U_polarization_map)
+            ax5_o = ax5.tricontourf(x_axis_plot, y_axis_plot, angle, 50,
+                                    cmap=angle_map)
 
-        # Assign a color bar legends
-        fig1.colorbar(ax1_o, ax=ax1)
-        fig1.colorbar(ax2_o, ax=ax2)
-        fig1.colorbar(ax3_o, ax=ax3)
-        fig1.colorbar(ax4_o, ax=ax4)
-        fig1.colorbar(ax5_o, ax=ax5)
+            # Assign titles.
+            ax1.set_title('Total Intensity')
+            ax2.set_title('Polar Intensity')
+            ax3.set_title('Q Values')
+            ax4.set_title('U Values')
+            ax5.set_title('Angle')
 
-        plt.show()
+            # Assign a color bar legends
+            fig1.colorbar(ax1_o, ax=ax1)
+            fig1.colorbar(ax2_o, ax=ax2)
+            fig1.colorbar(ax3_o, ax=ax3)
+            fig1.colorbar(ax4_o, ax=ax4)
+            fig1.colorbar(ax5_o, ax=ax5)
+
+            plt.show()
 
         # Just in case they want to play with the data.
         return ra_dec_array, stokes_parameters
@@ -605,7 +648,7 @@ class ObservingRun():
         # Integrate over the density function.
         integrated_intensity, int_error = _Backend.cli.cloud_line_integral(
             self.target.density_model, self.target.cloud_model,
-            sightline_center, box_width, 
+            sightline_center, box_width,
             view_line_deltas=sightline_slopes,
             n_guesses=self.target._zeros_guess_count,
             integral_method=integral_method)
@@ -614,7 +657,7 @@ class ObservingRun():
         polarized_integrated_intensity, pol_error = \
             _Backend.cli.cloud_line_integral(
                 polarization_intensity, self.target.cloud_model,
-                sightline_center, box_width, 
+                sightline_center, box_width,
                 view_line_deltas=sightline_slopes,
                 n_guesses=self.target._zeros_guess_count,
                 integral_method=integral_method)
@@ -688,19 +731,19 @@ class ObservingRun():
         # Begin computation.
         Bfield_x_integrated, error_x = _Backend.cli.cloud_line_integral(
             target_cloud_Bfield_x, self.target.cloud_model,
-            sightline_center, box_width, 
+            sightline_center, box_width,
             view_line_deltas=sightline_slopes,
             n_guesses=self.target._zeros_guess_count,
             integral_method=integral_method)
         Bfield_y_integrated, error_y = _Backend.cli.cloud_line_integral(
             target_cloud_Bfield_y, self.target.cloud_model,
-            sightline_center, box_width, 
+            sightline_center, box_width,
             view_line_deltas=sightline_slopes,
             n_guesses=self.target._zeros_guess_count,
             integral_method=integral_method)
         Bfield_z_integrated, error_z = _Backend.cli.cloud_line_integral(
             target_cloud_Bfield_z, self.target.cloud_model,
-            sightline_center, box_width, 
+            sightline_center, box_width,
             view_line_deltas=sightline_slopes,
             n_guesses=self.target._zeros_guess_count,
             integral_method=integral_method)
