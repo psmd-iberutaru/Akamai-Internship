@@ -187,17 +187,18 @@
 <span class="sd">    validate it in turn.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Type check. If it is not an array, attempt to change it to one.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">int_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input integer array is not transformable into a &#39;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input integer array is not transformable into an &#39;</span>
                             <span class="s1">&#39;integer array.    --Kyubey&#39;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">int_array_input</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">):</span>
+            
+    <span class="k">if</span> <span class="p">(</span><span class="n">int_array_input</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">int_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">int_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input integer array is not transformable into a &#39;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input integer array is not transformable into an &#39;</span>
                             <span class="s1">&#39;integer array.    --Kyubey&#39;</span><span class="p">)</span>
 
     <span class="c1"># Check the optional conditions of shape and size.</span>
@@ -289,13 +290,13 @@
 <span class="sd">    validate it in turn.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Type check. If it is not an array, attempt to change it to one.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">float_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input float array is not transformable into a &#39;</span>
                             <span class="s1">&#39;float array.    --Kyubey&#39;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">float_array_input</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">float_array_input</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">float_array_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">float_array_input</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>

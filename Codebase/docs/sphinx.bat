@@ -6,5 +6,4 @@ sphinx-apidoc -e -f -o docs/source ./Active_Codebase
 
 :: Go back into the doc directory and compile the html.
 cd docs
-make clean && make html
-
+make clean && make html && make latex && make latexpdf

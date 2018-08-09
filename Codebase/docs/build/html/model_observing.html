@@ -159,7 +159,7 @@ Seen range is `` (RA,DEC) ± field_of_view/2 <a href="#id1"><span class="problem
 
 <dl class="class">
 <dt id="model_observing.ProtostarModel">
-<em class="property">class </em><code class="descclassname">model_observing.</code><code class="descname">ProtostarModel</code><span class="sig-paren">(</span><em>coordinates</em>, <em>cloud_model</em>, <em>magnetic_field_model</em>, <em>density_model=None</em>, <em>polarization_model=None</em>, <em>ra_wrap_angle=6.283185307179586</em>, <em>zeros_guess_count=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#ProtostarModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.ProtostarModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">model_observing.</code><code class="descname">ProtostarModel</code><span class="sig-paren">(</span><em>coordinates</em>, <em>cloud_model</em>, <em>magnetic_field_model</em>, <em>density_model=None</em>, <em>polarization_model=None</em>, <em>zeros_guess_count=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#ProtostarModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.ProtostarModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This is an object that represents a model of an object in space. It
 contains all the required functions and parameters associated with
@@ -200,7 +200,7 @@ the polarization model of the cloud.</p>
 
 <dl class="method">
 <dt id="model_observing.ProtostarModel.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>coordinates</em>, <em>cloud_model</em>, <em>magnetic_field_model</em>, <em>density_model=None</em>, <em>polarization_model=None</em>, <em>ra_wrap_angle=6.283185307179586</em>, <em>zeros_guess_count=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#ProtostarModel.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.ProtostarModel.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>coordinates</em>, <em>cloud_model</em>, <em>magnetic_field_model</em>, <em>density_model=None</em>, <em>polarization_model=None</em>, <em>zeros_guess_count=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#ProtostarModel.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.ProtostarModel.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object form of a model object to be observed.</p>
 <p>This is the object representation of an object in the sky. The
 required terms are present.</p>
@@ -229,9 +229,6 @@ a function (or string representing a function) <code class="docutils literal not
 as a constant float value. Default is uniform value of 1. If an
 interpolation table is given, a numerical approximation function
 will be used instead.</li>
-<li><strong>ra_wrap_angle</strong> (<em>float; optional</em>) – This angle, in radians, specifies where the RA values should wrap.
-Wrapping is considered to be very bad and should be avoided.
-Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)</li>
 <li><strong>zeros_guess_count</strong> (<em>int; optional</em>) – This value stipulates how many spread out test points there should
 be when finding sightline intersection points. A higher number
 should be used for complex shapes. Defaults at 100.</li>
@@ -246,7 +243,7 @@ should be used for complex shapes. Defaults at 100.</li>
 
 <dl class="class">
 <dt id="model_observing.Sightline">
-<em class="property">class </em><code class="descclassname">model_observing.</code><code class="descname">Sightline</code><span class="sig-paren">(</span><em>right_ascension</em>, <em>declination</em>, <em>SkyCoord_object=None</em>, <em>ra_wrap_angle=6.283185307179586</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#Sightline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.Sightline" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">model_observing.</code><code class="descname">Sightline</code><span class="sig-paren">(</span><em>right_ascension</em>, <em>declination</em>, <em>SkyCoord_object=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#Sightline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.Sightline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This is a sightline. It contains the information for a given sightline
 through space. The sightline is always given by the RA and DEC values.</p>
@@ -280,7 +277,7 @@ the equatorial coordinate system to the cartesian coordinate system.</p>
 </table>
 <dl class="method">
 <dt id="model_observing.Sightline.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>right_ascension</em>, <em>declination</em>, <em>SkyCoord_object=None</em>, <em>ra_wrap_angle=6.283185307179586</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#Sightline.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.Sightline.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>right_ascension</em>, <em>declination</em>, <em>SkyCoord_object=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model_observing.html#Sightline.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model_observing.Sightline.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization of a sightline.</p>
 <p>The creates the sightline’s main parameters, the defineing elements
 of the sightline is the location that it is throughout space. This
@@ -301,9 +298,6 @@ precision.</li>
 <li><strong>Skycord_object</strong> (<a class="reference external" href="http://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v3.0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SkyCoord</span></code></a> object; optional) – It may be easier to also just pass an Astropy
 <a class="reference external" href="http://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v3.0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SkyCoord</span></code></a> object in
 general. The other strings are ignored if it is successful.</li>
-<li><strong>ra_wrap_angle</strong> (<em>float; optional</em>) – This angle, in radians, specifies where the RA values should wrap.
-Wrapping is considered to be very bad and should be avoided.
-Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)</li>
 </ul>
 </td>
 </tr>

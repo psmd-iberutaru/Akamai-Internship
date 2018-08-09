@@ -1,0 +1,155 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Backend.astronomical_coordinates &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Backend.astronomical_coordinates</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file is mostly the calculations required for corrections to the </span>
+<span class="sd">astrophysical coordinate system, and any calculations required for such is </span>
+<span class="sd">recorded here.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">Robustness</span> <span class="k">as</span> <span class="nn">Robust</span>
+
+<div class="viewcode-block" id="angle_normalization_0_2pi"><a class="viewcode-back" href="../../Backend.astronomical_coordinates.html#Backend.astronomical_coordinates.angle_normalization_0_2pi">[docs]</a><span class="k">def</span> <span class="nf">angle_normalization_0_2pi</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Automatically normalize angle value(s) to the range of 0-2pi.</span>
+
+<span class="sd">    This function relies on modular arithmetic.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    angle : array_like</span>
+<span class="sd">        The angles to be converted</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    normalized_angles : ndarray</span>
+<span class="sd">        The angles after being normalized to be between 0-2pi.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check.</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+
+    <span class="c1"># Attempt to correct all of the angle values. Do an explicit loop in</span>
+    <span class="c1"># the event of only a single number.</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">angle</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">normalized_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">angle</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">angle</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">angle</span><span class="p">)</span>
+
+    <span class="c1"># Vectorize just in case.</span>
+    <span class="n">normalized_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">normalized_angles</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">normalized_angles</span></div>
+
+<div class="viewcode-block" id="auto_ra_wrap_angle"><a class="viewcode-back" href="../../Backend.astronomical_coordinates.html#Backend.astronomical_coordinates.auto_ra_wrap_angle">[docs]</a><span class="k">def</span> <span class="nf">auto_ra_wrap_angle</span><span class="p">(</span><span class="n">object_ra_value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Automatically calculate the RA wrap value.</span>
+
+<span class="sd">    Given an input RA, this function automatically calculates the RA wrap</span>
+<span class="sd">    angle to likely be used for an Astropy :py:class:`~.SkyCoord` object. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    object_ra_value : array_like</span>
+<span class="sd">        The RA value(s) that will determine the wrap angle(s).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ra_wrap_angle : ndarray</span>
+<span class="sd">        The value of the wrap angle that the function best described.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    In this function, it assumes that there are only 4 main quadrants. First,</span>
+<span class="sd">    the wrap angle is determined to be either at :math:`0` or :math:`\pi` depending on the location of the sightline&#39;s RA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Type check.</span>
+    <span class="n">object_ra_value</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_array</span><span class="p">(</span><span class="n">object_ra_value</span><span class="p">)</span>
+    <span class="n">object_ra_value</span> <span class="o">=</span> <span class="n">angle_normalization_0_2pi</span><span class="p">(</span><span class="n">object_ra_value</span><span class="p">)</span>
+
+    <span class="c1"># Test for the ranges. If it is between pi/2 and 3pi/2, then the wrap </span>
+    <span class="c1"># around zero is fine. </span>
+    <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">&lt;=</span><span class="n">object_ra_value</span> <span class="o">&lt;=</span> <span class="mf">1.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+                             <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">object_ra_value</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
+                             <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">object_ra_value</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">ra_wrap_angle</span></div>
+
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

@@ -640,8 +640,8 @@ class ObservingRun():
             total = self.target.density_model(x,y,z)
             return total
         def polarization_intensity(x, y, z):
-            total = np.sqrt(np.abs(self.target.density_model(x, y, z)
-                                   * self.target.polarization_model(x, y, z)))
+            total = (self.target.density_model(x, y, z)
+                     * np.sqrt(np.abs(self.target.polarization_model(x, y, z))))
             return total
 
         # Integrate over the density function.
@@ -783,8 +783,8 @@ class ObservingRun():
         n_axial_samples = Robust.valid.validate_int_value(n_axial_samples,
                                                           greater_than=0)
 
-        # Work in radians for the target's center.
-        target_ra, target_dec = self.target._radianize_coordinates()
+        # Work in radians for the sightline's center.
+        target_ra, target_dec = self.sightline._radianize_coordinates()
 
         # Create a large list of sightlines.
         ra_range = np.linspace(target_ra - self.offset,

@@ -47,6 +47,51 @@
             
   <div class="section" id="module-Backend.astronomical_coordinates">
 <span id="backend-astronomical-coordinates-module"></span><h1>Backend.astronomical_coordinates module<a class="headerlink" href="#module-Backend.astronomical_coordinates" title="Permalink to this headline">¶</a></h1>
+<p>This file is mostly the calculations required for corrections to the
+astrophysical coordinate system, and any calculations required for such is
+recorded here.</p>
+<dl class="function">
+<dt id="Backend.astronomical_coordinates.angle_normalization_0_2pi">
+<code class="descclassname">Backend.astronomical_coordinates.</code><code class="descname">angle_normalization_0_2pi</code><span class="sig-paren">(</span><em>angle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/astronomical_coordinates.html#angle_normalization_0_2pi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.astronomical_coordinates.angle_normalization_0_2pi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically normalize angle value(s) to the range of 0-2pi.</p>
+<p>This function relies on modular arithmetic.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>angle</strong> (<em>array_like</em>) – The angles to be converted</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>normalized_angles</strong> – The angles after being normalized to be between 0-2pi.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Backend.astronomical_coordinates.auto_ra_wrap_angle">
+<code class="descclassname">Backend.astronomical_coordinates.</code><code class="descname">auto_ra_wrap_angle</code><span class="sig-paren">(</span><em>object_ra_value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Backend/astronomical_coordinates.html#auto_ra_wrap_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Backend.astronomical_coordinates.auto_ra_wrap_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically calculate the RA wrap value.</p>
+<p>Given an input RA, this function automatically calculates the RA wrap
+angle to likely be used for an Astropy <code class="xref py py-class docutils literal notranslate"><span class="pre">SkyCoord</span></code> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>object_ra_value</strong> (<em>array_like</em>) – The RA value(s) that will determine the wrap angle(s).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ra_wrap_angle</strong> – The value of the wrap angle that the function best described.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>In this function, it assumes that there are only 4 main quadrants. First,
+the wrap angle is determined to be either at <span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(\pi\)</span> depending on the location of the sightline’s RA.</p>
+</dd></dl>
+
 </div>
 
 

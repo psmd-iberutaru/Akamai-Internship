@@ -82,7 +82,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Sightline.__init__"><a class="viewcode-back" href="../model_observing.html#model_observing.Sightline.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">right_ascension</span><span class="p">,</span> <span class="n">declination</span><span class="p">,</span>
-                 <span class="n">SkyCoord_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">):</span>
+                 <span class="n">SkyCoord_object</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialization of a sightline.</span>
 
 <span class="sd">        The creates the sightline&#39;s main parameters, the defineing elements</span>
@@ -105,13 +105,6 @@
 <span class="sd">            It may be easier to also just pass an Astropy </span>
 <span class="sd">            :py:class:`~.astropy.coordinates.SkyCoord` object in</span>
 <span class="sd">            general. The other strings are ignored if it is successful.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        ra_wrap_angle : float; optional</span>
-<span class="sd">            This angle, in radians, specifies where the RA values should wrap.</span>
-<span class="sd">            Wrapping is considered to be very bad and should be avoided. </span>
-<span class="sd">            Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Type check.</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">SkyCoord_object</span><span class="p">,</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">)):</span>
@@ -124,12 +117,17 @@
             <span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">(</span><span class="n">right_ascension</span><span class="p">,</span>
                                                 <span class="n">declination</span><span class="p">,</span>
                                                 <span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">)</span>
-        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">ra_wrap_angle</span><span class="p">)</span>
-        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span> <span class="o">*</span> <span class="n">ap_u</span><span class="o">.</span><span class="n">rad</span>
+
+
+        <span class="c1"># Automatically calculate the wrap angle along with the radian version</span>
+        <span class="c1"># of the angles.</span>
+        <span class="n">ra_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sky_coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">12</span><span class="p">))</span>
+        <span class="n">dec_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sky_coordinates</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
+        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">astrcoord</span><span class="o">.</span><span class="n">auto_ra_wrap_angle</span><span class="p">(</span><span class="n">ra_radians</span><span class="p">)</span>
 
         <span class="c1"># Define the member arguments.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">sky_coordinates</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span> <span class="o">*</span> <span class="n">ap_u</span><span class="o">.</span><span class="n">rad</span></div>
 
 <div class="viewcode-block" id="Sightline.sightline_parameters"><a class="viewcode-back" href="../model_observing.html#model_observing.Sightline.sightline_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">sightline_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; This function returns the sightline linear parameters.</span>
@@ -221,8 +219,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ProtostarModel.__init__"><a class="viewcode-back" href="../model_observing.html#model_observing.ProtostarModel.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">cloud_model</span><span class="p">,</span> <span class="n">magnetic_field_model</span><span class="p">,</span>
-                 <span class="n">density_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">polarization_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">zeros_guess_count</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+                 <span class="n">density_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">polarization_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">zeros_guess_count</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Object form of a model object to be observed.</span>
 
 <span class="sd">        This is the object representation of an object in the sky. The </span>
@@ -258,10 +255,6 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ra_wrap_angle : float; optional</span>
-<span class="sd">            This angle, in radians, specifies where the RA values should wrap.</span>
-<span class="sd">            Wrapping is considered to be very bad and should be avoided. </span>
-<span class="sd">            Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)</span>
 <span class="sd">        zeros_guess_count : int; optional</span>
 <span class="sd">            This value stipulates how many spread out test points there should </span>
 <span class="sd">            be when finding sightline intersection points. A higher number </span>
@@ -379,18 +372,20 @@
                             <span class="s1">&#39;or a constant float/int value.&#39;</span>
                             <span class="s1">&#39;    --Kyubey&#39;</span><span class="p">)</span>
 
-        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_float_value</span><span class="p">(</span><span class="n">ra_wrap_angle</span><span class="p">)</span>
-        <span class="n">ra_wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span> <span class="o">*</span> <span class="n">ap_u</span><span class="o">.</span><span class="n">rad</span>
-
         <span class="n">zeros_guess_count</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_int_value</span><span class="p">(</span><span class="n">zeros_guess_count</span><span class="p">,</span>
                                                             <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Automatically calculate the wrap angle along with the radian version</span>
+        <span class="c1"># of the angles.</span>
+        <span class="n">ra_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">12</span><span class="p">))</span>
+        <span class="n">dec_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coordinates</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
+        <span class="n">ra_wrap_angle</span> <span class="o">=</span> \
+            <span class="n">_Backend</span><span class="o">.</span><span class="n">astrcoord</span><span class="o">.</span><span class="n">auto_ra_wrap_angle</span><span class="p">(</span><span class="n">ra_radians</span><span class="p">)</span> <span class="o">*</span> <span class="n">ap_u</span><span class="o">.</span><span class="n">rad</span>
 
         <span class="c1"># All models equations must be offset by the coordinates. This</span>
         <span class="c1"># transformation assumes the flat approximation of the astronomical</span>
         <span class="c1"># sky.</span>
         <span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span>
-        <span class="n">ra_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">12</span><span class="p">))</span>
-        <span class="n">dec_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coordinates</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
         <span class="c1"># Translate the cloud model function.</span>
         <span class="k">def</span> <span class="nf">translate_cloud_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">cloud_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">ra_radians</span><span class="p">,</span> <span class="n">z</span><span class="o">-</span><span class="n">dec_radians</span><span class="p">)</span>
@@ -428,7 +423,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Change the wrapping location if necessary. Astropy requires a unit.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">wrap_angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">wrap_angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> 
 
         <span class="n">ra_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">12</span><span class="p">))</span>
         <span class="n">dec_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
@@ -599,6 +594,7 @@
                 <span class="n">_Backend</span><span class="o">.</span><span class="n">pltcust</span><span class="o">.</span><span class="n">zeroedColorMap</span><span class="p">(</span><span class="n">PuOr_map</span><span class="p">,</span>
                                                 <span class="n">angle</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">angle</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
 
+
             <span class="c1"># Extrapolate and plot a contour based on irregularly spaced data.</span>
             <span class="n">ax1_o</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">x_axis_plot</span><span class="p">,</span> <span class="n">y_axis_plot</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span>
                                     <span class="n">cmap</span><span class="o">=</span><span class="n">intensity_maps</span><span class="p">)</span>
@@ -679,6 +675,9 @@
         <span class="c1"># because the user expects a I_p = I_t * p, while the most efficient</span>
         <span class="c1"># method of implementation (modifying the E-fields), produces a</span>
         <span class="c1"># relationship of I_p = I_t * p**2.</span>
+        <span class="k">def</span> <span class="nf">total_intensity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">density_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">total</span>
         <span class="k">def</span> <span class="nf">polarization_intensity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
             <span class="n">total</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">density_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
                      <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">polarization_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))))</span>
@@ -686,7 +685,7 @@
 
         <span class="c1"># Integrate over the density function.</span>
         <span class="n">integrated_intensity</span><span class="p">,</span> <span class="n">int_error</span> <span class="o">=</span> <span class="n">_Backend</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">cloud_line_integral</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">density_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">cloud_model</span><span class="p">,</span>
+            <span class="n">total_intensity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">cloud_model</span><span class="p">,</span>
             <span class="n">sightline_center</span><span class="p">,</span> <span class="n">box_width</span><span class="p">,</span>
             <span class="n">view_line_deltas</span><span class="o">=</span><span class="n">sightline_slopes</span><span class="p">,</span>
             <span class="n">n_guesses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_zeros_guess_count</span><span class="p">,</span>
@@ -701,7 +700,7 @@
                 <span class="n">n_guesses</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_zeros_guess_count</span><span class="p">,</span>
                 <span class="n">integral_method</span><span class="o">=</span><span class="n">integral_method</span><span class="p">)</span>
 
-        <span class="c1"># Error propagates in q.uadrature</span>
+        <span class="c1"># Error propagates in quadrature</span>
         <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">int_error</span><span class="p">,</span> <span class="n">pol_error</span><span class="p">)</span>
 
         <span class="c1"># Return</span>
@@ -823,12 +822,8 @@
         <span class="n">n_axial_samples</span> <span class="o">=</span> <span class="n">Robust</span><span class="o">.</span><span class="n">valid</span><span class="o">.</span><span class="n">validate_int_value</span><span class="p">(</span><span class="n">n_axial_samples</span><span class="p">,</span>
                                                           <span class="n">greater_than</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="c1"># Work in radians for the target&#39;s center.</span>
-        <span class="n">target_ra</span><span class="p">,</span> <span class="n">target_dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">_radianize_coordinates</span><span class="p">()</span>
-
-        <span class="c1"># Use the primary sightline&#39;s wrap angle as it is the most likely to</span>
-        <span class="c1"># accurate.</span>
-        <span class="n">ra_wrap_angle_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sightline</span><span class="o">.</span><span class="n">_ra_wrap_angle</span><span class="o">.</span><span class="n">value</span>
+        <span class="c1"># Work in radians for the sightline&#39;s center.</span>
+        <span class="n">target_ra</span><span class="p">,</span> <span class="n">target_dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sightline</span><span class="o">.</span><span class="n">_radianize_coordinates</span><span class="p">()</span>
 
         <span class="c1"># Create a large list of sightlines.</span>
         <span class="n">ra_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">target_ra</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
@@ -848,8 +843,7 @@
         <span class="k">for</span> <span class="n">radex</span><span class="p">,</span> <span class="n">decdex</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ra_array</span><span class="p">,</span> <span class="n">dec_array</span><span class="p">):</span>
             <span class="n">temp_skycoord</span> <span class="o">=</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">(</span><span class="n">radex</span><span class="p">,</span> <span class="n">decdex</span><span class="p">,</span>
                                               <span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;rad&#39;</span><span class="p">)</span>
-            <span class="n">sightline_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Sightline</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">temp_skycoord</span><span class="p">,</span>
-                                            <span class="n">ra_wrap_angle</span><span class="o">=</span><span class="n">ra_wrap_angle_value</span><span class="p">))</span>
+            <span class="n">sightline_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Sightline</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">temp_skycoord</span><span class="p">))</span>
 
         <span class="c1"># It is best if it is not vectored like other numpy operations.</span>
         <span class="c1"># Because it deals with specific classes and whatnot.</span>
