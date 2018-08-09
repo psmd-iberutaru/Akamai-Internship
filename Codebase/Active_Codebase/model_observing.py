@@ -555,8 +555,6 @@ class ObservingRun():
                 _Backend.pltcust.zeroedColorMap(PuOr_map,
                                                 angle.min(), angle.max())
 
-            print(Q.min(),Q.max())
-            print(U.min(),U.max())
 
             # Extrapolate and plot a contour based on irregularly spaced data.
             ax1_o = ax1.tricontourf(x_axis_plot, y_axis_plot, I, 50,
@@ -639,7 +637,7 @@ class ObservingRun():
         # method of implementation (modifying the E-fields), produces a
         # relationship of I_p = I_t * p**2.
         def total_intensity(x,y,z):
-            total = np.sqrt(np.abs(self.target.density_model(x, y, z)))
+            total = self.target.density_model(x,y,z)
             return total
         def polarization_intensity(x, y, z):
             total = np.sqrt(np.abs(self.target.density_model(x, y, z)
