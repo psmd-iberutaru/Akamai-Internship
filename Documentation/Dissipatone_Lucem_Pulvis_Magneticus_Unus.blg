@@ -1,0 +1,15 @@
+[0] Config.pm:302> INFO - This is Biber 2.11
+[1] Config.pm:305> INFO - Logfile is 'Dissipatone_Lucem_Pulvis_Magneticus_Unus.blg'
+[151] biber-MSWIN32:313> INFO - === 
+[286] Biber.pm:371> INFO - Reading 'Dissipatone_Lucem_Pulvis_Magneticus_Unus.bcf'
+[449] Biber.pm:857> INFO - Found 1 citekeys in bib section 0
+[472] Biber.pm:3976> INFO - Processing section 0
+[579] Biber.pm:4136> INFO - Looking for bibtex format file './../../../Citations/Models_and_Simulations/electromagnetic_models_and_simulations.bib' for section 0
+[584] bibtex.pm:1500> INFO - LaTeX decoding ...
+[598] bibtex.pm:1316> INFO - Found BibTeX data source './../../../Citations/Models_and_Simulations/electromagnetic_models_and_simulations.bib'
+[630] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[630] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[630] Biber.pm:3804> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'en-US'
+[630] Biber.pm:3810> INFO - No sort tailoring available for locale 'en-US'
+[705] bbl.pm:617> INFO - Writing 'Dissipatone_Lucem_Pulvis_Magneticus_Unus.bbl' with encoding 'UTF-8'
+[708] bbl.pm:720> INFO - Output to Dissipatone_Lucem_Pulvis_Magneticus_Unus.bbl

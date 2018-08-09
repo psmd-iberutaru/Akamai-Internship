@@ -148,17 +148,18 @@ def validate_int_array(int_array_input,
     validate it in turn.
     """
     # Type check. If it is not an array, attempt to change it to one.
-    if not isinstance(int_array_input, (int, np.ndarray)):
+    if not isinstance(int_array_input, (np.ndarray)):
         try:
             int_array_input = np.array(int_array_input, dtype=int)
         except Exception:
-            raise TypeError('Input integer array is not transformable into a '
+            raise TypeError('Input integer array is not transformable into an '
                             'integer array.    --Kyubey')
-    elif (int_array_input.dtype != int):
+            
+    if (int_array_input.dtype != int):
         try:
             int_array_input = np.array(int_array_input, dtype=int)
         except Exception:
-            raise TypeError('Input integer array is not transformable into a '
+            raise TypeError('Input integer array is not transformable into an '
                             'integer array.    --Kyubey')
 
     # Check the optional conditions of shape and size.
@@ -250,13 +251,13 @@ def validate_float_array(float_array_input,
     validate it in turn.
     """
     # Type check. If it is not an array, attempt to change it to one.
-    if not isinstance(float_array_input, (float, np.ndarray)):
+    if not isinstance(float_array_input, np.ndarray):
         try:
             float_array_input = np.array(float_array_input, dtype=float)
         except Exception:
             raise TypeError('Input float array is not transformable into a '
                             'float array.    --Kyubey')
-    elif (float_array_input.dtype != float):
+    if (float_array_input.dtype != float):
         try:
             float_array_input = np.array(float_array_input, dtype=float)
         except Exception:

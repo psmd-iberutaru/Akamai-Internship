@@ -27,20 +27,23 @@ def zeroedColorMap(cmap,min_val,max_val,name='shiftedcmap'):
     """
 
     # Use the formula from the previous documentation.
-    midpoint = 1 - max_val / (max_val + np.abs(min_val))
+    midpoint = 1 - np.divide(max_val, max_val + np.abs(min_val), 
+                            out=np.full_like(max_val,0.5), 
+                            where=((max_val + np.abs(min_val)) != 0))
+    
+    # This section finally assumes that it is only being used for the 
+    # polarization functions, and should only be of last resort.
+    if (not(0 <= midpoint <= 1)):
+        if ((min_val <= 0) and (max_val <= 0)):
+            midpoint = 1
+        elif ((min_val >= 0) and (max_val >= 0)):
+            midpoint = 0
+        else:
+            midpoint = 0.5
 
-    # Test to see if the formula was successful, if not, then just assume
-    # zero point (the error was most likely caused by a 0/0 anyways).
-    if (not isinstance(midpoint,(int,float)) or
-        np.isnan(midpoint)):
-        midpoint = 0.5
-
-    newcmap = shiftedColorMap(
-        cmap, midpoint=midpoint, name=name)
+    newcmap = shiftedColorMap(cmap, midpoint=midpoint, name=name)
 
     return newcmap
-
-    
 
 
 def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
@@ -88,7 +91,7 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
         np.linspace(0.0, midpoint, 128, endpoint=False), 
         np.linspace(midpoint, 1.0, 129, endpoint=True)
     ])
-
+    print(midpoint)
     for ri, si in zip(reg_index, shift_index):
         r, g, b, a = cmap(ri)
 

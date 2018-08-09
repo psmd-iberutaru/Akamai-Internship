@@ -43,7 +43,7 @@ class Sightline():
     """
 
     def __init__(self, right_ascension, declination,
-                 SkyCoord_object=None, ra_wrap_angle=2*np.pi):
+                 SkyCoord_object=None):
         """Initialization of a sightline.
 
         The creates the sightline's main parameters, the defineing elements
@@ -66,13 +66,6 @@ class Sightline():
             It may be easier to also just pass an Astropy 
             :py:class:`~.astropy.coordinates.SkyCoord` object in
             general. The other strings are ignored if it is successful.
-
-        Parameters
-        ----------
-        ra_wrap_angle : float; optional
-            This angle, in radians, specifies where the RA values should wrap.
-            Wrapping is considered to be very bad and should be avoided. 
-            Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)
         """
         # Type check.
         if (isinstance(SkyCoord_object, ap_coord.SkyCoord)):
@@ -85,12 +78,17 @@ class Sightline():
             sky_coordinates = ap_coord.SkyCoord(right_ascension,
                                                 declination,
                                                 frame='icrs')
-        ra_wrap_angle = Robust.valid.validate_float_value(ra_wrap_angle)
-        ra_wrap_angle = ra_wrap_angle * ap_u.rad
+
+
+        # Automatically calculate the wrap angle along with the radian version
+        # of the angles.
+        ra_radians = float(sky_coordinates.ra.hour * (np.pi / 12))
+        dec_radians = float(sky_coordinates.dec.radian)
+        ra_wrap_angle = _Backend.astrcoord.auto_ra_wrap_angle(ra_radians)
 
         # Define the member arguments.
         self.coordinates = sky_coordinates
-        self._ra_wrap_angle = ra_wrap_angle
+        self._ra_wrap_angle = ra_wrap_angle * ap_u.rad
 
     def sightline_parameters(self):
         """ This function returns the sightline linear parameters.
@@ -182,8 +180,7 @@ class ProtostarModel():
     """
 
     def __init__(self, coordinates, cloud_model, magnetic_field_model,
-                 density_model=None, polarization_model=None,
-                 ra_wrap_angle=2*np.pi, zeros_guess_count=100):
+                 density_model=None, polarization_model=None, zeros_guess_count=100):
         """Object form of a model object to be observed.
 
         This is the object representation of an object in the sky. The 
@@ -219,10 +216,6 @@ class ProtostarModel():
 
         Parameters
         ----------
-        ra_wrap_angle : float; optional
-            This angle, in radians, specifies where the RA values should wrap.
-            Wrapping is considered to be very bad and should be avoided. 
-            Defaults to 0/2pi wrapping (i.e ra_wrap_angle = 2pi)
         zeros_guess_count : int; optional
             This value stipulates how many spread out test points there should 
             be when finding sightline intersection points. A higher number 
@@ -340,18 +333,20 @@ class ProtostarModel():
                             'or a constant float/int value.'
                             '    --Kyubey')
 
-        ra_wrap_angle = Robust.valid.validate_float_value(ra_wrap_angle)
-        ra_wrap_angle = ra_wrap_angle * ap_u.rad
-
         zeros_guess_count = Robust.valid.validate_int_value(zeros_guess_count,
                                                             greater_than=0)
+
+        # Automatically calculate the wrap angle along with the radian version
+        # of the angles.
+        ra_radians = float(coordinates.ra.hour * (np.pi / 12))
+        dec_radians = float(coordinates.dec.radian)
+        ra_wrap_angle = \
+            _Backend.astrcoord.auto_ra_wrap_angle(ra_radians) * ap_u.rad
 
         # All models equations must be offset by the coordinates. This
         # transformation assumes the flat approximation of the astronomical
         # sky.
         coordinates.ra.wrap_angle = ra_wrap_angle
-        ra_radians = float(coordinates.ra.hour * (np.pi / 12))
-        dec_radians = float(coordinates.dec.radian)
         # Translate the cloud model function.
         def translate_cloud_model(x, y, z):
             return cloud_model(x, y - ra_radians, z-dec_radians)
@@ -389,7 +384,7 @@ class ProtostarModel():
         """
 
         # Change the wrapping location if necessary. Astropy requires a unit.
-        self.coordinates.ra.wrap_angle = self._ra_wrap_angle
+        self.coordinates.ra.wrap_angle = self._ra_wrap_angle 
 
         ra_radians = float(self.coordinates.ra.hour * (np.pi / 12))
         dec_radians = float(self.coordinates.dec.radian)
@@ -560,6 +555,9 @@ class ObservingRun():
                 _Backend.pltcust.zeroedColorMap(PuOr_map,
                                                 angle.min(), angle.max())
 
+            print(Q.min(),Q.max())
+            print(U.min(),U.max())
+
             # Extrapolate and plot a contour based on irregularly spaced data.
             ax1_o = ax1.tricontourf(x_axis_plot, y_axis_plot, I, 50,
                                     cmap=intensity_maps)
@@ -640,14 +638,17 @@ class ObservingRun():
         # because the user expects a I_p = I_t * p, while the most efficient
         # method of implementation (modifying the E-fields), produces a
         # relationship of I_p = I_t * p**2.
+        def total_intensity(x,y,z):
+            total = np.sqrt(np.abs(self.target.density_model(x, y, z)))
+            return total
         def polarization_intensity(x, y, z):
-            total = (self.target.density_model(x, y, z)
-                     * np.sqrt(np.abs(self.target.polarization_model(x, y, z))))
+            total = np.sqrt(np.abs(self.target.density_model(x, y, z)
+                                   * self.target.polarization_model(x, y, z)))
             return total
 
         # Integrate over the density function.
         integrated_intensity, int_error = _Backend.cli.cloud_line_integral(
-            self.target.density_model, self.target.cloud_model,
+            total_intensity, self.target.cloud_model,
             sightline_center, box_width,
             view_line_deltas=sightline_slopes,
             n_guesses=self.target._zeros_guess_count,
@@ -662,7 +663,7 @@ class ObservingRun():
                 n_guesses=self.target._zeros_guess_count,
                 integral_method=integral_method)
 
-        # Error propagates in q.uadrature
+        # Error propagates in quadrature
         error = np.hypot(int_error, pol_error)
 
         # Return
@@ -787,10 +788,6 @@ class ObservingRun():
         # Work in radians for the target's center.
         target_ra, target_dec = self.target._radianize_coordinates()
 
-        # Use the primary sightline's wrap angle as it is the most likely to
-        # accurate.
-        ra_wrap_angle_value = self.sightline._ra_wrap_angle.value
-
         # Create a large list of sightlines.
         ra_range = np.linspace(target_ra - self.offset,
                                target_ra + self.offset,
@@ -809,8 +806,7 @@ class ObservingRun():
         for radex, decdex in zip(ra_array, dec_array):
             temp_skycoord = ap_coord.SkyCoord(radex, decdex,
                                               frame='icrs', unit='rad')
-            sightline_list.append(Sightline(None, None, temp_skycoord,
-                                            ra_wrap_angle=ra_wrap_angle_value))
+            sightline_list.append(Sightline(None, None, temp_skycoord))
 
         # It is best if it is not vectored like other numpy operations.
         # Because it deals with specific classes and whatnot.
