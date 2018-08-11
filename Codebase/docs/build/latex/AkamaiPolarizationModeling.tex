@@ -30,6 +30,7 @@
 \usepackage{babel}
 \usepackage{times}
 \usepackage[Bjarne]{fncychap}
+
 \usepackage{sphinx}
 
 \usepackage{geometry}
@@ -56,7 +57,7 @@
 
 
 \title{Akamai Polarization Modeling Documentation}
-\date{Aug 08, 2018}
+\date{Aug 11, 2018}
 \release{1.0}
 \author{Kyubey}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -108,7 +109,344 @@ The core of this module is the {\hyperref[\detokenize{model_observing:model_obse
 
 In order to make the {\hyperref[\detokenize{model_observing:model_observing.ObservingRun}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ObservingRun}}}}} object, we first need two other objects: {\hyperref[\detokenize{model_observing:model_observing.ProtostarModel}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ProtostarModel}}}}} and {\hyperref[\detokenize{model_observing:model_observing.Sightline}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{Sightline}}}}} objects.
 
+
+\section{ProtostarModel Creation}
+\label{\detokenize{quickstart:protostarmodel-creation}}\label{\detokenize{quickstart:id1}}
 First, let us make the {\hyperref[\detokenize{model_observing:model_observing.ProtostarModel}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ProtostarModel}}}}} object. First off there are five things that we need to provide in order to make such an object (although two are optional).
+
+Please note that the coordinate system for the equations and functions within this section is where the origin of the object is the origin of the coordinate system, with the x-axis on the light of sight, positive going from the observing telescope, to the origin of the object, deeper into space, and thus is equivalent to the r-axis from Earth. The y-z plane is assumed to be analogous to the RA-DEC plane of the sky.
+
+The five things that are required for the {\hyperref[\detokenize{model_observing:model_observing.ProtostarModel}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ProtostarModel}}}}} is a \sphinxhref{http://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html\#astropy.coordinates.SkyCoord}{\sphinxcode{\sphinxupquote{SkyCoord}}}, a cloud function, a magnetic field function, a density function, and a polarization function.
+
+
+\subsection{Coordinates}
+\label{\detokenize{quickstart:coordinates}}
+The first parameter is the coordinates of the object in the sky. This is supposed to simulate actual observations, and thus a real sky coordinate is the accepted term. Consider the example parameters below for an object that is at the spring equinox (i.e. a RA of 00h00m00.00s and a DEC of 00d00m00.00s).
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{astropy} \PYG{k}{as} \PYG{n+nn}{ap}
+\PYG{k+kn}{import} \PYG{n+nn}{astropy}\PYG{n+nn}{.}\PYG{n+nn}{coordinates} \PYG{k}{as} \PYG{n+nn}{ap\PYGZus{}coord}
+
+\PYG{c+c1}{\PYGZsh{} Making the coordinate input, should be an Astropy SkyCoord class.}
+\PYG{n}{sky\PYGZus{}coordinates} \PYG{o}{=} \PYG{n}{ap\PYGZus{}coord}\PYG{o}{.}\PYG{n}{SkyCoord}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00h00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00d00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+                                    \PYG{n}{frame}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{icrs}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\subsection{Cloud Equation}
+\label{\detokenize{quickstart:cloud-equation}}
+The cloud equation must be a function that takes in three dimensions and is the expression of the implicit functional form. In a general sense, the function is programed as \(f(x,y,z) \to \text{ return}\), where the expression
+\(f(x,y,z)\) is from the mathematical implicit equation \(f(x,y,z) = 0\).
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Making a cloud function, a sphere in this case. Note that the units}
+\PYG{c+c1}{\PYGZsh{} are in angular space, and thus the unit of circle is radians.}
+\PYG{k}{def} \PYG{n+nf}{cloud\PYGZus{}equation}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{radius} \PYG{o}{=} \PYG{l+m+mf}{0.01}
+    \PYG{k}{return} \PYG{n}{x}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{y}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{z}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{\PYGZhy{}} \PYG{n}{radius}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}
+\end{sphinxVerbatim}
+
+
+\subsection{Magnetic Field}
+\label{\detokenize{quickstart:magnetic-field}}
+The magnetic field is a little bit more complex, this function is not a scalar function like the density or polarization functions. It is a vector function and thus must return three vectors in cartesian space, still with respect to the origin of the protostar model. Consider the following field that is uniform in one direction. More complex field geometries can be found in {\hyperref[\detokenize{magnetic_field_functions_3d:module-magnetic_field_functions_3d}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{magnetic\_field\_functions\_3d}}}}} and can be called from there.
+
+Please note the use of Numpy’s structures. Although it is possible to return only integers for the components, using these structures is required if table interpolation is used, and thus usage is suggested for compatibility purposes.
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+
+\PYG{c+c1}{\PYGZsh{} Making a magnetic field that is uniform in one direction. Consider a}
+\PYG{c+c1}{\PYGZsh{} field that is always 0i + 1j + 2k.}
+\PYG{k}{def} \PYG{n+nf}{magnetic\PYGZus{}field}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{Bfield\PYGZus{}x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros\PYGZus{}like}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{Bfield\PYGZus{}y} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones\PYGZus{}like}\PYG{p}{(}\PYG{n}{y}\PYG{p}{)}
+    \PYG{n}{Bfield\PYGZus{}z} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{full\PYGZus{}like}\PYG{p}{(}\PYG{n}{z}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n}{Bfield\PYGZus{}x}\PYG{p}{,}\PYG{n}{Bfield\PYGZus{}y}\PYG{p}{,}\PYG{n}{Bfield\PYGZus{}z}
+\end{sphinxVerbatim}
+
+
+\subsection{Density Function}
+\label{\detokenize{quickstart:density-function}}
+The density function is a scalar function in three dimensional space. As such, it should return a density value given a three dimensional input (\(f(x,y,z) = d\)). Consider the example function of a density profile that drops off as a function of \(\frac{1}{r^2}\).
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+
+\PYG{c+c1}{\PYGZsh{} Making a density function of a 1/r**2 profile.}
+\PYG{k}{def} \PYG{n+nf}{density\PYGZus{}function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{density} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} The above line is a faster implementation of the following.}
+    \PYG{c+c1}{\PYGZsh{} density = 1/np.dot(x**2 + y**2 + z**2)}
+
+    \PYG{k}{return} \PYG{n}{density}
+\end{sphinxVerbatim}
+
+
+\subsection{Polarization Function}
+\label{\detokenize{quickstart:polarization-function}}
+The polarization function, like the density function is a scalar function in three dimensional space. As such, it should return a value which corresponds to the level of polarization of the light at that given location in space (\(f(x,y,z) = p\)). Consider the example function of a polarization profile that drops off as a function of \(r^2\).
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+
+\PYG{c+c1}{\PYGZsh{} Making a polarization function of a 1/r**2 profile.}
+\PYG{k}{def} \PYG{n+nf}{polarization\PYGZus{}function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{polarization} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} The above line is a faster implementation of the following.}
+    \PYG{c+c1}{\PYGZsh{} polarization = np.sqrt(x**2 + y**2 + z**2)}
+
+    \PYG{k}{return} \PYG{n}{polarization}
+\end{sphinxVerbatim}
+
+
+\subsection{Creating the Class}
+\label{\detokenize{quickstart:creating-the-class}}
+From these parameters, a {\hyperref[\detokenize{model_observing:model_observing.ProtostarModel}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ProtostarModel}}}}} by the following line.
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{model\PYGZus{}observing} \PYG{k}{as} \PYG{n+nn}{m\PYGZus{}obs}
+
+\PYG{c+c1}{\PYGZsh{} Create the protostar class.}
+\PYG{n}{protostar} \PYG{o}{=} \PYG{n}{m\PYGZus{}obs}\PYG{o}{.}\PYG{n}{ProtostarModel}\PYG{p}{(}\PYG{n}{sky\PYGZus{}coordinates}\PYG{p}{,}
+                                 \PYG{n}{cloud\PYGZus{}equation}\PYG{p}{,}
+                                 \PYG{n}{magnetic\PYGZus{}field}\PYG{p}{,}
+                                 \PYG{n}{density\PYGZus{}function}\PYG{p}{,}
+                                 \PYG{n}{polarization\PYGZus{}function}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+Or, all in one block of code.
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{import} \PYG{n+nn}{astropy} \PYG{k}{as} \PYG{n+nn}{ap}
+\PYG{k+kn}{import} \PYG{n+nn}{astropy}\PYG{n+nn}{.}\PYG{n+nn}{coordinates} \PYG{k}{as} \PYG{n+nn}{ap\PYGZus{}coord}
+
+\PYG{k+kn}{import} \PYG{n+nn}{model\PYGZus{}observing} \PYG{k}{as} \PYG{n+nn}{m\PYGZus{}obs}
+
+\PYG{c+c1}{\PYGZsh{} Making the coordinate input, should be an Astropy SkyCoord class.}
+\PYG{n}{sky\PYGZus{}coordinates} \PYG{o}{=} \PYG{n}{ap\PYGZus{}coord}\PYG{o}{.}\PYG{n}{SkyCoord}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00h00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00d00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{n}{frame}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{icrs}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Making a cloud function, a sphere in this case. Note that the units}
+\PYG{c+c1}{\PYGZsh{} are in angular space, and thus the unit of circle is radians.}
+\PYG{k}{def} \PYG{n+nf}{cloud\PYGZus{}equation}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{radius} \PYG{o}{=} \PYG{l+m+mf}{0.01}
+    \PYG{k}{return} \PYG{n}{x}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{y}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{z}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{\PYGZhy{}} \PYG{n}{radius}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}
+
+\PYG{c+c1}{\PYGZsh{} Making a magnetic field that is uniform in one direction. Consider a}
+\PYG{c+c1}{\PYGZsh{} field that is always 0i + 1j + 2k.}
+\PYG{k}{def} \PYG{n+nf}{magnetic\PYGZus{}field}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{Bfield\PYGZus{}x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros\PYGZus{}like}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{Bfield\PYGZus{}y} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones\PYGZus{}like}\PYG{p}{(}\PYG{n}{y}\PYG{p}{)}
+    \PYG{n}{Bfield\PYGZus{}z} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{full\PYGZus{}like}\PYG{p}{(}\PYG{n}{z}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Making a density function of a 1/r**2 profile.}
+\PYG{k}{def} \PYG{n+nf}{density\PYGZus{}function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{density} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} The above line is a faster implementation of the following.}
+    \PYG{c+c1}{\PYGZsh{} density = np.sqrt(x**2 + y**2 + z**2)}
+
+    \PYG{k}{return} \PYG{n}{density}
+
+\PYG{c+c1}{\PYGZsh{} Making a polarization function of a 1/r**2 profile.}
+\PYG{k}{def} \PYG{n+nf}{polarization\PYGZus{}function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{polarization} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} The above line is a faster implementation of the following.}
+    \PYG{c+c1}{\PYGZsh{} polarization = np.sqrt(x**2 + y**2 + z**2)}
+
+    \PYG{k}{return} \PYG{n}{polarization}
+
+\PYG{c+c1}{\PYGZsh{} Create the protostar class.}
+\PYG{n}{protostar} \PYG{o}{=} \PYG{n}{m\PYGZus{}obs}\PYG{o}{.}\PYG{n}{ProtostarModel}\PYG{p}{(}\PYG{n}{sky\PYGZus{}coordinates}\PYG{p}{,}
+                                 \PYG{n}{cloud\PYGZus{}equation}\PYG{p}{,}
+                                 \PYG{n}{magnetic\PYGZus{}field}\PYG{p}{,}
+                                 \PYG{n}{density\PYGZus{}function}\PYG{p}{,}
+                                 \PYG{n}{polarization\PYGZus{}function}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\section{Sightline Creation}
+\label{\detokenize{quickstart:sightline-creation}}
+When the object is made, it would also be helpful to actually look at the object (simulated observations). Thus, there is a {\hyperref[\detokenize{model_observing:model_observing.Sightline}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{Sightline}}}}} class. The purpose of this class is to simulate the telescope’s pointing location.
+
+The {\hyperref[\detokenize{model_observing:model_observing.Sightline}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{Sightline}}}}} class takes in two strings for the RA and DEC of the object. They should be in the following format:
+\begin{itemize}
+\item {} 
+RA: \#\#h\#\#m\#\#.\#\#s (i.e 12h05m10.00s)
+
+\item {} 
+DEC: \#\#d\#\#m\#\#.\#\#s (i.e 06d18m10.25s)
+
+\end{itemize}
+
+Note that the seconds may have more decimals for an accuracy greater than the hundredths place.
+
+If we would like to observe the object that was created in the previous step in \DUrole{xref,std,std-ref}{\_ProtostarModel\_Creation}, it is best to also point to the object. Therefore, we expect to point to the same location in the sky.
+
+The code below generates a {\hyperref[\detokenize{model_observing:model_observing.Sightline}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{Sightline}}}}} class just to do that.
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{astropy} \PYG{k}{as} \PYG{n+nn}{ap}
+\PYG{k+kn}{import} \PYG{n+nn}{astropy}\PYG{n+nn}{.}\PYG{n+nn}{coordinates} \PYG{k}{as} \PYG{n+nn}{ap\PYGZus{}coord}
+
+\PYG{k+kn}{import} \PYG{n+nn}{model\PYGZus{}observing} \PYG{k}{as} \PYG{n+nn}{m\PYGZus{}obs}
+
+\PYG{c+c1}{\PYGZsh{} RA of 00h00m00.00s and a DEC of 00d00m00.00s}
+\PYG{n}{sightline} \PYG{o}{=} \PYG{n}{m\PYGZus{}obs}\PYG{o}{.}\PYG{n}{Sightline}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00h00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00d00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+Note that the class can also accept a \sphinxhref{http://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html\#astropy.coordinates.SkyCoord}{\sphinxcode{\sphinxupquote{SkyCoord}}} class object. This functionality is done to improve the compatibility with other RA-DEC notations. This alternative method of creating a Sightline is demonstrated below. Because the SkyCoord object contains all of the information needed, the strings that the user would have normally input is ignored in favor for the SkyCoord object.
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{astropy} \PYG{k}{as} \PYG{n+nn}{ap}
+\PYG{k+kn}{import} \PYG{n+nn}{astropy}\PYG{n+nn}{.}\PYG{n+nn}{coordinates} \PYG{k}{as} \PYG{n+nn}{ap\PYGZus{}coord}
+
+\PYG{k+kn}{import} \PYG{n+nn}{model\PYGZus{}observing} \PYG{k}{as} \PYG{n+nn}{m\PYGZus{}obs}
+
+\PYG{c+c1}{\PYGZsh{} Making the SkyCoord class with a RA of 00h00m00.00s and a}
+\PYG{c+c1}{\PYGZsh{} DEC of 00d00m00.00s}
+\PYG{n}{sky\PYGZus{}coordinates} \PYG{o}{=} \PYG{n}{ap\PYGZus{}coord}\PYG{o}{.}\PYG{n}{SkyCoord}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00h00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00d00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+                                    \PYG{n}{frame}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{icrs}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Creating the Sightline class using the SkyCoord class.}
+\PYG{n}{sightline} \PYG{o}{=} \PYG{n}{m\PYGZus{}obs}\PYG{o}{.}\PYG{n}{Sightline}\PYG{p}{(}\PYG{k+kc}{None}\PYG{p}{,} \PYG{k+kc}{None}\PYG{p}{,} \PYG{n}{SkyCoord\PYGZus{}object}\PYG{o}{=}\PYG{n}{sky\PYGZus{}coordinates}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\section{ObservingRun Creation}
+\label{\detokenize{quickstart:observingrun-creation}}
+When both the {\hyperref[\detokenize{model_observing:model_observing.ProtostarModel}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ProtostarModel}}}}} object and the {\hyperref[\detokenize{model_observing:model_observing.Sightline}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{Sightline}}}}} object is created, an {\hyperref[\detokenize{model_observing:model_observing.ObservingRun}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ObservingRun}}}}} object can be made using both of them.
+
+An {\hyperref[\detokenize{model_observing:model_observing.ObservingRun}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ObservingRun}}}}} object is an object that simulates the act of doing an observing run with a telescope (as the name implies). Through its member functions, the class allows for the computation of different observation run styles.
+
+To make an ObservingRun object, it can be made as follows.
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{model\PYGZus{}observing} \PYG{k}{as} \PYG{n+nn}{m\PYGZus{}obs}
+
+\PYG{c+c1}{\PYGZsh{} Define the field of view of the observation, in radians as the total}
+\PYG{c+c1}{\PYGZsh{} length of the observation square.}
+\PYG{n}{field\PYGZus{}of\PYGZus{}view} \PYG{o}{=} \PYG{l+m+mf}{0.015}
+
+\PYG{n}{observing\PYGZus{}run} \PYG{o}{=} \PYG{n}{m\PYGZus{}obs}\PYG{o}{.}\PYG{n}{ObservingRun}\PYG{p}{(}\PYG{n}{protostar}\PYG{p}{,}\PYG{n}{sightline}\PYG{p}{,}\PYG{n}{field\PYGZus{}of\PYGZus{}view}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+From the {\hyperref[\detokenize{model_observing:model_observing.ObservingRun}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{ObservingRun}}}}} object, the following observations can be completed from it.
+
+
+\subsection{Model Stokes Parameters}
+\label{\detokenize{quickstart:model-stokes-parameters}}
+Modeling Stokes parameters in plots is the primary function (as of current) of this repository codebase. It can be normally called by executing the member function {\hyperref[\detokenize{model_observing:model_observing.ObservingRun.Stokes_parameter_contours}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{Stokes\_parameter\_contours()}}}}}. The most basic execution of this method is as follows.
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{model\PYGZus{}observing} \PYG{k}{as} \PYG{n+nn}{m\PYGZus{}obs}
+
+\PYG{c+c1}{\PYGZsh{} Decide on the resolution of the data observed, this sets the number of}
+\PYG{c+c1}{\PYGZsh{} data points on one axis.}
+\PYG{n}{axis\PYGZus{}resolution} \PYG{o}{=} \PYG{l+m+mi}{30}
+
+\PYG{n}{results} \PYG{o}{=} \PYG{n}{observing\PYGZus{}run}\PYG{o}{.}\PYG{n}{Stokes\PYGZus{}parameter\PYGZus{}contours}\PYG{p}{(}
+    \PYG{n}{n\PYGZus{}axial\PYGZus{}samples}\PYG{o}{=}\PYG{n}{axis\PYGZus{}resolution}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+The value of the returned function is a list of the RA-DEC values for the sampled points along with the Stokes parameters from a sightline at those given RA-DEC values. Refer to the method documentation (see {\hyperref[\detokenize{model_observing:model_observing.ObservingRun.Stokes_parameter_contours}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{Stokes\_parameter\_contours()}}}}}) for more information.
+
+It should be the case that the plots of the object desired is created with this method. The method itself should already plot the information for you in heat-map based contours.
+
+Warning: If the values of the intensity is highly similar across the field of view, it may be the case that the colorbar readjustments fatally fails. To prevent this, it is suggested to choose one’s field of view such that at least one sightline misses the object.
+
+
+\chapter{Example}
+\label{\detokenize{example:example}}\label{\detokenize{example::doc}}
+This is the example from the \DUrole{xref,std,std-doc}{\textasciitilde{}.quickstart} guide function.
+
+The combined code block of that guide is below.
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{import} \PYG{n+nn}{astropy} \PYG{k}{as} \PYG{n+nn}{ap}
+\PYG{k+kn}{import} \PYG{n+nn}{astropy}\PYG{n+nn}{.}\PYG{n+nn}{coordinates} \PYG{k}{as} \PYG{n+nn}{ap\PYGZus{}coord}
+
+\PYG{k+kn}{import} \PYG{n+nn}{model\PYGZus{}observing} \PYG{k}{as} \PYG{n+nn}{m\PYGZus{}obs}
+
+\PYG{c+c1}{\PYGZsh{} Making the coordinate input, should be an Astropy SkyCoord class.}
+\PYG{n}{sky\PYGZus{}coordinates} \PYG{o}{=} \PYG{n}{ap\PYGZus{}coord}\PYG{o}{.}\PYG{n}{SkyCoord}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00h00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00d00m00.00s}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{n}{frame}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{icrs}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Making a cloud function, a sphere in this case. Note that the units}
+\PYG{c+c1}{\PYGZsh{} are in angular space, and thus the unit of circle is radians.}
+\PYG{k}{def} \PYG{n+nf}{cloud\PYGZus{}equation}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{radius} \PYG{o}{=} \PYG{l+m+mf}{0.01}
+    \PYG{k}{return} \PYG{n}{x}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{y}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{z}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{\PYGZhy{}} \PYG{n}{radius}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}
+
+\PYG{c+c1}{\PYGZsh{} Making a magnetic field that is uniform in one direction. Consider a}
+\PYG{c+c1}{\PYGZsh{} field that is always 0i + 1j + 2k.}
+\PYG{k}{def} \PYG{n+nf}{magnetic\PYGZus{}field}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{Bfield\PYGZus{}x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros\PYGZus{}like}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{Bfield\PYGZus{}y} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones\PYGZus{}like}\PYG{p}{(}\PYG{n}{y}\PYG{p}{)}
+    \PYG{n}{Bfield\PYGZus{}z} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{full\PYGZus{}like}\PYG{p}{(}\PYG{n}{z}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n}{Bfield\PYGZus{}x}\PYG{p}{,}\PYG{n}{Bfield\PYGZus{}y}\PYG{p}{,}\PYG{n}{Bfield\PYGZus{}z}
+
+\PYG{c+c1}{\PYGZsh{} Making a density function of a 1/r**2 profile.}
+\PYG{k}{def} \PYG{n+nf}{density\PYGZus{}function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{density} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} The above line is a faster implementation of the following.}
+    \PYG{c+c1}{\PYGZsh{} density = 1/(x**2 + y**2 + z**2)}
+
+    \PYG{k}{return} \PYG{n}{density}
+
+\PYG{c+c1}{\PYGZsh{} Making a polarization function of a 1/r**2 profile.}
+\PYG{k}{def} \PYG{n+nf}{polarization\PYGZus{}function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{polarization} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{n}{x}\PYG{p}{,}\PYG{n}{y}\PYG{p}{,}\PYG{n}{z}\PYG{p}{]}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} The above line is a faster implementation of the following.}
+    \PYG{c+c1}{\PYGZsh{} polarization = 1/(x**2 + y**2 + z**2)}
+
+    \PYG{k}{return} \PYG{n}{polarization}
+
+\PYG{c+c1}{\PYGZsh{} Create the protostar class.}
+\PYG{n}{protostar} \PYG{o}{=} \PYG{n}{m\PYGZus{}obs}\PYG{o}{.}\PYG{n}{ProtostarModel}\PYG{p}{(}\PYG{n}{sky\PYGZus{}coordinates}\PYG{p}{,}
+                                 \PYG{n}{cloud\PYGZus{}equation}\PYG{p}{,}
+                                 \PYG{n}{magnetic\PYGZus{}field}\PYG{p}{,}
+                                 \PYG{n}{density\PYGZus{}function}\PYG{p}{,}
+                                 \PYG{n}{polarization\PYGZus{}function}\PYG{p}{)}
+
+
+\PYG{c+c1}{\PYGZsh{} Creating the Sightline class using the SkyCoord class.}
+\PYG{n}{sightline} \PYG{o}{=} \PYG{n}{m\PYGZus{}obs}\PYG{o}{.}\PYG{n}{Sightline}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00h00m00}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{00d00m00}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+
+
+\PYG{c+c1}{\PYGZsh{} Define the field of view of the observation, in radians as the total}
+\PYG{c+c1}{\PYGZsh{} length of the observation square.}
+\PYG{n}{field\PYGZus{}of\PYGZus{}view} \PYG{o}{=} \PYG{l+m+mf}{0.015}
+
+\PYG{n}{observing\PYGZus{}run} \PYG{o}{=} \PYG{n}{m\PYGZus{}obs}\PYG{o}{.}\PYG{n}{ObservingRun}\PYG{p}{(}\PYG{n}{protostar}\PYG{p}{,}\PYG{n}{sightline}\PYG{p}{,}\PYG{n}{field\PYGZus{}of\PYGZus{}view}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Decide on the resolution of the data observed, this sets the number of}
+\PYG{c+c1}{\PYGZsh{} data points on one axis.}
+\PYG{n}{axis\PYGZus{}resolution} \PYG{o}{=} \PYG{l+m+mi}{30}
+
+\PYG{n}{results} \PYG{o}{=} \PYG{n}{observing\PYGZus{}run}\PYG{o}{.}\PYG{n}{Stokes\PYGZus{}parameter\PYGZus{}contours}\PYG{p}{(}
+    \PYG{n}{n\PYGZus{}axial\PYGZus{}samples}\PYG{o}{=}\PYG{n}{axis\PYGZus{}resolution}\PYG{p}{)}
+\end{sphinxVerbatim}
 
 
 \chapter{Active\_Codebase}

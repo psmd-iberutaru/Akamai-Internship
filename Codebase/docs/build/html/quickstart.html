@@ -16,7 +16,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Active_Codebase" href="modules.html" />
+    <link rel="next" title="Example" href="example.html" />
     <link rel="prev" title="Welcome to Akamai Polarization Modeling’s documentation!" href="index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -29,7 +29,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="Active_Codebase"
+          <a href="example.html" title="Example"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to Akamai Polarization Modeling’s documentation!"
@@ -49,7 +49,219 @@
 <p>It is assumed that the program/code has been installed along with its inherent dependencies. If not, then consult the main page for more information.</p>
 <p>The core of this module is the <a class="reference internal" href="model_observing.html#model_observing.ObservingRun" title="model_observing.ObservingRun"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservingRun</span></code></a> object. This object, as the name implies, is the class that acts as the observation run of the simulation.</p>
 <p>In order to make the <a class="reference internal" href="model_observing.html#model_observing.ObservingRun" title="model_observing.ObservingRun"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservingRun</span></code></a> object, we first need two other objects: <a class="reference internal" href="model_observing.html#model_observing.ProtostarModel" title="model_observing.ProtostarModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProtostarModel</span></code></a> and <a class="reference internal" href="model_observing.html#model_observing.Sightline" title="model_observing.Sightline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sightline</span></code></a> objects.</p>
+<div class="section" id="protostarmodel-creation">
+<span id="id1"></span><h2>ProtostarModel Creation<a class="headerlink" href="#protostarmodel-creation" title="Permalink to this headline">¶</a></h2>
 <p>First, let us make the <a class="reference internal" href="model_observing.html#model_observing.ProtostarModel" title="model_observing.ProtostarModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProtostarModel</span></code></a> object. First off there are five things that we need to provide in order to make such an object (although two are optional).</p>
+<p>Please note that the coordinate system for the equations and functions within this section is where the origin of the object is the origin of the coordinate system, with the x-axis on the light of sight, positive going from the observing telescope, to the origin of the object, deeper into space, and thus is equivalent to the r-axis from Earth. The y-z plane is assumed to be analogous to the RA-DEC plane of the sky.</p>
+<p>The five things that are required for the <a class="reference internal" href="model_observing.html#model_observing.ProtostarModel" title="model_observing.ProtostarModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProtostarModel</span></code></a> is a <a class="reference external" href="http://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v3.0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SkyCoord</span></code></a>, a cloud function, a magnetic field function, a density function, and a polarization function.</p>
+<div class="section" id="coordinates">
+<h3>Coordinates<a class="headerlink" href="#coordinates" title="Permalink to this headline">¶</a></h3>
+<p>The first parameter is the coordinates of the object in the sky. This is supposed to simulate actual observations, and thus a real sky coordinate is the accepted term. Consider the example parameters below for an object that is at the spring equinox (i.e. a RA of 00h00m00.00s and a DEC of 00d00m00.00s).</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astropy</span> <span class="k">as</span> <span class="nn">ap</span>
+<span class="kn">import</span> <span class="nn">astropy.coordinates</span> <span class="k">as</span> <span class="nn">ap_coord</span>
+
+<span class="c1"># Making the coordinate input, should be an Astropy SkyCoord class.</span>
+<span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">(</span><span class="s1">&#39;00h00m00.00s&#39;</span><span class="p">,</span><span class="s1">&#39;00d00m00.00s&#39;</span><span class="p">,</span>
+                                    <span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cloud-equation">
+<h3>Cloud Equation<a class="headerlink" href="#cloud-equation" title="Permalink to this headline">¶</a></h3>
+<p>The cloud equation must be a function that takes in three dimensions and is the expression of the implicit functional form. In a general sense, the function is programed as <span class="math notranslate nohighlight">\(f(x,y,z) \to \text{ return}\)</span>, where the expression
+<span class="math notranslate nohighlight">\(f(x,y,z)\)</span> is from the mathematical implicit equation <span class="math notranslate nohighlight">\(f(x,y,z) = 0\)</span>.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Making a cloud function, a sphere in this case. Note that the units</span>
+<span class="c1"># are in angular space, and thus the unit of circle is radians.</span>
+<span class="k">def</span> <span class="nf">cloud_equation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="magnetic-field">
+<h3>Magnetic Field<a class="headerlink" href="#magnetic-field" title="Permalink to this headline">¶</a></h3>
+<p>The magnetic field is a little bit more complex, this function is not a scalar function like the density or polarization functions. It is a vector function and thus must return three vectors in cartesian space, still with respect to the origin of the protostar model. Consider the following field that is uniform in one direction. More complex field geometries can be found in <a class="reference internal" href="magnetic_field_functions_3d.html#module-magnetic_field_functions_3d" title="magnetic_field_functions_3d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">magnetic_field_functions_3d</span></code></a> and can be called from there.</p>
+<p>Please note the use of Numpy’s structures. Although it is possible to return only integers for the components, using these structures is required if table interpolation is used, and thus usage is suggested for compatibility purposes.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Making a magnetic field that is uniform in one direction. Consider a</span>
+<span class="c1"># field that is always 0i + 1j + 2k.</span>
+<span class="k">def</span> <span class="nf">magnetic_field</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">Bfield_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">Bfield_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Bfield_x</span><span class="p">,</span><span class="n">Bfield_y</span><span class="p">,</span><span class="n">Bfield_z</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="density-function">
+<h3>Density Function<a class="headerlink" href="#density-function" title="Permalink to this headline">¶</a></h3>
+<p>The density function is a scalar function in three dimensional space. As such, it should return a density value given a three dimensional input (<span class="math notranslate nohighlight">\(f(x,y,z) = d\)</span>). Consider the example function of a density profile that drops off as a function of <span class="math notranslate nohighlight">\(\frac{1}{r^2}\)</span>.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Making a density function of a 1/r**2 profile.</span>
+<span class="k">def</span> <span class="nf">density_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">])</span>
+
+    <span class="c1"># The above line is a faster implementation of the following.</span>
+    <span class="c1"># density = 1/np.dot(x**2 + y**2 + z**2)</span>
+
+    <span class="k">return</span> <span class="n">density</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="polarization-function">
+<h3>Polarization Function<a class="headerlink" href="#polarization-function" title="Permalink to this headline">¶</a></h3>
+<p>The polarization function, like the density function is a scalar function in three dimensional space. As such, it should return a value which corresponds to the level of polarization of the light at that given location in space (<span class="math notranslate nohighlight">\(f(x,y,z) = p\)</span>). Consider the example function of a polarization profile that drops off as a function of <span class="math notranslate nohighlight">\(r^2\)</span>.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Making a polarization function of a 1/r**2 profile.</span>
+<span class="k">def</span> <span class="nf">polarization_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">polarization</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">]))</span>
+
+    <span class="c1"># The above line is a faster implementation of the following.</span>
+    <span class="c1"># polarization = np.sqrt(x**2 + y**2 + z**2)</span>
+
+    <span class="k">return</span> <span class="n">polarization</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-the-class">
+<h3>Creating the Class<a class="headerlink" href="#creating-the-class" title="Permalink to this headline">¶</a></h3>
+<p>From these parameters, a <a class="reference internal" href="model_observing.html#model_observing.ProtostarModel" title="model_observing.ProtostarModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProtostarModel</span></code></a> by the following line.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">model_observing</span> <span class="k">as</span> <span class="nn">m_obs</span>
+
+<span class="c1"># Create the protostar class.</span>
+<span class="n">protostar</span> <span class="o">=</span> <span class="n">m_obs</span><span class="o">.</span><span class="n">ProtostarModel</span><span class="p">(</span><span class="n">sky_coordinates</span><span class="p">,</span>
+                                 <span class="n">cloud_equation</span><span class="p">,</span>
+                                 <span class="n">magnetic_field</span><span class="p">,</span>
+                                 <span class="n">density_function</span><span class="p">,</span>
+                                 <span class="n">polarization_function</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or, all in one block of code.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">astropy</span> <span class="k">as</span> <span class="nn">ap</span>
+<span class="kn">import</span> <span class="nn">astropy.coordinates</span> <span class="k">as</span> <span class="nn">ap_coord</span>
+
+<span class="kn">import</span> <span class="nn">model_observing</span> <span class="k">as</span> <span class="nn">m_obs</span>
+
+<span class="c1"># Making the coordinate input, should be an Astropy SkyCoord class.</span>
+<span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">(</span><span class="s1">&#39;00h00m00.00s&#39;</span><span class="p">,</span><span class="s1">&#39;00d00m00.00s&#39;</span><span class="p">,</span><span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">)</span>
+
+<span class="c1"># Making a cloud function, a sphere in this case. Note that the units</span>
+<span class="c1"># are in angular space, and thus the unit of circle is radians.</span>
+<span class="k">def</span> <span class="nf">cloud_equation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1"># Making a magnetic field that is uniform in one direction. Consider a</span>
+<span class="c1"># field that is always 0i + 1j + 2k.</span>
+<span class="k">def</span> <span class="nf">magnetic_field</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">Bfield_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">Bfield_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Making a density function of a 1/r**2 profile.</span>
+<span class="k">def</span> <span class="nf">density_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">]))</span>
+
+    <span class="c1"># The above line is a faster implementation of the following.</span>
+    <span class="c1"># density = np.sqrt(x**2 + y**2 + z**2)</span>
+
+    <span class="k">return</span> <span class="n">density</span>
+
+<span class="c1"># Making a polarization function of a 1/r**2 profile.</span>
+<span class="k">def</span> <span class="nf">polarization_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">polarization</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">]))</span>
+
+    <span class="c1"># The above line is a faster implementation of the following.</span>
+    <span class="c1"># polarization = np.sqrt(x**2 + y**2 + z**2)</span>
+
+    <span class="k">return</span> <span class="n">polarization</span>
+
+<span class="c1"># Create the protostar class.</span>
+<span class="n">protostar</span> <span class="o">=</span> <span class="n">m_obs</span><span class="o">.</span><span class="n">ProtostarModel</span><span class="p">(</span><span class="n">sky_coordinates</span><span class="p">,</span>
+                                 <span class="n">cloud_equation</span><span class="p">,</span>
+                                 <span class="n">magnetic_field</span><span class="p">,</span>
+                                 <span class="n">density_function</span><span class="p">,</span>
+                                 <span class="n">polarization_function</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="sightline-creation">
+<h2>Sightline Creation<a class="headerlink" href="#sightline-creation" title="Permalink to this headline">¶</a></h2>
+<p>When the object is made, it would also be helpful to actually look at the object (simulated observations). Thus, there is a <a class="reference internal" href="model_observing.html#model_observing.Sightline" title="model_observing.Sightline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sightline</span></code></a> class. The purpose of this class is to simulate the telescope’s pointing location.</p>
+<p>The <a class="reference internal" href="model_observing.html#model_observing.Sightline" title="model_observing.Sightline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sightline</span></code></a> class takes in two strings for the RA and DEC of the object. They should be in the following format:</p>
+<blockquote>
+<div><ul class="simple">
+<li>RA: ##h##m##.##s (i.e 12h05m10.00s)</li>
+<li>DEC: ##d##m##.##s (i.e 06d18m10.25s)</li>
+</ul>
+</div></blockquote>
+<p>Note that the seconds may have more decimals for an accuracy greater than the hundredths place.</p>
+<p>If we would like to observe the object that was created in the previous step in <span class="xref std std-ref">_ProtostarModel_Creation</span>, it is best to also point to the object. Therefore, we expect to point to the same location in the sky.</p>
+<p>The code below generates a <a class="reference internal" href="model_observing.html#model_observing.Sightline" title="model_observing.Sightline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sightline</span></code></a> class just to do that.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astropy</span> <span class="k">as</span> <span class="nn">ap</span>
+<span class="kn">import</span> <span class="nn">astropy.coordinates</span> <span class="k">as</span> <span class="nn">ap_coord</span>
+
+<span class="kn">import</span> <span class="nn">model_observing</span> <span class="k">as</span> <span class="nn">m_obs</span>
+
+<span class="c1"># RA of 00h00m00.00s and a DEC of 00d00m00.00s</span>
+<span class="n">sightline</span> <span class="o">=</span> <span class="n">m_obs</span><span class="o">.</span><span class="n">Sightline</span><span class="p">(</span><span class="s1">&#39;00h00m00.00s&#39;</span><span class="p">,</span><span class="s1">&#39;00d00m00.00s&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the class can also accept a <a class="reference external" href="http://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v3.0.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SkyCoord</span></code></a> class object. This functionality is done to improve the compatibility with other RA-DEC notations. This alternative method of creating a Sightline is demonstrated below. Because the SkyCoord object contains all of the information needed, the strings that the user would have normally input is ignored in favor for the SkyCoord object.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astropy</span> <span class="k">as</span> <span class="nn">ap</span>
+<span class="kn">import</span> <span class="nn">astropy.coordinates</span> <span class="k">as</span> <span class="nn">ap_coord</span>
+
+<span class="kn">import</span> <span class="nn">model_observing</span> <span class="k">as</span> <span class="nn">m_obs</span>
+
+<span class="c1"># Making the SkyCoord class with a RA of 00h00m00.00s and a</span>
+<span class="c1"># DEC of 00d00m00.00s</span>
+<span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">(</span><span class="s1">&#39;00h00m00.00s&#39;</span><span class="p">,</span><span class="s1">&#39;00d00m00.00s&#39;</span><span class="p">,</span>
+                                    <span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">)</span>
+
+<span class="c1"># Creating the Sightline class using the SkyCoord class.</span>
+<span class="n">sightline</span> <span class="o">=</span> <span class="n">m_obs</span><span class="o">.</span><span class="n">Sightline</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">SkyCoord_object</span><span class="o">=</span><span class="n">sky_coordinates</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="observingrun-creation">
+<h2>ObservingRun Creation<a class="headerlink" href="#observingrun-creation" title="Permalink to this headline">¶</a></h2>
+<p>When both the <a class="reference internal" href="model_observing.html#model_observing.ProtostarModel" title="model_observing.ProtostarModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProtostarModel</span></code></a> object and the <a class="reference internal" href="model_observing.html#model_observing.Sightline" title="model_observing.Sightline"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sightline</span></code></a> object is created, an <a class="reference internal" href="model_observing.html#model_observing.ObservingRun" title="model_observing.ObservingRun"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservingRun</span></code></a> object can be made using both of them.</p>
+<p>An <a class="reference internal" href="model_observing.html#model_observing.ObservingRun" title="model_observing.ObservingRun"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservingRun</span></code></a> object is an object that simulates the act of doing an observing run with a telescope (as the name implies). Through its member functions, the class allows for the computation of different observation run styles.</p>
+<p>To make an ObservingRun object, it can be made as follows.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">model_observing</span> <span class="k">as</span> <span class="nn">m_obs</span>
+
+<span class="c1"># Define the field of view of the observation, in radians as the total</span>
+<span class="c1"># length of the observation square.</span>
+<span class="n">field_of_view</span> <span class="o">=</span> <span class="mf">0.015</span>
+
+<span class="n">observing_run</span> <span class="o">=</span> <span class="n">m_obs</span><span class="o">.</span><span class="n">ObservingRun</span><span class="p">(</span><span class="n">protostar</span><span class="p">,</span><span class="n">sightline</span><span class="p">,</span><span class="n">field_of_view</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>From the <a class="reference internal" href="model_observing.html#model_observing.ObservingRun" title="model_observing.ObservingRun"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservingRun</span></code></a> object, the following observations can be completed from it.</p>
+<div class="section" id="model-stokes-parameters">
+<h3>Model Stokes Parameters<a class="headerlink" href="#model-stokes-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Modeling Stokes parameters in plots is the primary function (as of current) of this repository codebase. It can be normally called by executing the member function <a class="reference internal" href="model_observing.html#model_observing.ObservingRun.Stokes_parameter_contours" title="model_observing.ObservingRun.Stokes_parameter_contours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Stokes_parameter_contours()</span></code></a>. The most basic execution of this method is as follows.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">model_observing</span> <span class="k">as</span> <span class="nn">m_obs</span>
+
+<span class="c1"># Decide on the resolution of the data observed, this sets the number of</span>
+<span class="c1"># data points on one axis.</span>
+<span class="n">axis_resolution</span> <span class="o">=</span> <span class="mi">30</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">observing_run</span><span class="o">.</span><span class="n">Stokes_parameter_contours</span><span class="p">(</span>
+    <span class="n">n_axial_samples</span><span class="o">=</span><span class="n">axis_resolution</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The value of the returned function is a list of the RA-DEC values for the sampled points along with the Stokes parameters from a sightline at those given RA-DEC values. Refer to the method documentation (see <a class="reference internal" href="model_observing.html#model_observing.ObservingRun.Stokes_parameter_contours" title="model_observing.ObservingRun.Stokes_parameter_contours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Stokes_parameter_contours()</span></code></a>) for more information.</p>
+<p>It should be the case that the plots of the object desired is created with this method. The method itself should already plot the information for you in heat-map based contours.</p>
+<p>Warning: If the values of the intensity is highly similar across the field of view, it may be the case that the colorbar readjustments fatally fails. To prevent this, it is suggested to choose one’s field of view such that at least one sightline misses the object.</p>
+</div>
+</div>
 </div>
 
 
@@ -58,12 +270,33 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quickstart</a><ul>
+<li><a class="reference internal" href="#protostarmodel-creation">ProtostarModel Creation</a><ul>
+<li><a class="reference internal" href="#coordinates">Coordinates</a></li>
+<li><a class="reference internal" href="#cloud-equation">Cloud Equation</a></li>
+<li><a class="reference internal" href="#magnetic-field">Magnetic Field</a></li>
+<li><a class="reference internal" href="#density-function">Density Function</a></li>
+<li><a class="reference internal" href="#polarization-function">Polarization Function</a></li>
+<li><a class="reference internal" href="#creating-the-class">Creating the Class</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sightline-creation">Sightline Creation</a></li>
+<li><a class="reference internal" href="#observingrun-creation">ObservingRun Creation</a><ul>
+<li><a class="reference internal" href="#model-stokes-parameters">Model Stokes Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to Akamai Polarization Modeling’s documentation!</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="modules.html"
-                        title="next chapter">Active_Codebase</a></p>
+  <p class="topless"><a href="example.html"
+                        title="next chapter">Example</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -97,7 +330,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="Active_Codebase"
+          <a href="example.html" title="Example"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to Akamai Polarization Modeling’s documentation!"

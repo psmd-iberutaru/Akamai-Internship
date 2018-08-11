@@ -2,179 +2,180 @@
 \def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
 
   \bigletter {Symbols}
-  \item \_\_init\_\_() (data\_systematization.InterpolationTable method), \hyperpage{19}
-  \item \_\_init\_\_() (model\_observing.ObservingRun method), \hyperpage{25}
-  \item \_\_init\_\_() (model\_observing.ProtostarModel method), \hyperpage{26}
-  \item \_\_init\_\_() (model\_observing.Sightline method), \hyperpage{27}
+  \item \_\_init\_\_() (data\_systematization.InterpolationTable method), \hyperpage{25}
+  \item \_\_init\_\_() (model\_observing.ObservingRun method), \hyperpage{31}
+  \item \_\_init\_\_() (model\_observing.ProtostarModel method), \hyperpage{32}
+  \item \_\_init\_\_() (model\_observing.Sightline method), \hyperpage{33}
 
   \indexspace
   \bigletter A
   \item angle\_from\_Stokes\_parameters() (in module Backend.electromagnetic\_field\_polarization), 
+		\hyperpage{18}
+  \item angle\_normalization\_0\_2pi() (in module Backend.astronomical\_coordinates), 
 		\hyperpage{12}
-  \item angle\_normalization\_0\_2pi() (in module Backend.astronomical\_coordinates), \hyperpage{6}
-  \item AstronomyError, \hyperpage{15}
-  \item AstronomyWarning, \hyperpage{17}
-  \item auto\_ra\_wrap\_angle() (in module Backend.astronomical\_coordinates), \hyperpage{6}
+  \item AstronomyError, \hyperpage{21}
+  \item AstronomyWarning, \hyperpage{23}
+  \item auto\_ra\_wrap\_angle() (in module Backend.astronomical\_coordinates), \hyperpage{12}
 
   \indexspace
   \bigletter B
-  \item Backend (module), \hyperpage{15}
-  \item Backend.astronomical\_coordinates (module), \hyperpage{6}
-  \item Backend.cloud\_line\_integration (module), \hyperpage{7}
-  \item Backend.coordinate\_system\_transformation (module), \hyperpage{8}
-  \item Backend.electromagnetic\_field\_polarization (module), \hyperpage{11}
-  \item Backend.Ewertowski\_Basu\_2013 (module), \hyperpage{5}
-  \item Backend.plotting\_customization (module), \hyperpage{13}
-  \item Backend.table\_interpolation (module), \hyperpage{14}
-  \item bessel\_zeros() (in module Backend.Ewertowski\_Basu\_2013), \hyperpage{6}
+  \item Backend (module), \hyperpage{21}
+  \item Backend.astronomical\_coordinates (module), \hyperpage{12}
+  \item Backend.cloud\_line\_integration (module), \hyperpage{13}
+  \item Backend.coordinate\_system\_transformation (module), \hyperpage{14}
+  \item Backend.electromagnetic\_field\_polarization (module), \hyperpage{17}
+  \item Backend.Ewertowski\_Basu\_2013 (module), \hyperpage{11}
+  \item Backend.plotting\_customization (module), \hyperpage{19}
+  \item Backend.table\_interpolation (module), \hyperpage{20}
+  \item bessel\_zeros() (in module Backend.Ewertowski\_Basu\_2013), \hyperpage{12}
 
   \indexspace
   \bigletter C
   \item cartesian\_to\_cylindrical\_3d() (in module Backend.coordinate\_system\_transformation), 
-		\hyperpage{8}
+		\hyperpage{14}
   \item cartesian\_to\_polar\_2d() (in module Backend.coordinate\_system\_transformation), 
-		\hyperpage{9}
+		\hyperpage{15}
   \item cartesian\_to\_spherical\_3d() (in module Backend.coordinate\_system\_transformation), 
-		\hyperpage{9}
+		\hyperpage{15}
   \item circular\_magnetic\_field\_cart\_2d() (in module magnetic\_field\_functions\_2d), 
-		\hyperpage{20}
+		\hyperpage{26}
   \item circular\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d), 
-		\hyperpage{21}
-  \item cloud\_line\_integral() (in module Backend.cloud\_line\_integration), \hyperpage{7}
-  \item cloud\_model (model\_observing.ProtostarModel.self attribute), \hyperpage{26}
-  \item coordinates (model\_observing.ProtostarModel.self attribute), \hyperpage{25}
-  \item coordinates (model\_observing.Sightline.self attribute), \hyperpage{26}
+		\hyperpage{27}
+  \item cloud\_line\_integral() (in module Backend.cloud\_line\_integration), \hyperpage{13}
+  \item cloud\_model (model\_observing.ProtostarModel.self attribute), \hyperpage{32}
+  \item coordinates (model\_observing.ProtostarModel.self attribute), \hyperpage{31}
+  \item coordinates (model\_observing.Sightline.self attribute), \hyperpage{32}
   \item cylindrical\_to\_cartesian\_3d() (in module Backend.coordinate\_system\_transformation), 
-		\hyperpage{9}
+		\hyperpage{15}
   \item cylindrical\_to\_spherical\_3d() (in module Backend.coordinate\_system\_transformation), 
-		\hyperpage{10}
+		\hyperpage{16}
 
   \indexspace
   \bigletter D
-  \item DangerWarning, \hyperpage{17}
-  \item data\_systematization (module), \hyperpage{18}
-  \item density\_field\_functions (module), \hyperpage{20}
-  \item density\_model (model\_observing.ProtostarModel.self attribute), \hyperpage{26}
+  \item DangerWarning, \hyperpage{23}
+  \item data\_systematization (module), \hyperpage{24}
+  \item density\_field\_functions (module), \hyperpage{26}
+  \item density\_model (model\_observing.ProtostarModel.self attribute), \hyperpage{32}
 
   \indexspace
   \bigletter E
   \item electric\_to\_magnetic() (in module Backend.electromagnetic\_field\_polarization), 
-		\hyperpage{12}
-  \item Ewer\_Basu\_\_B\_r() (in module Backend.Ewertowski\_Basu\_2013), \hyperpage{5}
-  \item Ewer\_Basu\_\_B\_z() (in module Backend.Ewertowski\_Basu\_2013), \hyperpage{5}
-  \item Ewer\_Basu\_\_eigenvalues() (in module Backend.Ewertowski\_Basu\_2013), \hyperpage{6}
+		\hyperpage{18}
+  \item Ewer\_Basu\_\_B\_r() (in module Backend.Ewertowski\_Basu\_2013), \hyperpage{11}
+  \item Ewer\_Basu\_\_B\_z() (in module Backend.Ewertowski\_Basu\_2013), \hyperpage{11}
+  \item Ewer\_Basu\_\_eigenvalues() (in module Backend.Ewertowski\_Basu\_2013), \hyperpage{12}
 
   \indexspace
   \bigletter F
-  \item field\_of\_view (model\_observing.ObservingRun.self attribute), \hyperpage{24}
-  \item funt\_interpolate\_scalar\_table() (in module Backend.table\_interpolation), \hyperpage{14}
-  \item funt\_interpolate\_vector\_table() (in module Backend.table\_interpolation), \hyperpage{14}
+  \item field\_of\_view (model\_observing.ObservingRun.self attribute), \hyperpage{30}
+  \item funt\_interpolate\_scalar\_table() (in module Backend.table\_interpolation), \hyperpage{20}
+  \item funt\_interpolate\_vector\_table() (in module Backend.table\_interpolation), \hyperpage{20}
 
   \indexspace
   \bigletter H
   \item hourglass\_magnetic\_field\_cart\_2d() (in module magnetic\_field\_functions\_2d), 
-		\hyperpage{20}
+		\hyperpage{26}
   \item hourglass\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d), 
-		\hyperpage{21}
+		\hyperpage{27}
   \item hourglass\_magnetic\_field\_cyln\_3d() (in module magnetic\_field\_functions\_3d), 
-		\hyperpage{22}
+		\hyperpage{28}
 
   \indexspace
   \bigletter I
-  \item InputError, \hyperpage{15}
-  \item InputWarning, \hyperpage{17}
-  \item InterpolationTable (class in data\_systematization), \hyperpage{18}
+  \item InputError, \hyperpage{21}
+  \item InputWarning, \hyperpage{23}
+  \item InterpolationTable (class in data\_systematization), \hyperpage{24}
 
   \indexspace
   \bigletter K
-  \item kyubey\_warning() (in module Robustness.warning), \hyperpage{17}
+  \item kyubey\_warning() (in module Robustness.warning), \hyperpage{23}
 
   \indexspace
   \bigletter L
-  \item line\_integral\_boundaries() (in module Backend.cloud\_line\_integration), \hyperpage{8}
+  \item line\_integral\_boundaries() (in module Backend.cloud\_line\_integration), \hyperpage{14}
   \item linear\_combination\_magnetic\_field() (in module magnetic\_field\_functions\_3d), 
-		\hyperpage{23}
+		\hyperpage{29}
 
   \indexspace
   \bigletter M
-  \item magnetic\_field (model\_observing.ProtostarModel.self attribute), \hyperpage{26}
-  \item magnetic\_field\_functions\_2d (module), \hyperpage{20}
-  \item magnetic\_field\_functions\_3d (module), \hyperpage{21}
+  \item magnetic\_field (model\_observing.ProtostarModel.self attribute), \hyperpage{32}
+  \item magnetic\_field\_functions\_2d (module), \hyperpage{26}
+  \item magnetic\_field\_functions\_3d (module), \hyperpage{27}
   \item magnetic\_to\_electric() (in module Backend.electromagnetic\_field\_polarization), 
-		\hyperpage{12}
-  \item model\_observing (module), \hyperpage{24}
+		\hyperpage{18}
+  \item model\_observing (module), \hyperpage{30}
   \item monopole\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d), 
-		\hyperpage{23}
+		\hyperpage{29}
   \item monopole\_magnetic\_field\_sphr\_3d() (in module magnetic\_field\_functions\_3d), 
-		\hyperpage{23}
+		\hyperpage{29}
 
   \indexspace
   \bigletter N
-  \item numerical\_function() (data\_systematization.InterpolationTable method), \hyperpage{19}
+  \item numerical\_function() (data\_systematization.InterpolationTable method), \hyperpage{25}
 
   \indexspace
   \bigletter O
-  \item observe\_target (model\_observing.ObservingRun.self attribute), \hyperpage{24}
-  \item ObservingRun (class in model\_observing), \hyperpage{24}
-  \item OutputError, \hyperpage{15}
-  \item OutputWarning, \hyperpage{17}
+  \item observe\_target (model\_observing.ObservingRun.self attribute), \hyperpage{30}
+  \item ObservingRun (class in model\_observing), \hyperpage{30}
+  \item OutputError, \hyperpage{21}
+  \item OutputWarning, \hyperpage{23}
 
   \indexspace
   \bigletter P
-  \item PhysicalityWarning, \hyperpage{17}
-  \item PhysicsWarning, \hyperpage{17}
+  \item PhysicalityWarning, \hyperpage{23}
+  \item PhysicsWarning, \hyperpage{23}
   \item polar\_to\_cartesian\_2d() (in module Backend.coordinate\_system\_transformation), 
-		\hyperpage{10}
-  \item polarization\_model (model\_observing.ProtostarModel.self attribute), \hyperpage{26}
-  \item ProtostarModel (class in model\_observing), \hyperpage{25}
+		\hyperpage{16}
+  \item polarization\_model (model\_observing.ProtostarModel.self attribute), \hyperpage{32}
+  \item ProtostarModel (class in model\_observing), \hyperpage{31}
 
   \indexspace
   \bigletter R
-  \item Robustness (module), \hyperpage{18}
-  \item Robustness.exception (module), \hyperpage{15}
-  \item Robustness.input\_parsing (module), \hyperpage{15}
-  \item Robustness.validation (module), \hyperpage{16}
-  \item Robustness.warning (module), \hyperpage{17}
+  \item Robustness (module), \hyperpage{24}
+  \item Robustness.exception (module), \hyperpage{21}
+  \item Robustness.input\_parsing (module), \hyperpage{21}
+  \item Robustness.validation (module), \hyperpage{22}
+  \item Robustness.warning (module), \hyperpage{23}
 
   \indexspace
   \bigletter S
-  \item ShapeError, \hyperpage{15}
-  \item shiftedColorMap() (in module Backend.plotting\_customization), \hyperpage{13}
-  \item Sightline (class in model\_observing), \hyperpage{26}
-  \item sightline (model\_observing.ObservingRun.self attribute), \hyperpage{24}
-  \item sightline\_parameters() (model\_observing.Sightline method), \hyperpage{27}
+  \item ShapeError, \hyperpage{21}
+  \item shiftedColorMap() (in module Backend.plotting\_customization), \hyperpage{19}
+  \item Sightline (class in model\_observing), \hyperpage{32}
+  \item sightline (model\_observing.ObservingRun.self attribute), \hyperpage{30}
+  \item sightline\_parameters() (model\_observing.Sightline method), \hyperpage{33}
   \item spherical\_to\_cartesian\_3d() (in module Backend.coordinate\_system\_transformation), 
-		\hyperpage{10}
+		\hyperpage{16}
   \item spherical\_to\_cylindrical\_3d() (in module Backend.coordinate\_system\_transformation), 
-		\hyperpage{10}
-  \item Stokes\_parameter\_contours() (model\_observing.ObservingRun method), \hyperpage{25}
+		\hyperpage{16}
+  \item Stokes\_parameter\_contours() (model\_observing.ObservingRun method), \hyperpage{31}
   \item Stokes\_parameters\_from\_field() (in module Backend.electromagnetic\_field\_polarization), 
-		\hyperpage{11}
+		\hyperpage{17}
 
   \indexspace
   \bigletter T
-  \item TerminateError, \hyperpage{15}
-  \item TimeWarning, \hyperpage{17}
+  \item TerminateError, \hyperpage{21}
+  \item TimeWarning, \hyperpage{23}
 
   \indexspace
   \bigletter U
-  \item user\_equation\_parse() (in module Robustness.input\_parsing), \hyperpage{15}
+  \item user\_equation\_parse() (in module Robustness.input\_parsing), \hyperpage{21}
 
   \indexspace
   \bigletter V
-  \item validate\_boolean\_array() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_boolean\_value() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_float\_array() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_float\_value() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_function\_call() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_int\_array() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_int\_value() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_list() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_string() (in module Robustness.validation), \hyperpage{16}
-  \item validate\_tuple() (in module Robustness.validation), \hyperpage{16}
+  \item validate\_boolean\_array() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_boolean\_value() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_float\_array() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_float\_value() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_function\_call() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_int\_array() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_int\_value() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_list() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_string() (in module Robustness.validation), \hyperpage{22}
+  \item validate\_tuple() (in module Robustness.validation), \hyperpage{22}
 
   \indexspace
   \bigletter Z
-  \item zeroedColorMap() (in module Backend.plotting\_customization), \hyperpage{13}
+  \item zeroedColorMap() (in module Backend.plotting\_customization), \hyperpage{19}
 
 \end{sphinxtheindex}

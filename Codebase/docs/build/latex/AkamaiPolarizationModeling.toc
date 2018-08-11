@@ -1,35 +1,46 @@
 \babel@toc {english}{}
 \contentsline {chapter}{\numberline {1}Quickstart}{3}{chapter.1}
-\contentsline {chapter}{\numberline {2}Active\_Codebase}{5}{chapter.2}
-\contentsline {section}{\numberline {2.1}Backend package}{5}{section.2.1}
-\contentsline {subsection}{\numberline {2.1.1}Submodules}{5}{subsection.2.1.1}
-\contentsline {subsubsection}{Backend.Ewertowski\_Basu\_2013 module}{5}{subsubsection*.3}
-\contentsline {subsubsection}{Backend.astronomical\_coordinates module}{6}{subsubsection*.8}
-\contentsline {paragraph}{Notes}{7}{paragraph*.11}
-\contentsline {subsubsection}{Backend.cloud\_line\_integration module}{7}{subsubsection*.12}
-\contentsline {subsubsection}{Backend.coordinate\_system\_transformation module}{8}{subsubsection*.15}
-\contentsline {subsubsection}{Backend.electromagnetic\_field\_polarization module}{11}{subsubsection*.24}
-\contentsline {paragraph}{Notes}{12}{paragraph*.26}
-\contentsline {subsubsection}{Backend.plotting\_customization module}{13}{subsubsection*.30}
-\contentsline {subsubsection}{Backend.table\_interpolation module}{14}{subsubsection*.33}
-\contentsline {subsection}{\numberline {2.1.2}Module contents}{15}{subsection.2.1.2}
-\contentsline {section}{\numberline {2.2}Robustness package}{15}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Submodules}{15}{subsection.2.2.1}
-\contentsline {subsubsection}{Robustness.exception module}{15}{subsubsection*.36}
-\contentsline {subsubsection}{Robustness.input\_parsing module}{15}{subsubsection*.42}
-\contentsline {paragraph}{Notes}{16}{paragraph*.44}
-\contentsline {subsubsection}{Robustness.validation module}{16}{subsubsection*.45}
-\contentsline {subsubsection}{Robustness.warning module}{17}{subsubsection*.56}
-\contentsline {subsection}{\numberline {2.2.2}Module contents}{18}{subsection.2.2.2}
-\contentsline {section}{\numberline {2.3}data\_systematization module}{18}{section.2.3}
-\contentsline {paragraph}{Methods}{19}{paragraph*.66}
-\contentsline {section}{\numberline {2.4}density\_field\_functions module}{20}{section.2.4}
-\contentsline {section}{\numberline {2.5}magnetic\_field\_functions\_2d module}{20}{section.2.5}
-\contentsline {section}{\numberline {2.6}magnetic\_field\_functions\_3d module}{21}{section.2.6}
-\contentsline {section}{\numberline {2.7}model\_observing module}{24}{section.2.7}
-\contentsline {paragraph}{Methods}{25}{paragraph*.81}
-\contentsline {paragraph}{Methods}{27}{paragraph*.94}
-\contentsline {paragraph}{Notes}{27}{paragraph*.96}
-\contentsline {chapter}{\numberline {3}Indices and tables}{29}{chapter.3}
-\contentsline {chapter}{Python Module Index}{31}{section*.97}
-\contentsline {chapter}{Index}{33}{section*.98}
+\contentsline {section}{\numberline {1.1}ProtostarModel Creation}{3}{section.1.1}
+\contentsline {subsection}{\numberline {1.1.1}Coordinates}{3}{subsection.1.1.1}
+\contentsline {subsection}{\numberline {1.1.2}Cloud Equation}{4}{subsection.1.1.2}
+\contentsline {subsection}{\numberline {1.1.3}Magnetic Field}{4}{subsection.1.1.3}
+\contentsline {subsection}{\numberline {1.1.4}Density Function}{4}{subsection.1.1.4}
+\contentsline {subsection}{\numberline {1.1.5}Polarization Function}{5}{subsection.1.1.5}
+\contentsline {subsection}{\numberline {1.1.6}Creating the Class}{5}{subsection.1.1.6}
+\contentsline {section}{\numberline {1.2}Sightline Creation}{6}{section.1.2}
+\contentsline {section}{\numberline {1.3}ObservingRun Creation}{7}{section.1.3}
+\contentsline {subsection}{\numberline {1.3.1}Model Stokes Parameters}{7}{subsection.1.3.1}
+\contentsline {chapter}{\numberline {2}Example}{9}{chapter.2}
+\contentsline {chapter}{\numberline {3}Active\_Codebase}{11}{chapter.3}
+\contentsline {section}{\numberline {3.1}Backend package}{11}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Submodules}{11}{subsection.3.1.1}
+\contentsline {subsubsection}{Backend.Ewertowski\_Basu\_2013 module}{11}{subsubsection*.3}
+\contentsline {subsubsection}{Backend.astronomical\_coordinates module}{12}{subsubsection*.8}
+\contentsline {paragraph}{Notes}{13}{paragraph*.11}
+\contentsline {subsubsection}{Backend.cloud\_line\_integration module}{13}{subsubsection*.12}
+\contentsline {subsubsection}{Backend.coordinate\_system\_transformation module}{14}{subsubsection*.15}
+\contentsline {subsubsection}{Backend.electromagnetic\_field\_polarization module}{17}{subsubsection*.24}
+\contentsline {paragraph}{Notes}{18}{paragraph*.26}
+\contentsline {subsubsection}{Backend.plotting\_customization module}{19}{subsubsection*.30}
+\contentsline {subsubsection}{Backend.table\_interpolation module}{20}{subsubsection*.33}
+\contentsline {subsection}{\numberline {3.1.2}Module contents}{21}{subsection.3.1.2}
+\contentsline {section}{\numberline {3.2}Robustness package}{21}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Submodules}{21}{subsection.3.2.1}
+\contentsline {subsubsection}{Robustness.exception module}{21}{subsubsection*.36}
+\contentsline {subsubsection}{Robustness.input\_parsing module}{21}{subsubsection*.42}
+\contentsline {paragraph}{Notes}{22}{paragraph*.44}
+\contentsline {subsubsection}{Robustness.validation module}{22}{subsubsection*.45}
+\contentsline {subsubsection}{Robustness.warning module}{23}{subsubsection*.56}
+\contentsline {subsection}{\numberline {3.2.2}Module contents}{24}{subsection.3.2.2}
+\contentsline {section}{\numberline {3.3}data\_systematization module}{24}{section.3.3}
+\contentsline {paragraph}{Methods}{25}{paragraph*.66}
+\contentsline {section}{\numberline {3.4}density\_field\_functions module}{26}{section.3.4}
+\contentsline {section}{\numberline {3.5}magnetic\_field\_functions\_2d module}{26}{section.3.5}
+\contentsline {section}{\numberline {3.6}magnetic\_field\_functions\_3d module}{27}{section.3.6}
+\contentsline {section}{\numberline {3.7}model\_observing module}{30}{section.3.7}
+\contentsline {paragraph}{Methods}{31}{paragraph*.81}
+\contentsline {paragraph}{Methods}{33}{paragraph*.94}
+\contentsline {paragraph}{Notes}{33}{paragraph*.96}
+\contentsline {chapter}{\numberline {4}Indices and tables}{35}{chapter.4}
+\contentsline {chapter}{Python Module Index}{37}{section*.97}
+\contentsline {chapter}{Index}{39}{section*.98}

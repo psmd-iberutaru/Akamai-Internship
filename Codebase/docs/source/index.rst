@@ -30,6 +30,8 @@ However, it is suggested to use a standard `Anaconda Distribution <https://www.a
 
    quickstart
 
+   example
+
    modules
 
 Indices and tables

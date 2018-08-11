@@ -118,7 +118,6 @@
                                                 <span class="n">declination</span><span class="p">,</span>
                                                 <span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">)</span>
 
-
         <span class="c1"># Automatically calculate the wrap angle along with the radian version</span>
         <span class="c1"># of the angles.</span>
         <span class="n">ra_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sky_coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">12</span><span class="p">))</span>
@@ -387,15 +386,19 @@
         <span class="c1"># sky.</span>
         <span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">wrap_angle</span> <span class="o">=</span> <span class="n">ra_wrap_angle</span>
         <span class="c1"># Translate the cloud model function.</span>
+
         <span class="k">def</span> <span class="nf">translate_cloud_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">cloud_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">ra_radians</span><span class="p">,</span> <span class="n">z</span><span class="o">-</span><span class="n">dec_radians</span><span class="p">)</span>
         <span class="c1"># Translate the magnetic field function.</span>
+
         <span class="k">def</span> <span class="nf">translate_magnetic_field</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">magnetic_field_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">ra_radians</span><span class="p">,</span> <span class="n">z</span><span class="o">-</span><span class="n">dec_radians</span><span class="p">)</span>
         <span class="c1"># Translate the density model function.</span>
+
         <span class="k">def</span> <span class="nf">translate_density_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">density_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">ra_radians</span><span class="p">,</span> <span class="n">z</span><span class="o">-</span><span class="n">dec_radians</span><span class="p">)</span>
         <span class="c1"># Translate the polarization model function.</span>
+
         <span class="k">def</span> <span class="nf">translate_polarization_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">polarization_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">ra_radians</span><span class="p">,</span> <span class="n">z</span><span class="o">-</span><span class="n">dec_radians</span><span class="p">)</span>
 
@@ -423,7 +426,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Change the wrapping location if necessary. Astropy requires a unit.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">wrap_angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">wrap_angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ra_wrap_angle</span>
 
         <span class="n">ra_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">12</span><span class="p">))</span>
         <span class="n">dec_radians</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
@@ -594,7 +597,6 @@
                 <span class="n">_Backend</span><span class="o">.</span><span class="n">pltcust</span><span class="o">.</span><span class="n">zeroedColorMap</span><span class="p">(</span><span class="n">PuOr_map</span><span class="p">,</span>
                                                 <span class="n">angle</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">angle</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
 
-
             <span class="c1"># Extrapolate and plot a contour based on irregularly spaced data.</span>
             <span class="n">ax1_o</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">x_axis_plot</span><span class="p">,</span> <span class="n">y_axis_plot</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span>
                                     <span class="n">cmap</span><span class="o">=</span><span class="n">intensity_maps</span><span class="p">)</span>
@@ -675,9 +677,10 @@
         <span class="c1"># because the user expects a I_p = I_t * p, while the most efficient</span>
         <span class="c1"># method of implementation (modifying the E-fields), produces a</span>
         <span class="c1"># relationship of I_p = I_t * p**2.</span>
-        <span class="k">def</span> <span class="nf">total_intensity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
-            <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">density_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">total_intensity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">density_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">total</span>
+
         <span class="k">def</span> <span class="nf">polarization_intensity</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
             <span class="n">total</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">density_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
                      <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">polarization_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))))</span>

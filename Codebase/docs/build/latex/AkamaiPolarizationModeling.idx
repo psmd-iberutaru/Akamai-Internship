@@ -1,95 +1,95 @@
-\indexentry{Backend.Ewertowski\_Basu\_2013 (module)|hyperpage}{5}
-\indexentry{Ewer\_Basu\_\_B\_r() (in module Backend.Ewertowski\_Basu\_2013)|hyperpage}{5}
-\indexentry{Ewer\_Basu\_\_B\_z() (in module Backend.Ewertowski\_Basu\_2013)|hyperpage}{5}
-\indexentry{Ewer\_Basu\_\_eigenvalues() (in module Backend.Ewertowski\_Basu\_2013)|hyperpage}{6}
-\indexentry{bessel\_zeros() (in module Backend.Ewertowski\_Basu\_2013)|hyperpage}{6}
-\indexentry{Backend.astronomical\_coordinates (module)|hyperpage}{6}
-\indexentry{angle\_normalization\_0\_2pi() (in module Backend.astronomical\_coordinates)|hyperpage}{6}
-\indexentry{auto\_ra\_wrap\_angle() (in module Backend.astronomical\_coordinates)|hyperpage}{6}
-\indexentry{Backend.cloud\_line\_integration (module)|hyperpage}{7}
-\indexentry{cloud\_line\_integral() (in module Backend.cloud\_line\_integration)|hyperpage}{7}
-\indexentry{line\_integral\_boundaries() (in module Backend.cloud\_line\_integration)|hyperpage}{8}
-\indexentry{Backend.coordinate\_system\_transformation (module)|hyperpage}{8}
-\indexentry{cartesian\_to\_cylindrical\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{8}
-\indexentry{cartesian\_to\_polar\_2d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{9}
-\indexentry{cartesian\_to\_spherical\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{9}
-\indexentry{cylindrical\_to\_cartesian\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{9}
-\indexentry{cylindrical\_to\_spherical\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{10}
-\indexentry{polar\_to\_cartesian\_2d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{10}
-\indexentry{spherical\_to\_cartesian\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{10}
-\indexentry{spherical\_to\_cylindrical\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{10}
-\indexentry{Backend.electromagnetic\_field\_polarization (module)|hyperpage}{11}
-\indexentry{Stokes\_parameters\_from\_field() (in module Backend.electromagnetic\_field\_polarization)|hyperpage}{11}
-\indexentry{angle\_from\_Stokes\_parameters() (in module Backend.electromagnetic\_field\_polarization)|hyperpage}{12}
-\indexentry{electric\_to\_magnetic() (in module Backend.electromagnetic\_field\_polarization)|hyperpage}{12}
-\indexentry{magnetic\_to\_electric() (in module Backend.electromagnetic\_field\_polarization)|hyperpage}{12}
-\indexentry{Backend.plotting\_customization (module)|hyperpage}{13}
-\indexentry{shiftedColorMap() (in module Backend.plotting\_customization)|hyperpage}{13}
-\indexentry{zeroedColorMap() (in module Backend.plotting\_customization)|hyperpage}{13}
-\indexentry{Backend.table\_interpolation (module)|hyperpage}{14}
-\indexentry{funt\_interpolate\_scalar\_table() (in module Backend.table\_interpolation)|hyperpage}{14}
-\indexentry{funt\_interpolate\_vector\_table() (in module Backend.table\_interpolation)|hyperpage}{14}
-\indexentry{Backend (module)|hyperpage}{15}
-\indexentry{Robustness.exception (module)|hyperpage}{15}
-\indexentry{AstronomyError|hyperpage}{15}
-\indexentry{InputError|hyperpage}{15}
-\indexentry{OutputError|hyperpage}{15}
-\indexentry{ShapeError|hyperpage}{15}
-\indexentry{TerminateError|hyperpage}{15}
-\indexentry{Robustness.input\_parsing (module)|hyperpage}{15}
-\indexentry{user\_equation\_parse() (in module Robustness.input\_parsing)|hyperpage}{15}
-\indexentry{Robustness.validation (module)|hyperpage}{16}
-\indexentry{validate\_boolean\_array() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_boolean\_value() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_float\_array() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_float\_value() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_function\_call() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_int\_array() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_int\_value() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_list() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_string() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{validate\_tuple() (in module Robustness.validation)|hyperpage}{16}
-\indexentry{Robustness.warning (module)|hyperpage}{17}
-\indexentry{AstronomyWarning|hyperpage}{17}
-\indexentry{DangerWarning|hyperpage}{17}
-\indexentry{InputWarning|hyperpage}{17}
-\indexentry{OutputWarning|hyperpage}{17}
-\indexentry{PhysicalityWarning|hyperpage}{17}
-\indexentry{PhysicsWarning|hyperpage}{17}
-\indexentry{TimeWarning|hyperpage}{17}
-\indexentry{kyubey\_warning() (in module Robustness.warning)|hyperpage}{17}
-\indexentry{Robustness (module)|hyperpage}{18}
-\indexentry{data\_systematization (module)|hyperpage}{18}
-\indexentry{InterpolationTable (class in data\_systematization)|hyperpage}{18}
-\indexentry{\_\_init\_\_() (data\_systematization.InterpolationTable method)|hyperpage}{19}
-\indexentry{numerical\_function() (data\_systematization.InterpolationTable method)|hyperpage}{19}
-\indexentry{density\_field\_functions (module)|hyperpage}{20}
-\indexentry{magnetic\_field\_functions\_2d (module)|hyperpage}{20}
-\indexentry{circular\_magnetic\_field\_cart\_2d() (in module magnetic\_field\_functions\_2d)|hyperpage}{20}
-\indexentry{hourglass\_magnetic\_field\_cart\_2d() (in module magnetic\_field\_functions\_2d)|hyperpage}{20}
-\indexentry{magnetic\_field\_functions\_3d (module)|hyperpage}{21}
-\indexentry{circular\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{21}
-\indexentry{hourglass\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{21}
-\indexentry{hourglass\_magnetic\_field\_cyln\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{22}
-\indexentry{linear\_combination\_magnetic\_field() (in module magnetic\_field\_functions\_3d)|hyperpage}{23}
-\indexentry{monopole\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{23}
-\indexentry{monopole\_magnetic\_field\_sphr\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{23}
-\indexentry{model\_observing (module)|hyperpage}{24}
-\indexentry{ObservingRun (class in model\_observing)|hyperpage}{24}
-\indexentry{observe\_target (model\_observing.ObservingRun.self attribute)|hyperpage}{24}
-\indexentry{sightline (model\_observing.ObservingRun.self attribute)|hyperpage}{24}
-\indexentry{field\_of\_view (model\_observing.ObservingRun.self attribute)|hyperpage}{24}
-\indexentry{Stokes\_parameter\_contours() (model\_observing.ObservingRun method)|hyperpage}{25}
-\indexentry{\_\_init\_\_() (model\_observing.ObservingRun method)|hyperpage}{25}
-\indexentry{ProtostarModel (class in model\_observing)|hyperpage}{25}
-\indexentry{coordinates (model\_observing.ProtostarModel.self attribute)|hyperpage}{25}
-\indexentry{cloud\_model (model\_observing.ProtostarModel.self attribute)|hyperpage}{26}
-\indexentry{magnetic\_field (model\_observing.ProtostarModel.self attribute)|hyperpage}{26}
-\indexentry{density\_model (model\_observing.ProtostarModel.self attribute)|hyperpage}{26}
-\indexentry{polarization\_model (model\_observing.ProtostarModel.self attribute)|hyperpage}{26}
-\indexentry{\_\_init\_\_() (model\_observing.ProtostarModel method)|hyperpage}{26}
-\indexentry{Sightline (class in model\_observing)|hyperpage}{26}
-\indexentry{coordinates (model\_observing.Sightline.self attribute)|hyperpage}{26}
-\indexentry{sightline\_parameters() (model\_observing.Sightline method)|hyperpage}{27}
-\indexentry{\_\_init\_\_() (model\_observing.Sightline method)|hyperpage}{27}
-\indexentry{sightline\_parameters() (model\_observing.Sightline method)|hyperpage}{27}
+\indexentry{Backend.Ewertowski\_Basu\_2013 (module)|hyperpage}{11}
+\indexentry{Ewer\_Basu\_\_B\_r() (in module Backend.Ewertowski\_Basu\_2013)|hyperpage}{11}
+\indexentry{Ewer\_Basu\_\_B\_z() (in module Backend.Ewertowski\_Basu\_2013)|hyperpage}{11}
+\indexentry{Ewer\_Basu\_\_eigenvalues() (in module Backend.Ewertowski\_Basu\_2013)|hyperpage}{12}
+\indexentry{bessel\_zeros() (in module Backend.Ewertowski\_Basu\_2013)|hyperpage}{12}
+\indexentry{Backend.astronomical\_coordinates (module)|hyperpage}{12}
+\indexentry{angle\_normalization\_0\_2pi() (in module Backend.astronomical\_coordinates)|hyperpage}{12}
+\indexentry{auto\_ra\_wrap\_angle() (in module Backend.astronomical\_coordinates)|hyperpage}{12}
+\indexentry{Backend.cloud\_line\_integration (module)|hyperpage}{13}
+\indexentry{cloud\_line\_integral() (in module Backend.cloud\_line\_integration)|hyperpage}{13}
+\indexentry{line\_integral\_boundaries() (in module Backend.cloud\_line\_integration)|hyperpage}{14}
+\indexentry{Backend.coordinate\_system\_transformation (module)|hyperpage}{14}
+\indexentry{cartesian\_to\_cylindrical\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{14}
+\indexentry{cartesian\_to\_polar\_2d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{15}
+\indexentry{cartesian\_to\_spherical\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{15}
+\indexentry{cylindrical\_to\_cartesian\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{15}
+\indexentry{cylindrical\_to\_spherical\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{16}
+\indexentry{polar\_to\_cartesian\_2d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{16}
+\indexentry{spherical\_to\_cartesian\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{16}
+\indexentry{spherical\_to\_cylindrical\_3d() (in module Backend.coordinate\_system\_transformation)|hyperpage}{16}
+\indexentry{Backend.electromagnetic\_field\_polarization (module)|hyperpage}{17}
+\indexentry{Stokes\_parameters\_from\_field() (in module Backend.electromagnetic\_field\_polarization)|hyperpage}{17}
+\indexentry{angle\_from\_Stokes\_parameters() (in module Backend.electromagnetic\_field\_polarization)|hyperpage}{18}
+\indexentry{electric\_to\_magnetic() (in module Backend.electromagnetic\_field\_polarization)|hyperpage}{18}
+\indexentry{magnetic\_to\_electric() (in module Backend.electromagnetic\_field\_polarization)|hyperpage}{18}
+\indexentry{Backend.plotting\_customization (module)|hyperpage}{19}
+\indexentry{shiftedColorMap() (in module Backend.plotting\_customization)|hyperpage}{19}
+\indexentry{zeroedColorMap() (in module Backend.plotting\_customization)|hyperpage}{19}
+\indexentry{Backend.table\_interpolation (module)|hyperpage}{20}
+\indexentry{funt\_interpolate\_scalar\_table() (in module Backend.table\_interpolation)|hyperpage}{20}
+\indexentry{funt\_interpolate\_vector\_table() (in module Backend.table\_interpolation)|hyperpage}{20}
+\indexentry{Backend (module)|hyperpage}{21}
+\indexentry{Robustness.exception (module)|hyperpage}{21}
+\indexentry{AstronomyError|hyperpage}{21}
+\indexentry{InputError|hyperpage}{21}
+\indexentry{OutputError|hyperpage}{21}
+\indexentry{ShapeError|hyperpage}{21}
+\indexentry{TerminateError|hyperpage}{21}
+\indexentry{Robustness.input\_parsing (module)|hyperpage}{21}
+\indexentry{user\_equation\_parse() (in module Robustness.input\_parsing)|hyperpage}{21}
+\indexentry{Robustness.validation (module)|hyperpage}{22}
+\indexentry{validate\_boolean\_array() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_boolean\_value() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_float\_array() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_float\_value() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_function\_call() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_int\_array() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_int\_value() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_list() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_string() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{validate\_tuple() (in module Robustness.validation)|hyperpage}{22}
+\indexentry{Robustness.warning (module)|hyperpage}{23}
+\indexentry{AstronomyWarning|hyperpage}{23}
+\indexentry{DangerWarning|hyperpage}{23}
+\indexentry{InputWarning|hyperpage}{23}
+\indexentry{OutputWarning|hyperpage}{23}
+\indexentry{PhysicalityWarning|hyperpage}{23}
+\indexentry{PhysicsWarning|hyperpage}{23}
+\indexentry{TimeWarning|hyperpage}{23}
+\indexentry{kyubey\_warning() (in module Robustness.warning)|hyperpage}{23}
+\indexentry{Robustness (module)|hyperpage}{24}
+\indexentry{data\_systematization (module)|hyperpage}{24}
+\indexentry{InterpolationTable (class in data\_systematization)|hyperpage}{24}
+\indexentry{\_\_init\_\_() (data\_systematization.InterpolationTable method)|hyperpage}{25}
+\indexentry{numerical\_function() (data\_systematization.InterpolationTable method)|hyperpage}{25}
+\indexentry{density\_field\_functions (module)|hyperpage}{26}
+\indexentry{magnetic\_field\_functions\_2d (module)|hyperpage}{26}
+\indexentry{circular\_magnetic\_field\_cart\_2d() (in module magnetic\_field\_functions\_2d)|hyperpage}{26}
+\indexentry{hourglass\_magnetic\_field\_cart\_2d() (in module magnetic\_field\_functions\_2d)|hyperpage}{26}
+\indexentry{magnetic\_field\_functions\_3d (module)|hyperpage}{27}
+\indexentry{circular\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{27}
+\indexentry{hourglass\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{27}
+\indexentry{hourglass\_magnetic\_field\_cyln\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{28}
+\indexentry{linear\_combination\_magnetic\_field() (in module magnetic\_field\_functions\_3d)|hyperpage}{29}
+\indexentry{monopole\_magnetic\_field\_cart\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{29}
+\indexentry{monopole\_magnetic\_field\_sphr\_3d() (in module magnetic\_field\_functions\_3d)|hyperpage}{29}
+\indexentry{model\_observing (module)|hyperpage}{30}
+\indexentry{ObservingRun (class in model\_observing)|hyperpage}{30}
+\indexentry{observe\_target (model\_observing.ObservingRun.self attribute)|hyperpage}{30}
+\indexentry{sightline (model\_observing.ObservingRun.self attribute)|hyperpage}{30}
+\indexentry{field\_of\_view (model\_observing.ObservingRun.self attribute)|hyperpage}{30}
+\indexentry{Stokes\_parameter\_contours() (model\_observing.ObservingRun method)|hyperpage}{31}
+\indexentry{\_\_init\_\_() (model\_observing.ObservingRun method)|hyperpage}{31}
+\indexentry{ProtostarModel (class in model\_observing)|hyperpage}{31}
+\indexentry{coordinates (model\_observing.ProtostarModel.self attribute)|hyperpage}{31}
+\indexentry{cloud\_model (model\_observing.ProtostarModel.self attribute)|hyperpage}{32}
+\indexentry{magnetic\_field (model\_observing.ProtostarModel.self attribute)|hyperpage}{32}
+\indexentry{density\_model (model\_observing.ProtostarModel.self attribute)|hyperpage}{32}
+\indexentry{polarization\_model (model\_observing.ProtostarModel.self attribute)|hyperpage}{32}
+\indexentry{\_\_init\_\_() (model\_observing.ProtostarModel method)|hyperpage}{32}
+\indexentry{Sightline (class in model\_observing)|hyperpage}{32}
+\indexentry{coordinates (model\_observing.Sightline.self attribute)|hyperpage}{32}
+\indexentry{sightline\_parameters() (model\_observing.Sightline method)|hyperpage}{33}
+\indexentry{\_\_init\_\_() (model\_observing.Sightline method)|hyperpage}{33}
+\indexentry{sightline\_parameters() (model\_observing.Sightline method)|hyperpage}{33}

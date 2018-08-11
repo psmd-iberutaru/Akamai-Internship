@@ -79,7 +79,6 @@ class Sightline():
                                                 declination,
                                                 frame='icrs')
 
-
         # Automatically calculate the wrap angle along with the radian version
         # of the angles.
         ra_radians = float(sky_coordinates.ra.hour * (np.pi / 12))
@@ -348,17 +347,21 @@ class ProtostarModel():
         # sky.
         coordinates.ra.wrap_angle = ra_wrap_angle
         # Translate the cloud model function.
+
         def translate_cloud_model(x, y, z):
-            return cloud_model(x, y - ra_radians, z-dec_radians)
+            return cloud_model(x, y - ra_radians, z - dec_radians)
         # Translate the magnetic field function.
+
         def translate_magnetic_field(x, y, z):
-            return magnetic_field_model(x, y - ra_radians, z-dec_radians)
+            return magnetic_field_model(x, y - ra_radians, z - dec_radians)
         # Translate the density model function.
+
         def translate_density_model(x, y, z):
-            return density_model(x, y - ra_radians, z-dec_radians)
+            return density_model(x, y - ra_radians, z - dec_radians)
         # Translate the polarization model function.
+
         def translate_polarization_model(x, y, z):
-            return polarization_model(x, y - ra_radians, z-dec_radians)
+            return polarization_model(x, y - ra_radians, z - dec_radians)
 
         self.coordinates = coordinates
         self.cloud_model = translate_cloud_model
@@ -384,7 +387,7 @@ class ProtostarModel():
         """
 
         # Change the wrapping location if necessary. Astropy requires a unit.
-        self.coordinates.ra.wrap_angle = self._ra_wrap_angle 
+        self.coordinates.ra.wrap_angle = self._ra_wrap_angle
 
         ra_radians = float(self.coordinates.ra.hour * (np.pi / 12))
         dec_radians = float(self.coordinates.dec.radian)
@@ -555,7 +558,6 @@ class ObservingRun():
                 _Backend.pltcust.zeroedColorMap(PuOr_map,
                                                 angle.min(), angle.max())
 
-
             # Extrapolate and plot a contour based on irregularly spaced data.
             ax1_o = ax1.tricontourf(x_axis_plot, y_axis_plot, I, 50,
                                     cmap=intensity_maps)
@@ -636,9 +638,10 @@ class ObservingRun():
         # because the user expects a I_p = I_t * p, while the most efficient
         # method of implementation (modifying the E-fields), produces a
         # relationship of I_p = I_t * p**2.
-        def total_intensity(x,y,z):
-            total = self.target.density_model(x,y,z)
+        def total_intensity(x, y, z):
+            total = self.target.density_model(x, y, z)
             return total
+
         def polarization_intensity(x, y, z):
             total = (self.target.density_model(x, y, z)
                      * np.sqrt(np.abs(self.target.polarization_model(x, y, z))))

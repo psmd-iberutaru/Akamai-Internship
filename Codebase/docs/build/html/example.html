@@ -1,0 +1,178 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Example &#8212; Akamai Polarization Modeling 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Active_Codebase" href="modules.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="Active_Codebase"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quickstart"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="example">
+<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h1>
+<p>This is the example from the <span class="xref std std-doc">~.quickstart</span> guide function.</p>
+<p>The combined code block of that guide is below.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">astropy</span> <span class="k">as</span> <span class="nn">ap</span>
+<span class="kn">import</span> <span class="nn">astropy.coordinates</span> <span class="k">as</span> <span class="nn">ap_coord</span>
+
+<span class="kn">import</span> <span class="nn">model_observing</span> <span class="k">as</span> <span class="nn">m_obs</span>
+
+<span class="c1"># Making the coordinate input, should be an Astropy SkyCoord class.</span>
+<span class="n">sky_coordinates</span> <span class="o">=</span> <span class="n">ap_coord</span><span class="o">.</span><span class="n">SkyCoord</span><span class="p">(</span><span class="s1">&#39;00h00m00.00s&#39;</span><span class="p">,</span><span class="s1">&#39;00d00m00.00s&#39;</span><span class="p">,</span><span class="n">frame</span><span class="o">=</span><span class="s1">&#39;icrs&#39;</span><span class="p">)</span>
+
+<span class="c1"># Making a cloud function, a sphere in this case. Note that the units</span>
+<span class="c1"># are in angular space, and thus the unit of circle is radians.</span>
+<span class="k">def</span> <span class="nf">cloud_equation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1"># Making a magnetic field that is uniform in one direction. Consider a</span>
+<span class="c1"># field that is always 0i + 1j + 2k.</span>
+<span class="k">def</span> <span class="nf">magnetic_field</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">Bfield_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">Bfield_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">Bfield_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Bfield_x</span><span class="p">,</span><span class="n">Bfield_y</span><span class="p">,</span><span class="n">Bfield_z</span>
+
+<span class="c1"># Making a density function of a 1/r**2 profile.</span>
+<span class="k">def</span> <span class="nf">density_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">])</span>
+
+    <span class="c1"># The above line is a faster implementation of the following.</span>
+    <span class="c1"># density = 1/(x**2 + y**2 + z**2)</span>
+
+    <span class="k">return</span> <span class="n">density</span>
+
+<span class="c1"># Making a polarization function of a 1/r**2 profile.</span>
+<span class="k">def</span> <span class="nf">polarization_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">polarization</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">])</span>
+
+    <span class="c1"># The above line is a faster implementation of the following.</span>
+    <span class="c1"># polarization = 1/(x**2 + y**2 + z**2)</span>
+
+    <span class="k">return</span> <span class="n">polarization</span>
+
+<span class="c1"># Create the protostar class.</span>
+<span class="n">protostar</span> <span class="o">=</span> <span class="n">m_obs</span><span class="o">.</span><span class="n">ProtostarModel</span><span class="p">(</span><span class="n">sky_coordinates</span><span class="p">,</span>
+                                 <span class="n">cloud_equation</span><span class="p">,</span>
+                                 <span class="n">magnetic_field</span><span class="p">,</span>
+                                 <span class="n">density_function</span><span class="p">,</span>
+                                 <span class="n">polarization_function</span><span class="p">)</span>
+
+
+<span class="c1"># Creating the Sightline class using the SkyCoord class.</span>
+<span class="n">sightline</span> <span class="o">=</span> <span class="n">m_obs</span><span class="o">.</span><span class="n">Sightline</span><span class="p">(</span><span class="s1">&#39;00h00m00&#39;</span><span class="p">,</span> <span class="s1">&#39;00d00m00&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Define the field of view of the observation, in radians as the total</span>
+<span class="c1"># length of the observation square.</span>
+<span class="n">field_of_view</span> <span class="o">=</span> <span class="mf">0.015</span>
+
+<span class="n">observing_run</span> <span class="o">=</span> <span class="n">m_obs</span><span class="o">.</span><span class="n">ObservingRun</span><span class="p">(</span><span class="n">protostar</span><span class="p">,</span><span class="n">sightline</span><span class="p">,</span><span class="n">field_of_view</span><span class="p">)</span>
+
+<span class="c1"># Decide on the resolution of the data observed, this sets the number of</span>
+<span class="c1"># data points on one axis.</span>
+<span class="n">axis_resolution</span> <span class="o">=</span> <span class="mi">30</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">observing_run</span><span class="o">.</span><span class="n">Stokes_parameter_contours</span><span class="p">(</span>
+    <span class="n">n_axial_samples</span><span class="o">=</span><span class="n">axis_resolution</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">Quickstart</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="next chapter">Active_Codebase</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/example.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="Active_Codebase"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quickstart"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Akamai Polarization Modeling 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Kyubey.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>
